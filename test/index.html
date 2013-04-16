@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Validator Tests</title>
+    <link rel="stylesheet" href="qunit/qunit.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">
+
+<form id="form">
+    <input type="text" name="username" id="username" data-rule="required">
+</form>
+
+<form id="form_normal">
+    <input type="text" name="field1">
+    <input type="text" name="field2">
+    <input type="checkbox" name="checkbox" value="1">
+    <input type="checkbox" name="checkbox" value="2">
+    <input type="checkbox" name="checkbox" value="3">
+</form>
+
+<form id="form_submit">
+    <input type="text" name="username" data-rule="required">
+    <input type="text" name="password" data-rule="required">
+    <button type="submit" id="submit">Submit</button>
+</form>
+
+</div>
+
+
+<script src="../../static/jquery-1.7.2.js"></script>
+<script src="../validator.js"></script>
+<script src="../validator-zh-CN.js"></script>
+<script src="qunit/qunit.js"></script>
+<!-- tests begin -->
+<script>
+    function initForm (){
+        $('form').find(':input[data-rule]').each(function(){
+            $(this).attr('data-cacherule', $(this).attr('data-rule'));
+        });
+    }
+    initForm();
+
+    function resetForm(form){
+        $(form).find(':input[data-cacherule]').each(function(){
+            $(this).attr('data-rule', $(this).attr('data-cacherule'));
+        });
+    }
+</script>
+<script src="unit/core.js"></script>
+<script src="unit/rules.js"></script>
+</body>
+</html>
