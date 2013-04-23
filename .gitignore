@@ -1,0 +1,12 @@
+Thumbs.db
+.DS_Store
+.git
+.idea
+.sass-cache
+.cache
+.tmproj
+.project
+*.esproj
+*.sublime-project
+*.sublime-workspace
+*.bak
