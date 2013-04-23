@@ -104,7 +104,6 @@
         },
         'simple_bottom': {
             formClass: 'n-simple',
-            //msgTemplate: '<div>{#msg}</div>',
             msgClass: 'n-bottom',
             msgStyle: 'margin-top:5px;'
         },
