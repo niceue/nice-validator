@@ -1,21 +1,21 @@
 
-@mixin theme($color:null, $bg-color:#fff, $bd-color:#FFBB76, $sd-color:null){
-	@if color != null {
+theme($color=null, $bg_color=#fff, $bd_color=#FFBB76, $sd_color=null){
+	if color != null {
         color: $color;
     }
-	background-color: $bg-color;
-	border-color: $bd-color;
-	@if $sd-color != null {
-        box-shadow: 0 1px 3px #{$sd-color};
+	background-color: $bg_color;
+	border-color: $bd_color;
+	if $sd_color != null {
+        box-shadow: 0 1px 3px $sd_color;
     }
 	.n-arrow {
 		b {
-			color: $bd-color;
-			@if $sd-color != null {
-                text-shadow: 0 0 2px #{$sd-color};
+			color: $bd_color;
+			if $sd_color != null {
+                text-shadow: 0 0 2px $sd_color;
             }
 		}
-		i {color: $bg-color;}
+		i {color: $bg_color;}
 	}
 }
 
@@ -154,7 +154,7 @@
         padding: 4px 6px;
         font-size: 12px;
         border: 1px solid transparent;
-        @include theme(#DB7C22, #FFFCEF, #FFBB76, #ddd);
+        theme(#DB7C22, #FFFCEF, #FFBB76, #ddd);
         border-radius: 2px;
 
         .n-icon {
@@ -162,7 +162,7 @@
         }
     }
     .n-tip, .n-ok, .n-loading {
-        @include theme(#333, #f8fdff, #ddd, #ddd);
+        theme(#333, #f8fdff, #ddd, #ddd);
     }
     .n-tip {
         .n-icon {display:none;}
