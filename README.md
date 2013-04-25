@@ -1,2 +1,2 @@
 # validator
-Simple, smart, Pleasant verification solution.
+Simple, smart and pleasant verification solution.

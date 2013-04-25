@@ -4,11 +4,11 @@ var fs = require('fs'),
     U2 = require("uglify-js"),
     stylus = require('stylus');
 
-var NS = 'validator',
-    VERSION = '1.0',
-    COPYRIGHT = '/*! Nice Validator '+ VERSION +'\n'
-              + '* (c) 2012-2013 Jony Zhang (www.niceue.com), MIT Licensed\n'
-              + '* http://niceue.github.io/validator\n'
+var pkg = JSON.parse(fs.readFileSync(__dirname + '/package.json')),
+    NS = 'validator',
+    COPYRIGHT = '/*! '+ pkg.name +' '+ pkg.version +'\n'
+              + '* (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
+              + '* '+ pkg.homepage +'\n'
               + '*/',
     js = fs.readFileSync(__dirname + '/src/'+ NS +'.js').toString(),
     css = fs.readFileSync(__dirname + '/src/'+ NS +'.styl').toString();

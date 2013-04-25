@@ -1,6 +1,6 @@
 {
-    "name": "validator",
-    "description": "Simple, smart, Pleasant verification solution.",
+    "name": "Nice Validator",
+    "description": "Simple, smart and pleasant verification solution.",
     "version": "1.0.0",
     "keywords": ["validator", "js"],
     "homepage": "http://niceue.github.io/validator/",
