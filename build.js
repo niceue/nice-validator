@@ -10,8 +10,8 @@ var NS = 'validator',
               + '* (c) 2012-2013 Jony Zhang (www.niceue.com), MIT Licensed\n'
               + '* http://niceue.github.io/validator\n'
               + '*/',
-    js = fs.readFileSync(__dirname + '/'+ NS +'.js').toString(),
-    css = fs.readFileSync(__dirname + '/'+ NS +'.styl').toString();
+    js = fs.readFileSync(__dirname + '/src/'+ NS +'.js').toString(),
+    css = fs.readFileSync(__dirname + '/src/'+ NS +'.styl').toString();
     
 console.log('building and minifying...');
 buildJS(js, NS + '.js');
@@ -35,7 +35,7 @@ function buildJS(js, name) {
     ast.mangle_names();
 
     code = ast.print_to_string();
-    fs.writeFile(__dirname + '/../' + name, COPYRIGHT + '\n' + code);
+    fs.writeFile(__dirname + '/' + name, COPYRIGHT + '\n' + code);
 }
 
 function buildCSS(css, name) {
@@ -44,6 +44,6 @@ function buildCSS(css, name) {
         .set('compress', true)
         .render(function(err, css){
             if (err) throw err;
-            fs.writeFile(__dirname + '/../' + name, COPYRIGHT + '\n' + css);
+            fs.writeFile(__dirname + '/' + name, COPYRIGHT + '\n' + css);
         });
 }
