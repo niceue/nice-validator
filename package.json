@@ -1,0 +1,25 @@
+{
+    "name": "validator",
+    "description": "Simple, smart, Pleasant verification solution.",
+    "version": "1.0.0",
+    "keywords": ["validator", "js"],
+    "homepage": "http://niceue.github.io/validator/",
+    "author": "Jony Zhang <zj86@live.cn>",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/niceue/validator.git"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://niceue.github.com/validator/LICENSE"
+        }
+    ],
+    "engine": [
+        "node >=0.8.0"
+    ],
+    "dependencies": {
+        "uglify-js": ">= 2.2.0",
+        "stylus": ">= 0.32.0"
+    }
+}

@@ -1,5 +1,6 @@
 Thumbs.db
 .DS_Store
+node_modules
 .git
 .idea
 .sass-cache
