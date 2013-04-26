@@ -1,13 +1,14 @@
+node_modules
 Thumbs.db
 .DS_Store
-node_modules
-.git
-.idea
 .sass-cache
 .cache
 .tmproj
 .project
+.settings
 *.esproj
 *.sublime-project
 *.sublime-workspace
+*.patch
+*.diff
 *.bak
