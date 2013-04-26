@@ -1,7 +1,7 @@
-/*! Nice Validator 1.0
- * (c) 2012-2013 Jony Zhang (www.niceue.com), MIT Licensed
- * http://niceue.github.io/validator
- */
+/*! Validator 1.0.0-pre
+* (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
+* http://niceue.github.io/validator/
+*/
 /*jshint browser:true, evil:true*/
 (function($, undefined) {
     "use strict";
@@ -131,8 +131,7 @@
     };
 
     function Validator(element, options) {
-        var me = this,
-            opt, theme = opt.theme;
+        var me = this, opt, theme;
         if (!me instanceof Validator) return new Validator(element, options);
         me.$el = $(element);
         if (isFunction(options)) {
@@ -141,6 +140,7 @@
             };
         }
         opt = me.options = $.extend({}, defaults, options);
+        theme = opt.theme;
         if (theme && themes[theme]) {
             opt = $.extend(opt, themes[theme], options);
         }
@@ -1047,9 +1047,9 @@
 
         /** 远程验证
          *  适配3种结果(前面为成功，后面为失败):
-                1.返回text: 
+                1.返回text:
                     ''  '错误消息'
-                2.返回json: 
+                2.返回json:
                     {"ok": ""}  {"error": "错误消息"}
                 3.json包装格式:
                     {"status": 1, "ok": ""}  {"status": 1, "error": "错误消息"}

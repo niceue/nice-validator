@@ -107,22 +107,22 @@ test('integer', function(){
     F = $el.val('test').isValid();
     ok( F === false, 'integer');
     //integer[+]
-    obj.updateField({field1: 'integer[+]'});
+    obj.setField({field1: 'integer[+]'});
     F = $el.val('0').isValid();
     T  = $el.val('1').isValid();
     ok( T === true && F === false, 'integer[+]');
     //integer[+0]
-    obj.updateField({field1: 'integer[+0]'});
+    obj.setField({field1: 'integer[+0]'});
     F = $el.val('-1').isValid();
     T  = $el.val('0').isValid();
     ok( T === true && F === false, 'integer[+0]');
     //integer[-]
-    obj.updateField({field1: 'integer[-]'});
+    obj.setField({field1: 'integer[-]'});
     F = $el.val('0').isValid();
     T  = $el.val('-1').isValid();
     ok( T === true && F === false, 'integer[-]');
     //integer[-0]
-    obj.updateField({field1: 'integer[-0]'});
+    obj.setField({field1: 'integer[-0]'});
     F = $el.val('1').isValid();
     T  = $el.val('0').isValid();
     ok( T === true && F === false, 'integer[-0]');
@@ -152,22 +152,22 @@ test('match', function(){
     $el1.val('10');
 
     //match[lt, field1]
-    obj.updateField({field2: 'match[lt, field1]'});
+    obj.setField({field2: 'match[lt, field1]'});
     F = $el2.val('11').isValid();
     T = $el2.val('9').isValid();
     ok( T === true && F === false, 'match[lt, field1]');
     //match[lte, field1]
-    obj.updateField({field2: 'match[lte, field1]'});
+    obj.setField({field2: 'match[lte, field1]'});
     F = $el2.val('11').isValid();
     T = $el2.val('10').isValid();
     ok( T === true && F === false, 'match[lte, field1]');
     //match[gt, field1]
-    obj.updateField({field2: 'match[gt, field1]'});
+    obj.setField({field2: 'match[gt, field1]'});
     F = $el2.val('9').isValid();
     T = $el2.val('11').isValid();
     ok( T === true && F === false, 'match[gt, field1]');
     //match[gte, field1]
-    obj.updateField({field2: 'match[gte, field1]'});
+    obj.setField({field2: 'match[gte, field1]'});
     F = $el2.val('9').isValid();
     T = $el2.val('10').isValid();
     ok( T === true && F === false, 'match[gte, field1]');
@@ -191,12 +191,12 @@ test('range', function(){
     T = $el.val('0').isValid();
     ok( T === true && F === false, 'range[0~99]');
     //range[0~]
-    obj.updateField({field1: 'range[0~]'});
+    obj.setField({field1: 'range[0~]'});
     F = $el.val('-1').isValid();
     T = $el.val('0').isValid();
     ok( T === true && F === false, 'range[0~]');
     //range[~99]
-    obj.updateField({field1: 'range[~99]'});
+    obj.setField({field1: 'range[~99]'});
     F = $el.val('100').isValid();
     T = $el.val('99').isValid();
     ok( T === true && F === false, 'range[~99]');
@@ -222,24 +222,24 @@ test('checked', function(){
     T = $els.eq(0).prop('checked', true).isValid();
     ok( T === true && F === false, 'checked');
     //checked[2~3]
-    obj.updateField({checkbox: 'checked[2~3]'});
+    obj.setField({checkbox: 'checked[2~3]'});
     F = $els.eq(0).isValid();
     T = $els.eq(1).prop('checked', true).isValid();
     ok( T === true && F === false, 'checked[2~3]');
     //checked[2~]
-    obj.updateField({checkbox: 'checked[2~]'});
+    obj.setField({checkbox: 'checked[2~]'});
     $els.prop('checked', false).eq(0).prop('checked', true);
     F = $els.eq(0).isValid();
     T = $els.eq(1).prop('checked', true).isValid();
     ok( T === true && F === false, 'checked[2~]');
     //checked[~2]
-    obj.updateField({checkbox: 'checked[~2]'});
+    obj.setField({checkbox: 'checked[~2]'});
     $els.prop('checked', true);
     F = $els.eq(0).isValid();
     T = $els.eq(0).prop('checked', false).isValid();
     ok( T === true && F === false, 'checked[~2]');
     //checked[2]
-    obj.updateField({checkbox: 'checked[2]'});
+    obj.setField({checkbox: 'checked[2]'});
     $els.prop('checked', true);
     F = $els.eq(0).isValid();
     T = $els.eq(0).prop('checked', false).isValid();
@@ -264,17 +264,17 @@ test('length', function(){
     T = $el.val('1234').isValid();
     ok( T === true && F === false, 'length[4~10]');
     //length[4~]
-    obj.updateField({field1: 'length[4~]'});
+    obj.setField({field1: 'length[4~]'});
     F = $el.val('123').isValid();
     T = $el.val('1234').isValid();
     ok( T === true && F === false, 'length[4~]');
     //length[~4]
-    obj.updateField({field1: 'length[~4]'});
+    obj.setField({field1: 'length[~4]'});
     F = $el.val('12345').isValid();
     T = $el.val('1234').isValid();
     ok( T === true && F === false, 'length[~4]');
     //length[~4, true]
-    obj.updateField({field1: 'length[~4, true]'});
+    obj.setField({field1: 'length[~4, true]'});
     F = $el.val('测试1').isValid();
     T = $el.val('测试').isValid();
     ok( T === true && F === false, 'length[~4, true]');

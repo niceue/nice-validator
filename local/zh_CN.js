@@ -1,7 +1,4 @@
-/*! Nice Validator 1.0
- * (c) 2012-2013 Jony Zhang (www.niceue.com), MIT Licensed
- *
- *********************************
+/*********************************
  * 主题，规则定义，以及国际化支持
  *********************************/
 (function ($) {
@@ -34,9 +31,9 @@
             accept: function(element, params){
                 if (!params) return;
                 var ext = params[0];
-                if (ext === '*') return;
-                ext = params ? ext.replace(/,/g, '|') : "png|jpg|jpeg|gif";
-                return (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) || this.renderMsg("只接受{1}后缀", ext.replace(',', '、'));
+                return (ext === '*') 
+                    || (new RegExp(".(?:" + (ext || "png|jpg|jpeg|gif") + ")$", "i")).test(element.value) 
+                    || this.renderMsg("只接受{1}后缀", ext.replace('|', ','));
             }
         }
     });
@@ -90,13 +87,6 @@
      */
     var TPL_ARROW = '<span class="n-arrow"><b>◆</b><i>◆</i></span>';
     $.validator.setTheme({
-        'default': {
-            formClass: 'n-default',
-            //msgStyle: 'margin-left:10px;',
-            msgClass: 'n-right',
-            showOk: '',
-            timely: 'input'
-        },
         'simple_right': {
             formClass: 'n-simple',
             msgClass: 'n-right',
