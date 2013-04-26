@@ -2,9 +2,10 @@
 * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
 * http://niceue.github.io/validator/
 */
+.msg-wrap,.n-icon{display:inline-block;*display:inline;*zoom:1}
 .msg-box{position:relative;*zoom:1;vertical-align:top;}
-.msg-box .msg-wrap{padding-top:2px;display:inline-block;*display:inline;*zoom:1;height:16px;white-space:nowrap}
-.msg-box .n-icon{display:inline-block;*display:inline;*zoom:1;width:16px;height:16px;margin:0;padding:0;vertical-align:top;background-repeat:no-repeat}
+.msg-box .msg-wrap{padding-top:2px;height:16px;white-space:nowrap}
+.msg-box .n-icon{width:16px;height:16px;margin:0;padding:0;vertical-align:top;background-repeat:no-repeat}
 .msg-box .n-arrow{position:absolute;overflow:hidden;font-size:12px;}
 .msg-box .n-arrow b,.msg-box .n-arrow i{position:absolute;left:0;top:0;font-style:normal;font-family:simsun !important}
 .msg-box .n-arrow i{text-shadow:none}

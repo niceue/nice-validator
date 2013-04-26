@@ -18,21 +18,25 @@ theme($color=null, $bg_color=#fff, $bd_color=#FFBB76, $sd_color=null){
     }
 }
 
+inline-block() {
+    display:inline-block; *display:inline; *zoom:1;
+}
 
 /*********************
  * global settings
  *********************/
+.msg-wrap,.n-icon {
+    inline-block()
+}
+
 .msg-box {
     position: relative; *zoom:1; vertical-align:top;
     .msg-wrap {
         padding-top: 2px;
-        display:inline-block; *display:inline; *zoom:1;
         height: 16px; 
         white-space: nowrap;
-        
     }
     .n-icon {
-        display:inline-block; *display:inline; *zoom:1;
         width:16px; height:16px;
         margin:0; padding:0;
         vertical-align:top;
@@ -67,7 +71,7 @@ theme($color=null, $bg_color=#fff, $bd_color=#FFBB76, $sd_color=null){
     .n-ok {color:#390;}
     .n-tip,.n-loading {color:#808080;}
 
-    /** icons **/
+    // icons
     .n-error .n-icon {background-position:0 0;}
     .n-ok .n-icon {background-position:-16px -0;}
     .n-loading .n-icon {background: url(images/loading.gif) 0 center no-repeat !important;}

@@ -1,21 +1,20 @@
+.msg-wrap,
+.n-icon {
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
 .msg-box {
   position: relative;
   *zoom: 1;
   vertical-align: top;
-/** icons **/
 }
 .msg-box .msg-wrap {
   padding-top: 2px;
-  display: inline-block;
-  *display: inline;
-  *zoom: 1;
   height: 16px;
   white-space: nowrap;
 }
 .msg-box .n-icon {
-  display: inline-block;
-  *display: inline;
-  *zoom: 1;
   width: 16px;
   height: 16px;
   margin: 0;
