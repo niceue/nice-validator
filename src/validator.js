@@ -65,7 +65,12 @@
             invalid: noop,
             validated: {}
         },
-        themes = {};
+        themes = {
+            default: {
+                msgClass: 'n-right',
+                showOk: ''
+            }
+        };
 
     /** jQuery Plugin
      * @param {Object} options

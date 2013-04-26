@@ -87,13 +87,6 @@
      */
     var TPL_ARROW = '<span class="n-arrow"><b>◆</b><i>◆</i></span>';
     $.validator.setTheme({
-        'default': {
-            formClass: 'n-default',
-            //msgStyle: 'margin-left:10px;',
-            msgClass: 'n-right',
-            showOk: '',
-            timely: 'input'
-        },
         'simple_right': {
             formClass: 'n-simple',
             msgClass: 'n-right',
