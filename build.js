@@ -5,8 +5,8 @@ var fs = require('fs'),
     stylus = require('stylus');
 
 var pkg = JSON.parse(fs.readFileSync(__dirname + '/package.json')),
-    NS = 'validator',
-    COPYRIGHT = '/*! '+ pkg.name +' '+ pkg.version +'\n'
+    NS = pkg.name,
+    COPYRIGHT = '/*! '+ pkg.title +' '+ pkg.version +'\n'
               + '* (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
               + '* '+ pkg.homepage +'\n'
               + '*/',
