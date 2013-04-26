@@ -41,6 +41,7 @@ function buildJS(js, name) {
 function buildCSS(css, name) {
     stylus(css)
         .set('filename', NS + '.styl')
+        .set('paths', [__dirname + '/src'])
         .set('compress', true)
         .render(function(err, css){
             if (err) throw err;

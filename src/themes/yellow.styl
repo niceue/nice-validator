@@ -1,0 +1,24 @@
+/* theme: yellow */
+.n-yellow {
+    .msg-box {
+        position: relative;
+    }
+    .msg-wrap {
+        position: absolute; z-index:10;
+        padding: 4px 6px;
+        font-size: 12px;
+        border: 1px solid transparent;
+        theme(#DB7C22, #FFFCEF, #FFBB76, #ddd);
+        border-radius: 2px;
+
+        .n-icon {
+            background-image: url(images/validator_simple.png);
+        }
+    }
+    .n-tip, .n-ok, .n-loading {
+        theme(#333, #f8fdff, #ddd, #ddd);
+    }
+    .n-tip {
+        .n-icon {display:none;}
+    }
+}
