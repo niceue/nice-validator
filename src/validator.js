@@ -321,9 +321,11 @@
                 if (e.type === 'keyup') {
                     var key = e.keyCode,
                         specialKey = {
-                            8: 1,
-                            9: 1,
-                            46: 1
+                            8: 1,  //Backspace
+                            9: 1,  //Tab
+                            16: 1, //Shift
+                            32: 1, //Space
+                            46: 1  //Delete
                         };
 
                     //回车键触发的是提交表单，防止重复验证
