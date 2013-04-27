@@ -334,7 +334,7 @@
                     if ((!specialKey[key] && key < 48) || key >= 112) return;
 
                     //键盘事件，降低验证频率
-                    timer = 600;
+                    timer = 500;
                 }
             }
 
