@@ -8,7 +8,6 @@ module('core', {
 
 test('validator()', function(){
     var obj;
-    expect(4);
 
     obj = $('#form').validator().data('validator');
     ok( obj && obj.fields.username, "无参调用" );
@@ -40,7 +39,6 @@ test('validator()', function(){
 
 test('isValid()', function(){
     var obj;
-    expect(2);
 
     obj = $('#form').validator().data('validator');
     ok( $('#username').val('jony').isValid() === true, "Assert true" );

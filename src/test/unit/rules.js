@@ -9,7 +9,6 @@ module('rules', {
 //全局配置规则
 test('config.rules', function(){
     var obj;
-    expect(2);
 
     $.validator.config({
         rules: {
@@ -29,7 +28,6 @@ test('config.rules', function(){
 //调用时传递局部规则
 test('options.rules', function(){
     var obj;
-    expect(1);
 
     obj = $('#form').validator({
         rules: {
@@ -45,7 +43,6 @@ test('options.rules', function(){
 test('setRule()', function(){
     var obj, T, F,
         $el = $('#form').find('input[name="username"]');;
-    expect(1);
 
     obj = $('#form').validator({
         rules: {
@@ -73,7 +70,7 @@ test('setRule()', function(){
 test('required', function(){
     var obj, T, F,
         $el = $('#form').find('input[name="username"]');
-    expect(3);
+
 
     obj = $('#form_normal').validator({
         username: 'required'
@@ -95,7 +92,6 @@ test('required', function(){
 test('integer', function(){
     var obj, T, F,
         $el = $('#form_normal').find('input[name="field1"]');
-    expect(5);
 
     obj = $('#form_normal').validator({
         fields: {
@@ -135,7 +131,6 @@ test('match', function(){
     var obj, T, F,
         $el1 = $('#form_normal').find('input[name="field1"]').val('test'),
         $el2 = $('#form_normal').find('input[name="field2"]');
-    expect(5);
 
     obj = $('#form_normal').validator({
         fields: {
@@ -176,9 +171,8 @@ test('match', function(){
 });
 
 test('range', function(){
-    var obj, T, F,
+    var obj,
         $el = $('#form_normal').find('input[name="field1"]');
-    expect(3);
 
     obj = $('#form_normal').validator({
         fields: {
@@ -187,19 +181,26 @@ test('range', function(){
     }).data('validator');
 
     //range[0~99]
-    F = $el.val('100').isValid();
-    T = $el.val('0').isValid();
-    ok( T === true && F === false, 'range[0~99]');
+    ok( $el.val('0').isValid() === true && 
+        $el.val('0.5').isValid() === true && 
+        $el.val('99').isValid() === true && 
+        $el.val('abc').isValid() === false && 
+        $el.val('100').isValid() === false
+    ,'range[0~99]');
+    
     //range[0~]
     obj.setField({field1: 'range[0~]'});
-    F = $el.val('-1').isValid();
-    T = $el.val('0').isValid();
-    ok( T === true && F === false, 'range[0~]');
+    ok( $el.val('0').isValid() === true && 
+        $el.val('0.5').isValid() === true && 
+        $el.val('-1').isValid() === false
+    ,'range[0~]');
+    
     //range[~99]
     obj.setField({field1: 'range[~99]'});
-    F = $el.val('100').isValid();
-    T = $el.val('99').isValid();
-    ok( T === true && F === false, 'range[~99]');
+    ok( $el.val('-1').isValid() === true && 
+        $el.val('99').isValid() === true && 
+        $el.val('100').isValid() === false
+    ,'range[~99]');
 
     obj.destroy();
 });
@@ -207,7 +208,6 @@ test('range', function(){
 test('checked', function(){
     var obj, T, F,
         $els = $('#form_normal').find('input[name="checkbox"]');
-    expect(5);
 
     $els.prop('checked', false);
 
@@ -251,7 +251,6 @@ test('checked', function(){
 test('length', function(){
     var obj, T, F,
         $el = $('#form_normal').find('input[name="field1"]');
-    expect(4);
 
     obj = $('#form_normal').validator({
         fields: {

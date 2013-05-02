@@ -1,7 +1,7 @@
 /*! Validator 1.0.0-pre
-* (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
-* http://niceue.github.io/validator/
-*/
+ * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
+ * http://niceue.github.io/validator/
+ */
 /*jshint browser:true, evil:true*/
 (function($, undefined) {
     "use strict";
@@ -131,7 +131,8 @@
     };
 
     function Validator(element, options) {
-        var me = this, opt, theme;
+        var me = this,
+            opt, theme;
         if (!me instanceof Validator) return new Validator(element, options);
         me.$el = $(element);
         if (isFunction(options)) {
@@ -172,8 +173,8 @@
                     key = el.id;
 
                 if (!key || !('#' + key in fields)) key = el.name; //不是Id模式
-
                 if (!key) return; //既没有id也没有name的字段不做验证
+
                 field = fields[key] || {};
                 if (!field.rule) field.rule = attr(el, 'data-rule') || '';
                 attr(el, 'data-rule', null);
@@ -321,16 +322,14 @@
                 if (e.type === 'keyup') {
                     var key = e.keyCode,
                         specialKey = {
-                            8: 1,  //Backspace
-                            9: 1,  //Tab
+                            8: 1, //Backspace
+                            9: 1, //Tab
                             16: 1, //Shift
                             32: 1, //Space
-                            46: 1  //Delete
+                            46: 1 //Delete
                         };
 
-                    //回车键触发的是提交表单，防止重复验证
-                    if (key === 13) return;
-                    //这些键不触发验证
+                    //这些键不触发验证(包含回车键，回车键触发的是提交表单，防止重复验证)
                     if ((!specialKey[key] && key < 48) || key >= 112) return;
 
                     //键盘事件，降低验证频率
@@ -357,7 +356,6 @@
                 rules;
 
             if (!arr) return;
-            field.vid = 0;
             field.rules = [];
             field.display = arr[1];
             rules = (arr[2] || '').split(';');
@@ -369,6 +367,7 @@
                     params: parts[2] ? $.trim(parts[2]).split(', ') : undefined
                 });
             });
+            field.vid = 0;
             field.rid = field.rules[0].method;
             field.status = 1;
             return field;
@@ -378,7 +377,7 @@
         _validatedField: function(e, field, msgOpt) {
             var me = this,
                 el = e.target,
-                isValid = field.isValid = msgOpt.valid;
+                isValid = field.isValid;
 
             $(el)[isValid ? 'removeClass' : 'addClass'](CLS_INPUT_INVALID)
                 .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, msgOpt])
@@ -452,32 +451,32 @@
                 debug[isValid ? 'info' : 'warn'](field.vid + ': ' + method + ' -> ' + (msgOpt.msg || true));
             }
 
-            msgOpt.valid = isValid;
-            //
-            me.elements[key] = el;
             //缓存结果
+            field.isValid = isValid;
             field.old.ret = msgOpt;
+            me.elements[key] = el;
 
-            //当前规则已通过，继续验证
-            if (isValid && field.vid < field.rules.length - 1) {
-                field.vid++;
-                me._checkRule(el, field);
-                return;
-            }
-            //字段验证失败，或者是字段的全部规则都验证成功
-            if (!isValid || field.vid === field.rules.length - 1) {
-                field.vid = 0;
-                //执行验证完一个字段的回调
-                isFunction(opt.validated[name]) && opt.validated[name].call(me, el, field, msgOpt);
-                $(el).trigger('validated.field', [field, msgOpt]);
-            }
             //刚刚验证完成，验证前的值却和现在的不一样了(快速输入-_-!), 需重新验证
             if (field.old.value !== el.value) {
                 field.vid = 0;
                 me._checkRule(el, field);
             }
+            //当前规则已通过，继续验证
+            if (isValid && field.vid < field.rules.length - 1) {
+                field.vid++;
+                return me._checkRule(el, field);
+            }
+            //字段验证失败，或者是字段的全部规则都验证成功
+            else {
+                //if (!isValid || field.vid === field.rules.length - 1) {
+                field.vid = 0;
+                //执行验证完一个字段的回调
+                isFunction(opt.validated[name]) && opt.validated[name].call(me, el, field, msgOpt);
+                $(el).trigger('validated.field', [field, msgOpt]);
+            }
         },
 
+        //验证字段的一个规则
         _checkRule: function(el, field) {
             var me = this,
                 ret,
@@ -495,15 +494,14 @@
             //有返回值，直接抛事件（异步验证无返回值）
             if (ret !== undefined) {
                 $(el).trigger('validated.rule', [ret, field]);
-                return ret === true || (isObject(ret) && 'ok' in ret);
             } else {
                 //暂时冻结验证
                 field.status = 0;
                 me.isValid = false;
-                return false;
             }
         },
 
+        //验证一个字段
         _checkField: function(el, field) {
             var me = this;
 
@@ -524,7 +522,7 @@
                 target,
                 old,
                 ret,
-                isValid = true;
+                isValid = field.isValid = true;
 
             //等待验证状态，后面可能会验证
             if (!field || !field.status || !field.rules || el.disabled || $el.is('[novalidate]')) {
@@ -538,7 +536,7 @@
                     $el.trigger('validated.field', [field, {
                         valid: true
                     }]);
-                    return true;
+                    return;
                 }
             }
 
@@ -547,7 +545,7 @@
 
             //如果值没变，就直接返回旧的验证结果
             if (!must && old && old.ret !== undefined && old.value === el.value) {
-                if (!old.ret.valid) me.isValid = isValid = false;
+                if (!old.ret.valid) isValid = me.isValid = field.isValid = false;
                 if (attr(el, DATA_INPUT_STATUS) === 'tip') return;
                 if (el.value !== '') {
                     msgOpt = old.ret;
@@ -582,7 +580,6 @@
             } else {
                 me._checkRule(el, field);
             }
-            return isValid;
         },
 
         //根据元素获取字段信息
@@ -601,7 +598,7 @@
         //检测某个元素的值是否符合某个规则
         test: function(el, rule) {
             var ret,
-            parts = rRule.exec(rule),
+                parts = rRule.exec(rule),
                 method,
                 params;
 
@@ -622,18 +619,19 @@
                 a = p[0],
                 b = p[1],
                 c = 'rg',
-                args = [''];
+                args = [''],
+                isNumber = /-?(\d\.\d+|[1-9]\d*|0)/.test(value);
 
             if (p.length === 2) {
                 if (a && b) {
-                    if (value >= +a && value <= +b) return true;
+                    if (isNumber && value >= +a && value <= +b) return true;
                     args = args.concat(p);
                 } else if (a && !b) {
-                    if (value >= +a) return true;
+                    if (isNumber && value >= +a) return true;
                     args.push(a);
                     c = 'gt';
                 } else if (!a && b) {
-                    if (value <= +b) return true;
+                    if (isNumber && value <= +b) return true;
                     args.push(b);
                     c = 'lt';
                 }
@@ -929,7 +927,7 @@
          *  integer[+0]
          *  integer[-]
          *  integer[-0]
-             */
+         */
         integer: function(element, params) {
             var re, z = '0|',
                 p = '[1-9]\\d*',
@@ -1012,8 +1010,8 @@
         checked: function(element, params) {
             if (!$(element).is(':radio,:checkbox')) return true;
             var count = $('input[name="' + element.name + '"]', this.$el).filter(function() {
-                    return !this.disabled && this.checked && $(this).is(':visible');
-                }).length;
+                return !this.disabled && this.checked && $(this).is(':visible');
+            }).length;
             if (!params) {
                 return !!count || this.messages.required;
             } else {
