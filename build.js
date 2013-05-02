@@ -1,7 +1,9 @@
 #!/usr/local/bin/node
 
 var fs = require('fs'),
+    //https://github.com/mishoo/UglifyJS2
     U2 = require("uglify-js"),
+    //http://learnboost.github.io/stylus/
     stylus = require('stylus');
 
 var pkg = JSON.parse(fs.readFileSync(__dirname + '/package.json')),

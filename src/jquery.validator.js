@@ -57,7 +57,7 @@
             loadingMsg: 'Validating...',
             msgTemplate: '<span>{#msg}</span>',
             msgIcon: '<span class="n-icon"></span>',
-                msgArrow: '',
+            msgArrow: '',
             msgClass: '',
             formClass: 'n-default',
             ignore: '',
@@ -66,7 +66,7 @@
             validated: {}
         },
         themes = {
-            default: {
+            'default': {
                 msgClass: 'n-right',
                 showOk: ''
             }
@@ -378,7 +378,8 @@
         _validatedField: function(e, field, msgOpt) {
             var me = this,
                 el = e.target,
-                isValid = msgOpt.valid;
+                isValid = field.isValid = msgOpt.valid;
+
             $(el)[isValid ? 'removeClass' : 'addClass'](CLS_INPUT_INVALID)
                 .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, msgOpt])
                 .attr(ARIA_INVALID, !isValid);
@@ -470,14 +471,14 @@
                 isFunction(opt.validated[name]) && opt.validated[name].call(me, el, field, msgOpt);
                 $(el).trigger('validated.field', [field, msgOpt]);
             }
-            //刚刚验证完成，验证前的值却和现在的不一样了(-_-!输入的速度也太快了吧), 又得重新验证
+            //刚刚验证完成，验证前的值却和现在的不一样了(快速输入-_-!), 需重新验证
             if (field.old.value !== el.value) {
                 field.vid = 0;
                 me._checkRule(el, field);
             }
         },
 
-        _checkRule: function(el, field, sync) {
+        _checkRule: function(el, field) {
             var me = this,
                 ret,
                 rule = field.rules[field.vid],
@@ -493,7 +494,7 @@
             }).call(me, el, params, field);
             //有返回值，直接抛事件（异步验证无返回值）
             if (ret !== undefined) {
-                if (!sync) $(el).trigger('validated.rule', [ret, field]);
+                $(el).trigger('validated.rule', [ret, field]);
                 return ret === true || (isObject(ret) && 'ok' in ret);
             } else {
                 //暂时冻结验证
@@ -503,29 +504,18 @@
             }
         },
 
-        //同步模式验证，只返回结果，不触发事件
         _checkField: function(el, field) {
-            var me = this,
-                ret,
-                loopFn = function() {
-                    ret = me._checkRule(el, field, true);
-                    field.vid++;
-                    if (ret && field.vid < field.rules.length - 1) {
-                        loopFn.apply(me, arguments);
-                    }
-                };
+            var me = this;
 
             field = field || me.getField(el);
             if (!field) return true;
-            ret = me._validate(el, field, true, true);
-            if (ret) loopFn();
+            me._validate(el, field, true);
 
-            field.vid = 0;
-            return ret;
+            return field.isValid;
         },
 
         //执行验证
-        _validate: function(el, field, must, sync) {
+        _validate: function(el, field, must) {
             var me = this,
                 opt = me.options,
                 $el = $(el),
@@ -557,7 +547,7 @@
 
             //如果值没变，就直接返回旧的验证结果
             if (!must && old && old.ret !== undefined && old.value === el.value) {
-                if (!old.ret.valid) me.isValid = false;
+                if (!old.ret.valid) me.isValid = isValid = false;
                 if (attr(el, DATA_INPUT_STATUS) === 'tip') return;
                 if (el.value !== '') {
                     msgOpt = old.ret;
@@ -586,16 +576,13 @@
             //输出调试信息
             if (opt.debug) debug.log(el);
 
-            if (!sync) {
-                //如果已经出来结果 (旧的验证结果，或者分组验证结果)
-                if (ret !== undefined) {
-                    $el.trigger('validated.rule', [ret, field, msgOpt]);
-                } else {
-                    me._checkRule(el, field, sync);
-                }
+            //如果已经出来结果 (旧的验证结果，或者分组验证结果)
+            if (ret !== undefined) {
+                $el.trigger('validated.rule', [ret, field, msgOpt]);
             } else {
-                return isValid;
+                me._checkRule(el, field);
             }
+            return isValid;
         },
 
         //根据元素获取字段信息
@@ -1149,6 +1136,6 @@
             }
         });
     };
-        $.validator = Validator;
+    $.validator = Validator;
 
 })(jQuery);
