@@ -369,7 +369,6 @@
             });
             field.vid = 0;
             field.rid = field.rules[0].method;
-            field.status = 1;
             return field;
         },
 
@@ -377,7 +376,7 @@
         _validatedField: function(e, field, msgOpt) {
             var me = this,
                 el = e.target,
-                isValid = field.isValid;
+                isValid = field.isValid = !!msgOpt.valid;
 
             $(el)[isValid ? 'removeClass' : 'addClass'](CLS_INPUT_INVALID)
                 .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, msgOpt])
@@ -402,7 +401,6 @@
                 showOk = false;
 
             msgOpt = msgOpt || {};
-            field.status = 1;
 
             //格式化结果和消息
             if (ret !== true) {
@@ -437,6 +435,7 @@
                 $(el).trigger('invalid.rule', [method]);
             } else {
                 msgOpt.type = 'ok';
+                msgOpt.valid = true;
                 if (!showOk && isString(opt.showOk)) {
                     showOk = true;
                     msgOpt.msg = opt.showOk;
@@ -452,7 +451,6 @@
             }
 
             //缓存结果
-            field.isValid = isValid;
             field.old.ret = msgOpt;
             me.elements[key] = el;
 
@@ -496,7 +494,6 @@
                 $(el).trigger('validated.rule', [ret, field]);
             } else {
                 //暂时冻结验证
-                field.status = 0;
                 me.isValid = false;
             }
         },
@@ -525,7 +522,7 @@
                 isValid = field.isValid = true;
 
             //等待验证状态，后面可能会验证
-            if (!field || !field.status || !field.rules || el.disabled || $el.is('[novalidate]')) {
+            if (!field || !field.rules || el.disabled || $el.is('[novalidate]')) {
                 return;
             }
 
@@ -545,7 +542,7 @@
 
             //如果值没变，就直接返回旧的验证结果
             if (!must && old && old.ret !== undefined && old.value === el.value) {
-                if (!old.ret.valid) isValid = me.isValid = field.isValid = false;
+                if (!old.ret.valid) isValid = me.isValid = false;
                 if (attr(el, DATA_INPUT_STATUS) === 'tip') return;
                 if (el.value !== '') {
                     msgOpt = old.ret;
