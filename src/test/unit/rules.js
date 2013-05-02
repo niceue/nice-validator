@@ -68,29 +68,25 @@ test('setRule()', function(){
 //内置规则验证
 
 test('required', function(){
-    var obj, T, F,
+    var obj,
         $el = $('#form').find('input[name="username"]');
-
 
     obj = $('#form_normal').validator({
         username: 'required'
     }).data('validator');
 
-    F = $el.val('').isValid();
-    ok( F === false, 'false: String ""');
+    ok( $el.val('').isValid() === false, 'false: String ""');
 
-    F = $el.val('  ').isValid();
-    ok( F === false, 'false: String "   "');
+    ok( $el.val('  ').isValid() === false, 'false: String "   "');
 
-    T = $el.val('0').isValid();
-    ok( T === true, 'true: String "0"');
+    ok( $el.val('0').isValid() === true, 'true: String "0"');
     
     obj.destroy();
     resetForm('#form');
 });
 
 test('integer', function(){
-    var obj, T, F,
+    var obj,
         $el = $('#form_normal').find('input[name="field1"]');
 
     obj = $('#form_normal').validator({
@@ -100,35 +96,46 @@ test('integer', function(){
     }).data('validator');
 
     //integer
-    F = $el.val('test').isValid();
-    ok( F === false, 'integer');
+    ok( $el.val('abc').isValid() === false &&
+        $el.val('3.14').isValid() === false &&
+        $el.val('1').isValid() === true
+    , 'integer');
+    
     //integer[+]
     obj.setField({field1: 'integer[+]'});
-    F = $el.val('0').isValid();
-    T  = $el.val('1').isValid();
-    ok( T === true && F === false, 'integer[+]');
+    ok( $el.val('0').isValid() === false && 
+        $el.val('1').isValid() === true && 
+        $el.val('-1').isValid() === false &&
+        $el.val('abc').isValid() === false 
+    , 'integer[+]');
+    
     //integer[+0]
     obj.setField({field1: 'integer[+0]'});
-    F = $el.val('-1').isValid();
-    T  = $el.val('0').isValid();
-    ok( T === true && F === false, 'integer[+0]');
+    ok( $el.val('0').isValid() === true && 
+        $el.val('1').isValid() === true && 
+        $el.val('-1').isValid() === false
+    , 'integer[+0]');
+    
     //integer[-]
     obj.setField({field1: 'integer[-]'});
-    F = $el.val('0').isValid();
-    T  = $el.val('-1').isValid();
-    ok( T === true && F === false, 'integer[-]');
+    ok( $el.val('0').isValid() === false && 
+        $el.val('1').isValid() === false && 
+        $el.val('-1').isValid() === true
+    , 'integer[-]');
+    
     //integer[-0]
     obj.setField({field1: 'integer[-0]'});
-    F = $el.val('1').isValid();
-    T  = $el.val('0').isValid();
-    ok( T === true && F === false, 'integer[-0]');
+    ok( $el.val('0').isValid() === true && 
+        $el.val('1').isValid() === false &&
+        $el.val('-1').isValid() === true
+    , 'integer[-0]');
 
     obj.destroy();
     resetForm('#form');
 });
 
 test('match', function(){
-    var obj, T, F,
+    var obj,
         $el1 = $('#form_normal').find('input[name="field1"]').val('test'),
         $el2 = $('#form_normal').find('input[name="field2"]');
 
@@ -140,32 +147,39 @@ test('match', function(){
     }).data('validator');
 
     //match[]
-    F = $el2.val('test2').isValid();
-    T = $el2.val('test').isValid();
-    ok( T === true && F === false, 'match[field1]');
+    ok( $el2.val('test').isValid() === true && 
+        $el2.val('test2').isValid() === false
+    , 'match[field1]');
 
     $el1.val('10');
 
     //match[lt, field1]
     obj.setField({field2: 'match[lt, field1]'});
-    F = $el2.val('11').isValid();
-    T = $el2.val('9').isValid();
-    ok( T === true && F === false, 'match[lt, field1]');
+    ok( $el2.val('9').isValid() === true && 
+        $el2.val('10').isValid() === false && 
+        $el2.val('11').isValid() === false
+    , 'match[lt, field1]');
+    
     //match[lte, field1]
     obj.setField({field2: 'match[lte, field1]'});
-    F = $el2.val('11').isValid();
-    T = $el2.val('10').isValid();
-    ok( T === true && F === false, 'match[lte, field1]');
+    ok( $el2.val('9.5').isValid() === true && 
+        $el2.val('10').isValid() === true && 
+        $el2.val('11').isValid() === false
+    , 'match[lte, field1]');
+    
     //match[gt, field1]
     obj.setField({field2: 'match[gt, field1]'});
-    F = $el2.val('9').isValid();
-    T = $el2.val('11').isValid();
-    ok( T === true && F === false, 'match[gt, field1]');
+    ok( $el2.val('9').isValid() === false && 
+        $el2.val('10').isValid() === false && 
+        $el2.val('10.5').isValid() === true
+    , 'match[gt, field1]');
+    
     //match[gte, field1]
     obj.setField({field2: 'match[gte, field1]'});
-    F = $el2.val('9').isValid();
-    T = $el2.val('10').isValid();
-    ok( T === true && F === false, 'match[gte, field1]');
+    ok( $el2.val('9').isValid() === false && 
+        $el2.val('10').isValid() === true && 
+        $el2.val('10.5').isValid() === true
+    , 'match[gte, field1]');
 
     obj.destroy();
 });
@@ -206,10 +220,8 @@ test('range', function(){
 });
 
 test('checked', function(){
-    var obj, T, F,
-        $els = $('#form_normal').find('input[name="checkbox"]');
-
-    $els.prop('checked', false);
+    var obj,
+        $els = $('#form_normal').find('input[name="checkbox"]').prop('checked', false);
 
     obj = $('#form_normal').validator({
         fields: {
@@ -218,38 +230,42 @@ test('checked', function(){
     }).data('validator');
 
     //checked
-    F = $els.eq(0).isValid();
-    T = $els.eq(0).prop('checked', true).isValid();
-    ok( T === true && F === false, 'checked');
+    ok( $els.eq(0).isValid() === false && 
+        $els.eq(0).prop('checked', true).isValid() === true
+    , 'checked');
+    
     //checked[2~3]
     obj.setField({checkbox: 'checked[2~3]'});
-    F = $els.eq(0).isValid();
-    T = $els.eq(1).prop('checked', true).isValid();
-    ok( T === true && F === false, 'checked[2~3]');
+    ok( $els.eq(0).isValid() === false && 
+        $els.eq(1).prop('checked', true).isValid() === true
+    , 'checked[2~3]');
+    
     //checked[2~]
     obj.setField({checkbox: 'checked[2~]'});
     $els.prop('checked', false).eq(0).prop('checked', true);
-    F = $els.eq(0).isValid();
-    T = $els.eq(1).prop('checked', true).isValid();
-    ok( T === true && F === false, 'checked[2~]');
+    ok( $els.eq(0).isValid() === false && 
+        $els.eq(1).prop('checked', true).isValid() === true
+    , 'checked[2~]');
+    
     //checked[~2]
     obj.setField({checkbox: 'checked[~2]'});
     $els.prop('checked', true);
-    F = $els.eq(0).isValid();
-    T = $els.eq(0).prop('checked', false).isValid();
-    ok( T === true && F === false, 'checked[~2]');
+    ok( $els.eq(0).isValid() === false && 
+        $els.eq(0).prop('checked', false).isValid() === true
+    , 'checked[~2]');
+    
     //checked[2]
     obj.setField({checkbox: 'checked[2]'});
     $els.prop('checked', true);
-    F = $els.eq(0).isValid();
-    T = $els.eq(0).prop('checked', false).isValid();
-    ok( T === true && F === false, 'checked[2]');
+    ok( $els.eq(0).isValid() === false && 
+        $els.eq(0).prop('checked', false).isValid() === true
+    , 'checked[2]');
 
     obj.destroy();
 });
 
 test('length', function(){
-    var obj, T, F,
+    var obj,
         $el = $('#form_normal').find('input[name="field1"]');
 
     obj = $('#form_normal').validator({
@@ -259,29 +275,34 @@ test('length', function(){
     }).data('validator');
 
     //length[4~10]
-    F = $el.val('123').isValid();
-    T = $el.val('1234').isValid();
-    ok( T === true && F === false, 'length[4~10]');
+    ok( $el.val('1234').isValid() === true && 
+        $el.val('abcdefghij').isValid() === true && 
+        $el.val('abcde.fghij').isValid() === false && 
+        $el.val('123').isValid() === false
+    , 'length[4~10]');
+    
     //length[4~]
     obj.setField({field1: 'length[4~]'});
-    F = $el.val('123').isValid();
-    T = $el.val('1234').isValid();
-    ok( T === true && F === false, 'length[4~]');
+    ok( $el.val('1234').isValid() === true && 
+        $el.val('123').isValid() === false
+    , 'length[4~]');
+    
     //length[~4]
     obj.setField({field1: 'length[~4]'});
-    F = $el.val('12345').isValid();
-    T = $el.val('1234').isValid();
-    ok( T === true && F === false, 'length[~4]');
+    ok( $el.val('1234').isValid() === true && 
+        $el.val('12345').isValid() === false
+    , 'length[~4]');
+    
     //length[~4, true]
     obj.setField({field1: 'length[~4, true]'});
-    F = $el.val('测试1').isValid();
-    T = $el.val('测试').isValid();
-    ok( T === true && F === false, 'length[~4, true]');
+    ok( $el.val('测试').isValid() === true && 
+        $el.val('测试1').isValid() === false
+    , 'length[~4, true]');
 
     obj.destroy();
 });
 /*
-asyncTest('remote', 1, function(){
+asyncTest('remote', function(){
     var obj, T, F,
         $el = $('#form').find('input[name="username"]');
     
