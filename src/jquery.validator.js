@@ -617,7 +617,7 @@
                 b = p[1],
                 c = 'rg',
                 args = [''],
-                isNumber = /-?(\d\.\d+|[1-9]\d*|0)/.test(value);
+                isNumber = +value === +value;
 
             if (p.length === 2) {
                 if (a && b) {
@@ -1098,7 +1098,6 @@
     });
 
     //公共静态接口
-    Validator.version = '1.0';
     Validator.defaults = defaults;
     Validator.showMsg = showMsg;
     Validator.hideMsg = hideMsg;

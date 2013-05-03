@@ -21,6 +21,7 @@ test('validator()', function(){
     }).data('validator');
     ok( obj && obj.fields.username, "传参调用" );
     obj.destroy();
+    resetForm('#form_normal');
 
     $('#username').trigger('focusin');
     obj = $('#form').data('validator');
@@ -32,8 +33,6 @@ test('validator()', function(){
     obj = $('#form_submit').data('validator');
     ok( obj, "不调用, submit表单时自动初始化" );
     obj.destroy();
-
-    resetForm('#form');
     resetForm('#form_submit');
 });
 
