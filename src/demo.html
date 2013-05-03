@@ -15,7 +15,7 @@
 
 <body>
 <form class="diy_form" style="margin:50px 0 0 250px;">
-<p><input type="text" class="group" name="username" id="username" autocomplete="off" data-rule="用户名:required; username" data-tip="请输入email或者手机号"><span class="msg-box n-right" data-for="username" style="display:none;"></span>
+<p><input type="text" class="group" name="username" id="username" autocomplete="off" data-rule="用户名:required;username;remote[valid_username.php]" data-tip="请输入email或者手机号"><span class="msg-box n-right" data-for="username" style="display:none;"></span>
 </p>
 
 <p><input type="password" class="group" name="password" id="password" data-rule="密码:required;password" data-tip="6个或更多字符! 要复杂些"></p>

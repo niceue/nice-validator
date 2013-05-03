@@ -246,7 +246,7 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                FOCUS_EVENT = 'focus.' + NS,
+                FOCUS_EVENT = 'focus.field',
                 ret,
                 $inputs = $(INPUT_SELECTOR, me.$el);
 
@@ -1063,25 +1063,20 @@
             $.ajax({
                 url: arr[2],
                 type: arr[1] || 'POST',
-                //dataType: 'json',
                 data: postData,
                 cache: false,
                 complete: function(res, status) {
-                    var msg = res.responseText,
-                        char0 = msg.charAt(0),
-                        data,
-                        isSuccess = status === 'success',
-                        isError = status === 'error';
-
-                    if (char0 === '{') { //服务端返回了json数据
+                    var msg = res.responseText, data;
+                    if (msg === '') {
+                        msg = true;
+                    } else if (!msg && status === 'error') {
+                        msg = 'Net error';
+                    } else if (msg.charAt(0) === '{') {
                         msg = $.parseJSON(msg) || {};
                         data = parseData(msg);
                         if (data === undefined) data = parseData(msg.data);
-                        msg = data || isSuccess;
-                    } else if (char0 === '<' || (!isSuccess && !isError)) { //异常
-                        msg = 'Net error';
-                    }
-
+                        msg = data || status === 'success';
+                    } 
                     $(element).trigger('validated.rule', [msg, field]);
                 }
             });

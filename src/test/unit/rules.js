@@ -6,25 +6,6 @@ module('rules', {
     }
 });
 
-//全局配置规则
-test('config.rules', function(){
-    var obj;
-
-    $.validator.config({
-        rules: {
-            globalRule1: [/\d*/, "only a test"],
-            globalRule2: function(element, params){
-                return !!element.value === "" || "only a test";
-            } 
-        }
-    });
-    obj = $('#form').validator().data('validator');
-    ok(obj.rules.globalRule1, "数组定义规则");
-    ok(obj.rules.globalRule2, "函数定义规则");
-    obj.destroy();
-    resetForm('#form');
-});
-
 //调用时传递局部规则
 test('options.rules', function(){
     var obj;
@@ -301,23 +282,27 @@ test('length', function(){
 
     obj.destroy();
 });
-/*
-asyncTest('remote', function(){
-    var obj, T, F,
-        $el = $('#form').find('input[name="username"]');
-    
-    obj = $('#form').validator({
-        fields: {
-            username: 'remote[../valid_username.php]'
-        }
-    }).data('validator');
-    
-    $el.on('valid.field', function(e, field, data){
-        ok(true, 'remote[../../valid_username.php]');
-        start();
+
+if (document.domain) {
+    asyncTest('remote', 2, function(){
+        var obj;
+        
+        obj = $('#form_normal').validator({
+            fields: {
+                username: 'remote[../valid_username.php]'
+            }
+        }).data('validator');
+        
+        $('#form_normal').find('input[name="username"]')
+        .on('valid.field', function(e, field, data){
+            ok(true, 'new');
+            $(this).val('123').trigger('validate');
+        })
+        .on('invalid.field', function(e, field, data){
+            ok(true, 'exist');
+            obj.destroy();
+            start();
+        }).val('jonyzhang').trigger('validate');
+          
     });
-    
-    $el.val('jony').trigger('validate');
-    
-});
-*/
+}
