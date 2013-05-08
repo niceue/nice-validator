@@ -204,8 +204,8 @@
                         };
                     $.extend(fn, obj);
                     $.map(obj.fields.split(' '), function(k) {
-                        var field = fields[k];
-                        if (field) field.group = fn;
+                        fields[k] = fields[k] || {};
+                        fields[k].group = fn;
                     });
                 });
             }
@@ -451,6 +451,7 @@
             }
 
             //缓存结果
+            field.old = field.old || {};
             field.old.ret = msgOpt;
             me.elements[key] = el;
 
@@ -525,9 +526,12 @@
             if (!field || !field.rules || el.disabled || $el.is('[novalidate]')) {
                 return;
             }
+            
+            old = field.old;
+            must = must || field.must; //此为特殊情况必须每次验证
 
             //如果非必填项且值为空，就没必要继续验证
-            if (!field.required && el.value === '') {
+            if (!field.required && el.value === '' && !groupFn) {
                 if ($el.is('[data-tip]')) return true;
                 if (!$el.is(':checkbox,:radio')) {
                     $el.trigger('validated.field', [field, {
@@ -536,9 +540,6 @@
                     return;
                 }
             }
-
-            old = field.old;
-            must = must || field.must; //此为特殊情况必须每次验证
 
             //如果值没变，就直接返回旧的验证结果
             if (!must && old && old.ret !== undefined && old.value === el.value) {
@@ -814,7 +815,7 @@
 
     function getMsgDOM(el, opt, context) {
         var datafor = el.name || '#' + el.id,
-            $msgbox = $('.' + CLS_MSG_BOX + '[data-for=' + datafor + ']', context || document);
+            $msgbox = $('.' + CLS_MSG_BOX + '[data-for=' + datafor + ']', context);
         if (!$msgbox.length) {
             var $el = $(attr(el, 'data-target') || el),
                 tpl = getTpl(opt.tpl);
@@ -860,7 +861,7 @@
             } else if (isArray(effect) && isFunction(effect[0])) {
                 fn = effect[0];
             }
-            fn && fn.call(null, $msg, opt.type);
+            fn && fn($msg, opt.type);
         }
     }
 
@@ -877,7 +878,7 @@
         if (isArray(effect) && isFunction(effect[1])) {
             $msg = $msgbox.find('span.msg-wrap');
             $msgbox[0].style.display = '';
-            effect[1].call(null, $msg, opt.type);
+            effect[1]($msg, opt.type);
         } else {
             $msgbox[0].style.display = 'none';
         }

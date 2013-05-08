@@ -10,6 +10,7 @@ module('rules', {
 test('options.rules', function(){
     var obj;
 
+    resetForm('#form');
     obj = $('#form').validator({
         rules: {
             testRule1: [/\d*/, "only a test"]
@@ -17,7 +18,33 @@ test('options.rules', function(){
     }).data('validator');
     ok(obj.rules.testRule1, "调用时传递局部规则");
     obj.destroy();
-    resetForm('#form');
+});
+
+test('options.groups', function(){
+    var obj,
+        $els = $('#form_normal').find('input');
+
+    resetForm('#form_normal');
+    obj = $('#form_normal').validator({
+        groups: [{
+            fields: 'username field1 field2',
+            callback: function($elements){
+                var me = this, count = 0;
+                $elements.map(function(){
+                    if (me.test(this, 'required')) count+=1;
+                });
+                return count>=1 || '请至少填写一项';
+            },
+            target: 'input[name=field2]'
+        }]
+    }).data('validator');
+
+    ok( $els.eq(0).isValid() === false &&
+        $els.eq(1).isValid() === false &&
+        $els.eq(0).val('test').isValid() === true && 
+        $els.eq(1).isValid() === true
+        , 'fill the field');
+    obj.destroy();
 });
 
 //调用后对规则的操作
@@ -25,6 +52,7 @@ test('setRule()', function(){
     var obj, T, F,
         $el = $('#form').find('input[name="username"]');;
 
+    resetForm('#form');
     obj = $('#form').validator({
         rules: {
             testRule1: [/^\d+$/, "only a test"]
@@ -42,7 +70,6 @@ test('setRule()', function(){
 
     ok( T === true && F === false, "调用后对规则的操作");
     obj.destroy();
-    resetForm('#form');
 });
 
 //##############################################
@@ -52,6 +79,7 @@ test('required', function(){
     var obj,
         $el = $('#form').find('input[name="username"]');
 
+    resetForm('#form');
     obj = $('#form_normal').validator({
         username: 'required'
     }).data('validator');
@@ -63,13 +91,13 @@ test('required', function(){
     ok( $el.val('0').isValid() === true, 'true: String "0"');
     
     obj.destroy();
-    resetForm('#form');
 });
 
 test('integer', function(){
     var obj,
         $el = $('#form_normal').find('input[name="field1"]');
-
+        
+    resetForm('#form');
     obj = $('#form_normal').validator({
         fields: {
             field1: 'integer'
@@ -111,8 +139,7 @@ test('integer', function(){
         $el.val('-1').isValid() === true
     , 'integer[-0]');
 
-    obj.destroy();
-    resetForm('#form');
+    obj.destroy();    
 });
 
 test('match', function(){
