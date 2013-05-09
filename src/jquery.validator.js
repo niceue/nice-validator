@@ -430,7 +430,6 @@
             //消息处理, 以及rule级别的事件
             if (!isValid) {
                 me.isValid = false;
-                msgOpt.type = 'error';
                 //失败的回调
                 $(el).trigger('invalid.rule', [method]);
             } else {
@@ -456,7 +455,7 @@
             me.elements[key] = el;
 
             //刚刚验证完成，验证前的值却和现在的不一样了(快速输入-_-!), 需重新验证
-            if (field.old.value !== el.value) {
+            if (isValid && field.old.value !== undefined && field.old.value !== el.value) {
                 field.vid = 0;
                 me._checkRule(el, field);
             }
@@ -554,17 +553,15 @@
             //如果有分组验证
             else if (groupFn) {
                 $.extend(msgOpt, groupFn);
-                if (groupFn.target) {
-                    target = $(groupFn.target, me.$el);
-                    if (target.length) msgOpt.target = target;
-                }
                 ret = groupFn.call(me);
                 if (ret === true) {
                     ret = undefined;
+                    me.hideMsg(el, msgOpt);
                 } else {
                     if (isString(ret)) ret = {
                         error: ret
                     };
+                    me.hideMsg(el);
                     isValid = false;
                 }
             }
@@ -814,11 +811,16 @@
     }
 
     function getMsgDOM(el, opt, context) {
-        var datafor = el.name || '#' + el.id,
-            $msgbox = $('.' + CLS_MSG_BOX + '[data-for=' + datafor + ']', context);
+        var $el, $msgbox, datafor, tpl;
+        if (opt.target) {
+            $el = $(opt.target, context);
+            if ($el.length) el = $el[0];
+        }
+        datafor = el.name || '#' + el.id,
+        $msgbox = $('.' + CLS_MSG_BOX + '[data-for=' + datafor + ']', context);
         if (!$msgbox.length) {
-            var $el = $(attr(el, 'data-target') || el),
-                tpl = getTpl(opt.tpl);
+            $el = $(attr(el, 'data-target') || el);
+            tpl = getTpl(opt.tpl);
             $msgbox = $(tpl).addClass(CLS_MSG_BOX).attr({
                 tabindex: -1,
                 role: "alert",

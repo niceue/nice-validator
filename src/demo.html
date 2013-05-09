@@ -15,10 +15,10 @@
 
 <body>
 <form class="diy_form" style="margin:50px 0 0 250px;">
-<p><input type="text" class="group" name="username" id="username" autocomplete="off" data-rule="用户名:required;username;remote[valid_username.php]" data-tip="请输入email或者手机号"><span class="msg-box n-right" data-for="username" style="display:none;"></span>
+<p><input type="text" class="group" name="username" id="username" autocomplete="off" data-rule="用户名:username;remote[valid_username.php]" data-tip="请输入email或者手机号"><span class="msg-box n-right" data-for="username" style="display:none;"></span>
 </p>
 
-<p><input type="password" class="group" name="password" id="password" data-rule="密码:required;password" data-tip="6个或更多字符! 要复杂些"></p>
+<p><input type="password" class="group" name="password" id="password" data-rule="密码:password" data-tip="6个或更多字符! 要复杂些"></p>
  <br>
 <input type="submit">
 <input type="reset">
@@ -26,7 +26,7 @@
 
 <script>
 $(function(){
-    $('#form3').validator({
+    $('form').validator({
         rules: {
             email_or_mobile: function(el){
                 return this.test(el, 'email') || this.test(el, 'mobile') || '请输入email或者手机号';
@@ -41,7 +41,15 @@ $(function(){
         valid: function(){
             console.log('callback:valid')
         },
-        /*groups: [{
+        validated: {
+            username: function(){
+                console.log('validated:username')
+            },
+            password: function(){
+                console.log('validated:password')
+            }
+        },
+        groups: [{
             fields: 'username password',
             callback: function($elements){
                 var me = this, count = 0;
@@ -52,16 +60,16 @@ $(function(){
             },
             target: '#password',
             style: 'margin-top:20px;'
-        }],*/
+        }],
         //debug: true,
         /*setMsg: {
             mobile: "sdgsdgsh"
         },*/
         //msgTheme: 'msg-simple-right msg-icon',
         //showOk: '',
-        //msgClass: 'n-bottom'
+        msgClass: 'n-bottom'
         //ignore: ':hidden',
-        stopOnError: true
+        //stopOnError: true
         //timely: true
     }).on('valid.form', function(){
         console.log('event:valid')
