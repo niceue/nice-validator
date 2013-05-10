@@ -50,9 +50,9 @@
         defaults = {
             debug: 0,
             timely: 'input',
-            stopOnError: false,
-            showError: true,
-            showOk: true,
+            stopOnError: 0,
+            showError: 1,
+            showOk: 1,
             defaultMsg: '{0} is not valid.',
             loadingMsg: 'Validating...',
             msgTemplate: '<span>{#msg}</span>',
@@ -62,8 +62,7 @@
             formClass: 'n-default',
             ignore: '',
             valid: noop,
-            invalid: noop,
-            validated: {}
+            invalid: noop
         },
         themes = {
             'default': {
@@ -93,7 +92,6 @@
         
         valid       {Function}  表单验证成功后的回调
         invalid     {Function}  表单验证失败后的回调
-        validated   {Object Function}
 
         fields      {Object}     待验证字段规则集合
         {String} key    name|#id
@@ -159,6 +157,22 @@
                 opt = me.options,
                 fields = me.fields;
 
+            //初始化分组验证
+            if (isArray(opt.groups)) {
+                $.map(opt.groups, function(obj) {
+                    if (!isString(obj.fields) || !isFunction(obj.callback)) return null;
+                    var $elememts = $(keys2selector(obj.fields), me.$el),
+                        fn = function() {
+                            return obj.callback.call(me, $elememts);
+                        };
+                    $.extend(fn, obj);
+                    $.map(obj.fields.split(' '), function(k) {
+                        fields[k] = fields[k] || {};
+                        fields[k].group = fn;
+                    });
+                });
+            }
+
             //处理字段信息
             if (isObject(opt.fields)) {
                 $.each(opt.fields, function(k, v) {
@@ -177,6 +191,7 @@
 
                 field = fields[key] || {};
                 if (!field.rule) field.rule = attr(el, 'data-rule') || '';
+                field.rules = [];
                 attr(el, 'data-rule', null);
                 if (!field.rule) return;
 
@@ -193,22 +208,6 @@
 
                 fields[key] = me._parseField(field);
             });
-
-            //初始化分组验证
-            if (isArray(opt.groups)) {
-                $.map(opt.groups, function(obj) {
-                    if (!isString(obj.fields) || !isFunction(obj.callback)) return null;
-                    var $elememts = $(keys2selector(obj.fields), me.$el),
-                        fn = function() {
-                            return obj.callback.call(me, $elememts);
-                        };
-                    $.extend(fn, obj);
-                    $.map(obj.fields.split(' '), function(k) {
-                        fields[k] = fields[k] || {};
-                        fields[k].group = fn;
-                    });
-                });
-            }
 
             //消息的参数
             me.msgOpt = {
@@ -273,29 +272,27 @@
 
         //接收：表单的reset事件
         _reset: function() {
-            var me = this;
-            $('[data-for].' + CLS_MSG_BOX, me.$el).map(function() {
-                this.style.display = 'none';
-            });
-            $(INPUT_SELECTOR, me.$el).map(function() {
-                attr(this, DATA_INPUT_STATUS, null);
-                attr(this, ARIA_INVALID, null);
-                $(this).removeClass(CLS_INPUT_INVALID);
-            });
-            /*$.each(me.fields, function(k, field){
-                field.old = null;
-            });*/
+            var me = this, showError = me.options.showError;
+            if (isString(showError)) {
+                $(showError).html('');
+            } else {
+               $('[data-for].' + CLS_MSG_BOX, me.$el).map(function() {
+                    this.style.display = 'none';
+                });
+                $(INPUT_SELECTOR, me.$el).map(function() {
+                    attr(this, DATA_INPUT_STATUS, null);
+                    attr(this, ARIA_INVALID, null);
+                    $(this).removeClass(CLS_INPUT_INVALID);
+                }); 
+            }
             me.isValid = true;
         },
 
         _focus: function(e) {
-            var el = e.target,
-                tip;
-            if (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip') return;
-            tip = attr(el, 'data-tip');
-            if (!tip) return;
+            var el = e.target;
+            if (el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip')) return;
             this.showMsg(el, {
-                msg: tip,
+                msg: attr(el, 'data-tip'),
                 type: 'tip'
             });
         },
@@ -356,7 +353,6 @@
                 rules;
 
             if (!arr) return;
-            field.rules = [];
             field.display = arr[1];
             rules = (arr[2] || '').split(';');
             $.map(rules, function(rule) {
@@ -375,16 +371,28 @@
         //验证完一个字段
         _validatedField: function(e, field, msgOpt) {
             var me = this,
+                opt = me.options,
+                showError = opt.showError,
                 el = e.target,
                 isValid = field.isValid = !!msgOpt.valid;
 
+            isValid && (msgOpt.type = 'ok');
             $(el)[isValid ? 'removeClass' : 'addClass'](CLS_INPUT_INVALID)
                 .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, msgOpt])
                 .attr(ARIA_INVALID, !isValid);
-            if (msgOpt.msg || msgOpt.showOk) {
-                me.showMsg(el, msgOpt);
+            
+            field.old.ret = msgOpt;
+            me.elements[field.key] = el;
+
+            if (!showError) return;
+            if (isString(showError)) {
+                $(showError).html(msgOpt.msg || '');
             } else {
-                me.hideMsg(el, msgOpt);
+                if (msgOpt.msg || msgOpt.showOk) {
+                    me.showMsg(el, msgOpt);
+                } else {
+                    el.value && me.hideMsg(el, msgOpt);
+                }
             }
         },
 
@@ -433,7 +441,6 @@
                 //失败的回调
                 $(el).trigger('invalid.rule', [method]);
             } else {
-                msgOpt.type = 'ok';
                 msgOpt.valid = true;
                 if (!showOk && isString(opt.showOk)) {
                     showOk = true;
@@ -451,8 +458,6 @@
 
             //缓存结果
             field.old = field.old || {};
-            field.old.ret = msgOpt;
-            me.elements[key] = el;
 
             //刚刚验证完成，验证前的值却和现在的不一样了(快速输入-_-!), 需重新验证
             if (isValid && field.old.value !== undefined && field.old.value !== el.value) {
@@ -460,16 +465,14 @@
                 me._checkRule(el, field);
             }
             //当前规则已通过，继续验证
-            if (isValid && field.vid < field.rules.length - 1) {
+            else if (isValid && field.vid < field.rules.length - 1) {
                 field.vid++;
-                return me._checkRule(el, field);
+                me._checkRule(el, field);
             }
             //字段验证失败，或者是字段的全部规则都验证成功
             else {
-                //if (!isValid || field.vid === field.rules.length - 1) {
                 field.vid = 0;
                 //执行验证完一个字段的回调
-                isFunction(opt.validated[name]) && opt.validated[name].call(me, el, field, msgOpt);
                 $(el).trigger('validated.field', [field, msgOpt]);
             }
         },
@@ -519,6 +522,7 @@
                 target,
                 old,
                 ret,
+                msgStatus = attr(el, DATA_INPUT_STATUS),
                 isValid = field.isValid = true;
 
             //等待验证状态，后面可能会验证
@@ -531,7 +535,9 @@
 
             //如果非必填项且值为空，就没必要继续验证
             if (!field.required && el.value === '' && !groupFn) {
-                if ($el.is('[data-tip]')) return true;
+                if (msgStatus === 'tip') return;
+                else me._focus({target: el});
+                
                 if (!$el.is(':checkbox,:radio')) {
                     $el.trigger('validated.field', [field, {
                         valid: true
@@ -543,7 +549,7 @@
             //如果值没变，就直接返回旧的验证结果
             if (!must && old && old.ret !== undefined && old.value === el.value) {
                 if (!old.ret.valid) isValid = me.isValid = false;
-                if (attr(el, DATA_INPUT_STATUS) === 'tip') return;
+                if (msgStatus === 'tip') return;
                 if (el.value !== '') {
                     msgOpt = old.ret;
                     $el.trigger('validated.field', [field, msgOpt]);
@@ -562,6 +568,8 @@
                         error: ret
                     };
                     me.hideMsg(el);
+                    field.vid = 0;
+                    field.rid = 'group';
                     isValid = false;
                 }
             }
@@ -572,7 +580,7 @@
             //如果已经出来结果 (旧的验证结果，或者分组验证结果)
             if (ret !== undefined) {
                 $el.trigger('validated.rule', [ret, field, msgOpt]);
-            } else {
+            } else if (field.rule) {
                 me._checkRule(el, field);
             }
         },
@@ -665,6 +673,7 @@
         //显示消息接口
         showMsg: function(el, opt) {
             opt = this._getMsgOpt(opt);
+            if (!opt.msg && !opt.showOk) return;
             //标记消息状态
             attr(el, DATA_INPUT_STATUS, opt.type);
             showMsg(el, opt, this.$el);
@@ -816,7 +825,7 @@
             $el = $(opt.target, context);
             if ($el.length) el = $el[0];
         }
-        datafor = el.name || '#' + el.id,
+        datafor = el.name || '#' + el.id;
         $msgbox = $('.' + CLS_MSG_BOX + '[data-for=' + datafor + ']', context);
         if (!$msgbox.length) {
             $el = $(attr(el, 'data-target') || el);

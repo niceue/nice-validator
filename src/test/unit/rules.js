@@ -22,7 +22,7 @@ test('options.rules', function(){
 
 test('options.groups', function(){
     var obj,
-        $els = $('#form_normal').find('input');
+        $els = $('#form_normal').find('input').val('');
 
     resetForm('#form_normal');
     obj = $('#form_normal').validator({

@@ -14,6 +14,7 @@
 </head>
 
 <body>
+<div id="error_msg"></div>
 <form class="diy_form" style="margin:50px 0 0 250px;">
 <p><input type="text" class="group" name="username" id="username" autocomplete="off" data-rule="用户名:username;remote[valid_username.php]" data-tip="请输入email或者手机号"><span class="msg-box n-right" data-for="username" style="display:none;"></span>
 </p>
@@ -41,15 +42,11 @@ $(function(){
         valid: function(){
             console.log('callback:valid')
         },
-        validated: {
-            username: function(){
-                console.log('validated:username')
-            },
-            password: function(){
-                console.log('validated:password')
-            }
+        invalid: function(){
+            console.log('callback:invalid')
         },
-        groups: [{
+        //showError: '#error_msg',
+        /*groups: [{
             fields: 'username password',
             callback: function($elements){
                 var me = this, count = 0;
@@ -61,15 +58,16 @@ $(function(){
             target: '#password',
             style: 'margin-top:20px;'
         }],
-        //debug: true,
+        
         /*setMsg: {
             mobile: "sdgsdgsh"
         },*/
         //msgTheme: 'msg-simple-right msg-icon',
         //showOk: '',
-        msgClass: 'n-bottom'
+        debug: true,
+        msgClass: 'n-bottom',
         //ignore: ':hidden',
-        //stopOnError: true
+        stopOnError: true
         //timely: true
     }).on('valid.form', function(){
         console.log('event:valid')

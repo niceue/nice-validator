@@ -47,7 +47,7 @@
     function resetForm(form){
         $(form).find(':input[data-cacherule]').each(function(){
             $(this).attr('data-rule', $(this).attr('data-cacherule'));
-        });
+        }).trigger('reset');
     }
 </script>
 <script src="unit/core.js"></script>
