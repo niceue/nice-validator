@@ -65,9 +65,10 @@ $(function(){
         //msgTheme: 'msg-simple-right msg-icon',
         //showOk: '',
         debug: true,
-        msgClass: 'n-bottom',
+        stopOnError: true,
+        msgClass: 'n-bottom'
         //ignore: ':hidden',
-        stopOnError: true
+        
         //timely: true
     }).on('valid.form', function(){
         console.log('event:valid')

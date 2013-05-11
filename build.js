@@ -13,20 +13,19 @@ var pkg = JSON.parse(fs.readFileSync(__dirname + '/package.json')),
               + '* (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
               + '* '+ pkg.homepage +'\n'
               + '*/',
-    JS_SRC  = __dirname + '/src/',
-    JS_OUT  = __dirname + '/',
-    CSS_SRC = __dirname + '/src/',
-    CSS_OUT = __dirname + '/';
-    js = fs.readFileSync(__dirname + '/src/'+ NS +'.js').toString(),
-    css = fs.readFileSync(__dirname + '/src/'+ NS +'.styl').toString();
+    SRC  = __dirname + '/src/',
+    OUT  = __dirname + '/';
     
 console.log('building and minifying...');
-buildJS(js, NS + '.js');
-buildCSS(css, NS+'.css');
+buildJS(NS);
+buildStyl(NS);
 console.log('done');
 
-function buildJS(js, name) {
-    var ast = U2.parse(js),
+
+function buildJS(name) {
+    var filename = name + '.js',
+        content = fs.readFileSync(SRC+ filename).toString(),
+        ast = U2.parse(content),
         compressor,
         code = '';
     
@@ -42,50 +41,21 @@ function buildJS(js, name) {
     ast.mangle_names();
 
     code = ast.print_to_string();
-    fs.writeFile(__dirname + '/' + name, COPYRIGHT + '\n' + code);
+    console.log('compiled: ' + filename);
+    fs.writeFile(OUT + filename, COPYRIGHT+code);
 }
 
-function buildCSS(css, name) {
-    stylus(css)
-        .set('filename', NS + '.styl')
-        .set('paths', [__dirname + '/src'])
-        .set('compress', true)
-        .render(function(err, css){
-            if (err) throw err;
-            fs.writeFile(__dirname + '/' + name, COPYRIGHT + '\n' + css);
-        });
-}
+function buildStyl(name) {
+    var filename = name + '.styl',
+        content = fs.readFileSync(SRC + filename).toString();
 
-function buildJS(p) {
-    var content = fs.readFileSync(p).toString(),
-        ast = U2.parse(content),
-        compressor,
-        code = '',
-        name = path.basename(p);
-    
-    compressor = U2.Compressor({
-        unsafe: true
-    });
-
-    ast.figure_out_scope();
-    ast = ast.transform(compressor);
-
-    ast.figure_out_scope();
-    ast.compute_char_frequency();
-    ast.mangle_names();
-
-    code = ast.print_to_string();
-    console.log('compiled: ' + name);
-    fs.writeFile(JS_OUT + name, code);
-}
-
-function buildStyl(p) {
-    fs.readFile(p, function(err, content) {
         stylus(content)
+            .set('filename', filename)
+            .set('paths', [__dirname + '/src'])
             .set('compress', true)
             .render(function(err, css){
                 if (err) throw err;
-                fs.writeFile(CSS_OUT + name, css);
+                console.log('compiled: ' + filename);
+                fs.writeFile(OUT + name + '.css', COPYRIGHT+css);
             });
-    });
 }

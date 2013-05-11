@@ -250,6 +250,7 @@
                 $inputs = $(INPUT_SELECTOR, me.$el);
 
             me._reset();
+            me.submiting = true;
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
             $inputs.each(function(i, el) {
                 if ($(el).is('[novalidate]')) return;
@@ -268,6 +269,7 @@
             ret = (me.isValid || opt.debug === 2) ? 'valid' : 'invalid';
             opt[ret].call(me, form);
             me.$el.trigger(ret + '.form', [form]);
+            me.submiting = false;
         },
 
         //接收：表单的reset事件
@@ -283,7 +285,7 @@
                     attr(this, DATA_INPUT_STATUS, null);
                     attr(this, ARIA_INVALID, null);
                     $(this).removeClass(CLS_INPUT_INVALID);
-                }); 
+                });
             }
             me.isValid = true;
         },
@@ -387,13 +389,11 @@
             if (!showError) return;
             if (isString(showError)) {
                 $(showError).html(msgOpt.msg || '');
-            } else {
-                if (msgOpt.msg || msgOpt.showOk) {
-                    me.showMsg(el, msgOpt);
-                } else {
-                    el.value && me.hideMsg(el, msgOpt);
-                }
+            } else if (msgOpt.msg || msgOpt.showOk) {
+                me.showMsg(el, msgOpt);
+                return;
             }
+            (el.value || me.submiting) && me.hideMsg(el, msgOpt);
         },
 
         //验证完一个规则
@@ -403,7 +403,6 @@
                 opt = me.options,
                 el = e.target,
                 msg = '',
-                key = field.key,
                 method = field.rid,
                 isValid = false,
                 showOk = false;
@@ -486,9 +485,8 @@
                 params = rule.params;
 
             field.rid = method;
-            field.old = {
-                value: el.value
-            };
+            field.old.value = el.value;
+
             ret = (getDataRule(el, method) || me.rules[method] || function() {
                 return true;
             }).call(me, el, params, field);
@@ -519,7 +517,6 @@
                 $el = $(el),
                 msgOpt = {},
                 groupFn = field.group,
-                target,
                 old,
                 ret,
                 msgStatus = attr(el, DATA_INPUT_STATUS),
@@ -530,24 +527,22 @@
                 return;
             }
             
-            old = field.old;
+            old = field.old = field.old || {};
             must = must || field.must; //此为特殊情况必须每次验证
 
-            //如果非必填项且值为空，就没必要继续验证
+            //如果非必填项且值为空
             if (!field.required && el.value === '' && !groupFn) {
                 if (msgStatus === 'tip') return;
                 else me._focus({target: el});
-                
+                old.value = '';
                 if (!$el.is(':checkbox,:radio')) {
-                    $el.trigger('validated.field', [field, {
-                        valid: true
-                    }]);
+                    $el.trigger('validated.field', [field, {valid: true}]);
                     return;
                 }
             }
 
             //如果值没变，就直接返回旧的验证结果
-            if (!must && old && old.ret !== undefined && old.value === el.value) {
+            else if (!must && old && old.ret !== undefined && old.value === el.value) {
                 if (!old.ret.valid) isValid = me.isValid = false;
                 if (msgStatus === 'tip') return;
                 if (el.value !== '') {
@@ -1088,7 +1083,7 @@
                         data = parseData(msg);
                         if (data === undefined) data = parseData(msg.data);
                         msg = data || status === 'success';
-                    } 
+                    }
                     $(element).trigger('validated.rule', [msg, field]);
                 }
             });
