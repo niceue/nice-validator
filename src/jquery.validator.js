@@ -329,7 +329,7 @@
                         };
 
                     //这些键不触发验证(包含回车键，回车键触发的是提交表单，防止重复验证)
-                    if ((!specialKey[key] && key < 48) || key >= 112) return;
+                    if (key < 48 && !specialKey[key]) return;
 
                     //键盘事件，降低验证频率
                     timer = 500;
