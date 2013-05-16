@@ -821,7 +821,7 @@
             if ($el.length) el = $el[0];
         }
         datafor = el.name || '#' + el.id;
-        $msgbox = $('.' + CLS_MSG_BOX + '[data-for=' + datafor + ']', context);
+        $msgbox = $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
         if (!$msgbox.length) {
             $el = $(attr(el, 'data-target') || el);
             tpl = getTpl(opt.tpl);

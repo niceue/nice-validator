@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title> Validator </title>
+<script src="../libs/jquery.js"></script>
+<!-- plugin -->
+<link rel="stylesheet" href="../../jquery.validator.css" />
+<script src="../jquery.validator.js"></script>
+<script src="../../local/zh-CN.js"></script>
+<style>
+body,fieldset,input {margin:0; padding:0; border:0;}
+body {
+  background: #fff; color:#333;
+  font: 14px/18px Arial,sans-serif;
+}
+.main {
+  width: 835px; margin:0 auto;
+  border: 1px solid rgba(0,0,0,.1); border-radius: 6px;
+}
+.signup-wrapper {
+  width: 585px; margin:0 auto;
+}
+.field-name {
+  font-size: 14px; font-weight: blod; margin-bottom: 3px; color:#333;
+}
+.field-input {
+  position: relative; margin-bottom: 15px;
+}
+.field-input input {
+  width:382px; height:20px; padding:4px; 
+  border-radius:3px; border:1px solid #ccc; 
+  background: #fff;
+}
+.field-input .msg-wrap {
+  padding-left:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="main">
+<div class="signup-wrapper">
+  <form id="signup_form">
+  <fieldset class="textbox">
+  <div class="item">
+    <div class="field-name">全名</div>
+    <div class="field-input">
+      <input type="text" name="user[name]" maxlength="20" autocomplete="off"
+      data-rule="required" 
+      data-tip="输入你的名字与姓氏。" 
+      data-msg-required="全名必填!" 
+      data-msg-ok="名字很棒。"
+      >
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="field-name">电子邮件地址</div>
+    <div class="field-input">
+      <input type="text" name="user[email]" autocomplete="off"
+      data-rule="required;email" 
+      data-tip="你的邮件地址是什么?" 
+      data-msg-required="电子邮箱地址必填!" 
+      data-msg-email="不像是有效的电子邮箱。" 
+      data-ok="我们将会给你发送确认邮件。"
+      >
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="field-name">创建密码</div>
+    <div class="field-input">
+      <input type="text" name="user[user_password]"
+      data-rule="required;length[6~]" 
+      data-tip="6个或更多字符! 要复杂些。" 
+      data-msg-length="密码最少为6位。" 
+      data-msg-required="密码不能为空!"
+      >
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="field-name">选择你的用户名</div>
+    <div class="field-input">
+      <input type="text" name="user[screen_name]" maxlength="15" autocomplete="off"
+      data-rule="required;username" 
+      data-rule-username="[/^[a-zA-Z0-9]+$/, '用户名无效! 仅支持字母与数字。']" 
+      data-tip="别担心,你可以稍后进行修改。" 
+      data-msg-required="用户名必填!<br>你可以稍后进行修改。" 
+      >
+    </div>
+  </div>
+
+  </fieldset>
+  <button type="submit">创建我的账号</button>
+  </form>
+</div>
+</div>
+<script>
+  //$("#signup_form").validator();
+</script>
+
+<!--
+        <div class="prompt name">
+          <div class="field-name">全名</div>
+          <div class="holding" data-fieldname="name">
+            <div class="sidetip">
+              <p class="ok isaok">名字很棒。</p>
+              <p class="tip active">输入你的名字与姓氏。</p>
+              <p class="blank invalid error" role="alert">全名必填!</p>
+            </div>
+            <input type="text" autocomplete="off" value="" name="user[name]" maxlength="20" aria-required="true" class="">
+          </div>
+        </div>
+    
+        <div class="prompt email">
+          <div class="field-name">电子邮件地址</div>
+          <div class="holding  has-content" data-fieldname="email">
+            <div class="sidetip">
+              <p class="tip">你的邮件地址是什么?</p>
+              <p class="ok isaok">我们将会给你发送确认邮件。</p>
+              <p class="checking">正在验证...</p>
+              <p class="invalid error" role="alert">不像是有效的电子邮箱。</p>
+              <p class="blank error" role="alert">电子邮箱地址必填!</p>
+              <p class="taken error active" role="alert">该电子邮件地址已被注册。是否希望<a href="/login">登录</a>或<a href="/account/resend_password">恢复密码</a>?</p>
+              <p class="domain tip">你是不是要找 <em><a class="js-email-correction" href="#"></a></em>?</p>
+            </div>
+            <input class="email-input" type="text" autocomplete="off" value="" name="user[email]" aria-required="true">
+          </div>
+        </div>
+    
+    
+    
+        <div class="prompt password">
+          <div class="field-name">创建密码</div>
+          <div class="holding  has-content" data-fieldname="password">
+            <div class="sidetip">
+              <p class="tip">6个或更多字符! 要复杂些。</p>
+              <p class="perfect isaok">密码很完美!</p>
+              <p class="ok isaok">密码复杂度还可以。</p>
+              <p class="weak isaok active">密码强度还可以更高</p>
+              <p class="weak error" role="alert">密码不够安全。</p>
+              <p class="obvious error" role="alert">密码太明显啦。</p>
+              <p class="invalid error" role="alert">密码最少为6位。</p>
+              <p class="blank error" role="alert">密码不能为空!</p>
+            </div>
+            <input type="password" value="" name="user[user_password]" aria-required="true">
+          </div>
+            <div class="score" style="display: block;"><span><b class="fill" style="width: 11.5px;"></b></span></div>
+        </div>
+    
+    
+        <div class="prompt username">
+          <div class="field-name">选择你的用户名</div>
+          <div class="holding " data-fieldname="username">
+            <div class="sidetip">
+              <p class="ok isaok">用户名可以使用。<br>你可以稍后进行修改。</p>
+              <p class="tip">别担心,你可以稍后进行修改。</p>
+              <p class="checking">正在验证...</p>
+              <p class="taken error" role="alert">用户名已被占用!</p>
+              <p class="invalid error" role="alert">用户名无效! 仅支持字母与数字。</p>
+              <p class="blank error" role="alert">用户名必填!<br>你可以稍后进行修改。</p>
+            </div>
+            <input type="text" autocomplete="off" value="" data-pre-input-value="" name="user[screen_name]" maxlength="15" aria-required="true">
+          </div>
+          <div class="suggestions" style="display: block;">推荐用户: <ul><li><button class="btn-link" data-sugg-sources="full_name" data-sugg-technik="oldschool">zj861</button></li></ul></div>
+        </div>
+    
+        <div class="prompt rememberme">
+          <label class="checkbox">
+            <input type="checkbox" checked="checked" name="user[remember_me_on_signup]" value="1">
+            <span>在这台电脑上保持我的登录状态。</span>
+          </label>
+          <input type="hidden" name="user[remember_me_on_signup]" value="">
+        </div>
+    
+        <div class="prompt optin">
+          <label>
+            <input type="checkbox" checked="checked" name="user[use_cookie_personalization]" value="1">
+            <input type="hidden" name="asked_cookie_personalization_setting" value="1">
+            <span>基于我最近访问的网站来定制 Twitter。<a class="cookie-personalization-support" href="https://support.twitter.com/articles/20169421" target="_blank">了解更多</a></span>
+          </label>
+        </div>
+    
+        <input type="hidden" name="context" value="">
+        <input type="hidden" name="ad_id" value="">
+        <input type="hidden" name="ad_ref" value="">
+    
+      </fieldset>
+-->
+
+</body>
+</html>
