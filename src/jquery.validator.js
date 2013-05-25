@@ -241,12 +241,12 @@
 
         //接收：表单的submit事件
         _submit: function(e) {
-            e && e.preventDefault();
             var me = this,
                 opt = me.options,
                 form = e.target,
                 FOCUS_EVENT = 'focus.field',
                 ret,
+                hasAction = !!form.action,
                 $inputs = $(INPUT_SELECTOR, me.$el);
 
             me._reset();
@@ -266,6 +266,7 @@
             if (!me.isValid && !opt.stopOnError) {
                 $(':input.' + CLS_INPUT_INVALID + ':first', me.$el).trigger(FOCUS_EVENT);
             }
+            if (!me.isValid || (!hasAction && e)) e.preventDefault();
             ret = (me.isValid || opt.debug === 2) ? 'valid' : 'invalid';
             opt[ret].call(me, form);
             me.$el.trigger(ret + '.form', [form]);
@@ -441,11 +442,17 @@
                 $(el).trigger('invalid.rule', [method]);
             } else {
                 msgOpt.valid = true;
-                if (!showOk && isString(opt.showOk)) {
-                    showOk = true;
-                    msgOpt.msg = opt.showOk;
+                if (!showOk) {
+                    var okmsg = attr(el, 'data-ok');
+                    if (okmsg) {
+                        showOk = true;
+                        msgOpt.msg = okmsg;
+                    } else if (isString(opt.showOk)) {
+                        showOk = true;
+                        msgOpt.msg = opt.showOk;
+                    }
                 }
-                if (showOk) msgOpt.showOk = true;
+                msgOpt.showOk = showOk;
                 //成功的回调
                 $(el).trigger('valid.rule', [method]);
             }
@@ -857,8 +864,11 @@
         if (!$msg.length) {
             $msg = $('<span class="msg-wrap"></span>').appendTo($msgbox);
         }
+        if (opt.pos === 'bottom') {
+            $msg[0].style.top = $(el).outerHeight() + 'px';
+        }
         $msg[0].innerHTML = (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
-        $msg[0].className = 'msg-wrap ' + cls;
+        $msg[0].className = 'msg-wrap ' + cls + (opt.icon ? ' n-hasicon' : '');
         $msgbox[0].style.display = '';
 
         if (effect) {

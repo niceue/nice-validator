@@ -94,12 +94,16 @@
         },
         'simple_bottom': {
             formClass: 'n-simple',
-            msgClass: 'n-bottom',
-            msgStyle: 'margin-top:5px;'
+            msgClass: 'n-bottom'
         },
         'yellow_right': {
             formClass: 'n-yellow',
             msgClass: 'n-right',
+            msgArrow: TPL_ARROW
+        },
+        'yellow_bottom': {
+            formClass: 'n-yellow',
+            msgClass: 'n-bottom',
             msgArrow: TPL_ARROW
         },
         'yellow_right_effect': {
