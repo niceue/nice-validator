@@ -1,16 +1,16 @@
-theme($color=null, $bg_color=#fff, $bd_color=#FFBB76, $sd_color=null){
-    if color != null {
-        color: $color;
-    }
+theme($ft_color, $bg_color=#fff, $bd_color=#FFBB76, $sd_color){
     background-color: $bg_color;
     border-color: $bd_color;
-    if $sd_color != null {
+    if $ft_color {
+        color: $ft_color;
+    }
+    if $sd_color {
         box-shadow: 0 1px 3px $sd_color;
     }
     .n-arrow {
         b {
             color: $bd_color;
-            if $sd_color != null {
+            if $sd_color {
                 text-shadow: 0 0 2px $sd_color;
             }
         }
@@ -27,6 +27,8 @@ inline-block() {
  *********************/
 .msg-wrap,.n-icon,.n-msg {
     inline-block()
+    margin:0; padding:0;
+    vertical-align:top;
 }
 
 .msg-box {
@@ -38,8 +40,6 @@ inline-block() {
     .n-icon {
         width:16px; height:16px;
         overflow:hidden;
-        margin:0; padding:0;
-        vertical-align:top;
         background-repeat:no-repeat;
     }
     .n-arrow {
@@ -55,8 +55,7 @@ inline-block() {
     }
     .n-msg {
         line-height:16px; 
-        margin:0; padding:0; margin-left:2px;
-        vertical-align:top;
+        margin-left:2px;
         font-size: 12px;
         font-family: simsun;
     }
@@ -79,7 +78,7 @@ inline-block() {
 .n-top .n-arrow,
 .n-bottom .n-arrow {height: 6px; width: 12px; left:6px;}
 .n-left .n-arrow,
-.n-right .n-arrow {height: 12px; width: 6px; top: 5px;}
+.n-right .n-arrow {height: 12px; width: 6px; top: 5px; *top: 4px;}
 
 /** top **/
 .n-top {

@@ -40,7 +40,7 @@ function buildJS(name) {
     ast.compute_char_frequency();
     ast.mangle_names();
 
-    code = ast.print_to_string();
+    code = ast.print_to_string() + '\n';
     console.log('compiled: ' + filename);
     fs.writeFile(OUT + filename, COPYRIGHT+code);
 }

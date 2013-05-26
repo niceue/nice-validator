@@ -1,4 +1,4 @@
-/*! Validator 1.0.0-pre
+/*! Validator 1.0.0-alpha
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.github.io/validator/
  */
@@ -246,7 +246,6 @@
                 form = e.target,
                 FOCUS_EVENT = 'focus.field',
                 ret,
-                hasAction = !!form.action,
                 $inputs = $(INPUT_SELECTOR, me.$el);
 
             me._reset();
@@ -258,15 +257,15 @@
                 if (!field) return;
                 me._validate(this, field);
                 if (!me.isValid && opt.stopOnError) {
-                    //Only trigger the default event, does not affect the focusin event.
-                    $(this).trigger(FOCUS_EVENT);
+                    //IE6要触发两次才生效
+                    $(this).trigger(FOCUS_EVENT).trigger(FOCUS_EVENT);
                     return false;
                 }
             });
             if (!me.isValid && !opt.stopOnError) {
-                $(':input.' + CLS_INPUT_INVALID + ':first', me.$el).trigger(FOCUS_EVENT);
+                $(':input.' + CLS_INPUT_INVALID + ':first', me.$el).trigger(FOCUS_EVENT).trigger(FOCUS_EVENT);
             }
-            if (!me.isValid || (!hasAction && e)) e.preventDefault();
+            if (!me.isValid || !attr(form, 'action') && e) e.preventDefault();
             ret = (me.isValid || opt.debug === 2) ? 'valid' : 'invalid';
             opt[ret].call(me, form);
             me.$el.trigger(ret + '.form', [form]);
@@ -293,7 +292,7 @@
 
         _focus: function(e) {
             var el = e.target;
-            if (el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip')) return;
+            if (this.submiting || el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip')) return;
             this.showMsg(el, {
                 msg: attr(el, 'data-tip'),
                 type: 'tip'
