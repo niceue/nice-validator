@@ -22,7 +22,7 @@
 .n-top .n-arrow{bottom:-6px;}
 .n-top .n-arrow b{top:-8px}
 .n-top .n-arrow i{top:-9px}
-.n-bottom .msg-wrap{position:absolute;margin-top:-6px\0/;*margin-top:3px}
+.n-bottom .msg-wrap{position:absolute;margin-top:2px;margin-top:3px\9}
 .n-bottom .n-arrow{top:-6px;}
 .n-bottom .n-arrow b{top:-2px}
 .n-bottom .n-arrow i{top:-1px}
@@ -34,8 +34,8 @@
 .n-right .n-arrow{left:-6px;}
 .n-right .n-arrow b{left:1px}
 .n-right .n-arrow i{left:2px}
-.n-default .msg-wrap{margin-top:6px;}
 .n-default .msg-wrap .n-icon{background-image:url("images/validator_default.png")}
+.n-default .n-right .msg-wrap{margin-top:6px}
 .n-default .n-tip .n-icon{display:none}
 .n-simple .msg-wrap .n-icon{background-image:url("images/validator_simple.png")}
 .n-simple .n-tip .n-icon{display:none}

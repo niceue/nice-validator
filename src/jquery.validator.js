@@ -34,6 +34,7 @@
         isObject = function(o) {
             return o && Object.prototype.toString.call(o) === '[object Object]';
         },
+        gtIE7 = !!(window.ActiveXObject && document.querySelector),
         attr = function(el, key, value) {
             if (value !== undefined) {
                 if (value === null) el.removeAttribute(key);
@@ -863,11 +864,11 @@
         if (!$msg.length) {
             $msg = $('<span class="msg-wrap"></span>').appendTo($msgbox);
         }
-        if (opt.pos === 'bottom') {
-            $msg[0].style.top = $(el).outerHeight() + 'px';
+        if ($msgbox[0].className.indexOf('bottom') !== -1) {
+            $msg[0].style.top = $(el).outerHeight() - (gtIE7 ? (parseInt($(el).css('padding-top'))+4) : 0 ) + 'px';
         }
         $msg[0].innerHTML = (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
-        $msg[0].className = 'msg-wrap ' + cls + (opt.icon ? ' n-hasicon' : '');
+        $msg[0].className = 'msg-wrap ' + cls;
         $msgbox[0].style.display = '';
 
         if (effect) {
