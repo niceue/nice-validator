@@ -131,7 +131,7 @@
 
     function Validator(element, options) {
         var me = this,
-            opt, theme;
+            opt, theme, dataOpt;
         if (!me instanceof Validator) return new Validator(element, options);
         me.$el = $(element);
         if (isFunction(options)) {
@@ -139,7 +139,9 @@
                 success: options
             };
         }
-        opt = me.options = $.extend({}, defaults, options);
+        dataOpt = attr(element, 'data-'+NS+'-option');
+        dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : null;
+        opt = me.options = $.extend({}, defaults, options, dataOpt);
         theme = opt.theme;
         if (theme && themes[theme]) {
             opt = $.extend(opt, themes[theme], options);
@@ -822,15 +824,22 @@
     }
 
     function getMsgDOM(el, opt, context) {
-        var $el, $msgbox, datafor, tpl;
+        var $el, $msgbox, datafor, tpl, tgt;
         if (opt.target) {
             $el = $(opt.target, context);
             if ($el.length) el = $el[0];
+        } else {
+            tgt = attr(el, 'data-target');
+            if (tgt) tgt = $(tgt, context);
+            if (tgt && tgt.length && tgt.is('.'+CLS_MSG_BOX)) {
+                $msgbox = tgt;
+            }
         }
+        
         datafor = el.name || '#' + el.id;
-        $msgbox = $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
+        $msgbox = $msgbox || $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
         if (!$msgbox.length) {
-            $el = $(attr(el, 'data-target') || el);
+            $el = $(tgt || el);
             tpl = getTpl(opt.tpl);
             $msgbox = $(tpl).addClass(CLS_MSG_BOX).attr({
                 tabindex: -1,
@@ -846,7 +855,7 @@
 
     function showMsg(el, opt, context) {
         var cls, fn, $msgbox, $msg, effect = opt.effect;
-
+        
         cls = {
             error: CLS_MSG_INVALID,
             ok: CLS_MSG_VALID,
