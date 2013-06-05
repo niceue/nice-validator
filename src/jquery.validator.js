@@ -100,10 +100,10 @@
         fields[key][rule]     {String}                    规则字符串
         fields[key][tip]      {String}                    自定义获得焦点时的提示信息
         fields[key][msg]      {Object}                    自定义验证失败的消息
-        fields[key][timely]   {Boolean}                   自定义验证失败的消息
+        fields[key][timely]   {Boolean}                   是否启用实时验证
         fields[key][target]   {jqSelector}                验证当前字段，但是消息却可以显示在target指向的元素周围
      */
-    $.fn.validator = function(options) {
+    $.fn[NS] = function(options) {
         var that = this,
             args = arguments;
         if (that.is(':input')) return that;
@@ -242,7 +242,6 @@
             }
         },
 
-        //接收：表单的submit事件
         _submit: function(e) {
             var me = this,
                 opt = me.options,
@@ -275,7 +274,6 @@
             me.submiting = false;
         },
 
-        //接收：表单的reset事件
         _reset: function() {
             var me = this, showError = me.options.showError;
             if (isString(showError)) {
@@ -411,6 +409,7 @@
                 showOk = false;
 
             msgOpt = msgOpt || {};
+            field.old = field.old || {};
 
             //格式化结果和消息
             if (ret !== true) {
@@ -419,9 +418,7 @@
                 if (!msg) {
                     if (isString(ret)) {
                         msg = ret;
-                        ret = {
-                            error: msg
-                        };
+                        ret = {error: msg};
                     } else if (isObject(ret)) {
                         if (ret.error) {
                             msg = ret.error;
@@ -440,7 +437,6 @@
             //消息处理, 以及rule级别的事件
             if (!isValid) {
                 me.isValid = false;
-                //失败的回调
                 $(el).trigger('invalid.rule', [method]);
             } else {
                 msgOpt.valid = true;
@@ -455,7 +451,6 @@
                     }
                 }
                 msgOpt.showOk = showOk;
-                //成功的回调
                 $(el).trigger('valid.rule', [method]);
             }
 
@@ -463,10 +458,6 @@
             if (opt.debug) {
                 debug[isValid ? 'info' : 'warn'](field.vid + ': ' + method + ' -> ' + (msgOpt.msg || true));
             }
-
-            //缓存结果
-            field.old = field.old || {};
-
             //刚刚验证完成，验证前的值却和现在的不一样了(快速输入-_-!), 需重新验证
             if (isValid && field.old.value !== undefined && field.old.value !== el.value) {
                 field.vid = 0;
@@ -480,7 +471,6 @@
             //字段验证失败，或者是字段的全部规则都验证成功
             else {
                 field.vid = 0;
-                //执行验证完一个字段的回调
                 $(el).trigger('validated.field', [field, msgOpt]);
             }
         },
@@ -496,9 +486,7 @@
             field.rid = method;
             field.old.value = el.value;
 
-            ret = (getDataRule(el, method) || me.rules[method] || function() {
-                return true;
-            }).call(me, el, params, field);
+            ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
             //有返回值，直接抛事件（异步验证无返回值）
             if (ret !== undefined) {
                 $(el).trigger('validated.rule', [ret, field]);
@@ -510,12 +498,10 @@
 
         //验证一个字段
         _checkField: function(el, field) {
-            var me = this;
-
-            field = field || me.getField(el);
+            field = field || this.getField(el);
             if (!field) return true;
-            me._validate(el, field, true);
-
+            this._validate(el, field, true);
+            
             return field.isValid;
         },
 
@@ -531,11 +517,7 @@
                 msgStatus = attr(el, DATA_INPUT_STATUS),
                 isValid = field.isValid = true;
 
-            //等待验证状态，后面可能会验证
-            if (!field || !field.rules || el.disabled || $el.is('[novalidate]')) {
-                return;
-            }
-            
+            if (!field || !field.rules || el.disabled || $el.is('[novalidate]')) return; //等待验证状态，后面可能会验证
             old = field.old = field.old || {};
             must = must || field.must; //此为特殊情况必须每次验证
 
@@ -549,7 +531,6 @@
                     return;
                 }
             }
-
             //如果值没变，就直接返回旧的验证结果
             else if (!must && old && old.ret !== undefined && old.value === el.value) {
                 if (!old.ret.valid) isValid = me.isValid = false;
@@ -568,9 +549,7 @@
                     ret = undefined;
                     me.hideMsg(el, msgOpt);
                 } else {
-                    if (isString(ret)) ret = {
-                        error: ret
-                    };
+                    if (isString(ret)) ret = {error: ret};
                     me.hideMsg(el);
                     field.vid = 0;
                     field.rid = 'group';
@@ -657,10 +636,7 @@
         },
 
         _getMsgOpt: function(obj) {
-            if (isString(obj)) obj = {
-                msg: obj
-            };
-            return $.extend({}, this.msgOpt, obj);
+            return $.extend({}, this.msgOpt, isString(obj) ? {msg: obj} : obj);
         },
 
         renderMsg: function() {
@@ -736,7 +712,6 @@
         }
     };
 
-
     function Rules(obj, context) {
         var that = context ? context === true ? this : context : Rules.prototype;
 
@@ -780,7 +755,6 @@
     }
 
     //根据元素获得验证的实例
-
     function getInstance(el) {
         if (!el || !el.tagName) return;
         var wrap = el;
@@ -790,11 +764,10 @@
             case 'TEXTAREA':
                 wrap = el.form || $(el).closest('.n-' + NS);
         }
-        return $(wrap).data(NS) || $(wrap).validator().data(NS);
+        return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
     //获取节点上的相应规则
-
     function getDataRule(el, method) {
         var fn = $.trim(attr(el, 'data-rule-' + method));
         if (!fn) return;
@@ -803,7 +776,6 @@
     }
 
     //获取节点上的自定义消息
-
     function getDataMsg(el, field, item) {
         var msg = field.msg;
         if (isObject(msg) && item) msg = msg[item];
@@ -825,6 +797,7 @@
 
     function getMsgDOM(el, opt, context) {
         var $el, $msgbox, datafor, tpl, tgt;
+        
         if (opt.target) {
             $el = $(opt.target, context);
             if ($el.length) el = $el[0];
@@ -835,7 +808,6 @@
                 $msgbox = tgt;
             }
         }
-        
         datafor = el.name || '#' + el.id;
         $msgbox = $msgbox || $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
         if (!$msgbox.length) {
@@ -863,11 +835,9 @@
             loading: CLS_MSG_LOADING
         }[opt.type || (opt.type = 'error')];
 
-        //多元素共享一个消息DOM
         if ($(el).is(':checkbox,:radio')) {
             el = getGroupTarget(el, opt.pos === 'left');
         }
-
         $msgbox = getMsgDOM(el, opt, context);
         $msg = $msgbox.find('span.msg-wrap');
         if (!$msg.length) {
@@ -924,7 +894,7 @@
             var $form = $(this),
                 me;
             if (!$form.data(NS)) {
-                me = $form.validator().data(NS);
+                me = $form[NS]().data(NS);
                 if (!$.isEmptyObject(me.fields)) {
                     me._submit(e);
                 } else {
@@ -1055,15 +1025,18 @@
             return this.getRangeMsg(len, params, 'length', (params[1] ? '2_' : ''));
         },
 
-        /** 远程验证
+        /** 远程验证 remote(url [, name1, [name2 ...]]);
          *  适配3种结果(前面为成功，后面为失败):
                 1.返回text:
                     ''  '错误消息'
                 2.返回json:
                     {"ok": ""}  {"error": "错误消息"}
                 3.json包装格式:
-                    {"status": 1, "ok": ""}  {"status": 1, "error": "错误消息"}
-         *  remote(url [name1, [name2 ...]]);
+                    {"status": 1, "data": {"ok": ""}}  {"status": 1, "data": {"error": "错误消息"}}
+         * @example:
+            最简单：remote(path/to/server.php);
+            带参数：remote(path/to/server.php, fieldName1, fieldName2, ...);
+            GET请求：remote(GET:path/to/server.php, fieldName1, fieldName2);
          */
         remote: function(element, params, field) {
             var me = this,
@@ -1151,6 +1124,6 @@
             }
         });
     };
-    $.validator = Validator;
+    $[NS] = Validator;
 
 })(jQuery);
