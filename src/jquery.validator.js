@@ -50,7 +50,7 @@
         },
         defaults = {
             debug: 0,
-            timely: 'input',
+            timely: 2,
             stopOnError: 0,
             showError: 1,
             showOk: 1,
@@ -99,6 +99,7 @@
         {String|Object} value
         fields[key][rule]     {String}                    规则字符串
         fields[key][tip]      {String}                    自定义获得焦点时的提示信息
+        fields[key][ok]       {String}                    字段验证成功后显示的消息
         fields[key][msg]      {Object}                    自定义验证失败的消息
         fields[key][timely]   {Boolean}                   是否启用实时验证
         fields[key][target]   {jqSelector}                验证当前字段，但是消息却可以显示在target指向的元素周围
@@ -130,10 +131,9 @@
     };
 
     function Validator(element, options) {
-        var me = this,
-            opt, theme, dataOpt;
+        var me = this, opt, theme, dataOpt;
         if (!me instanceof Validator) return new Validator(element, options);
-        me.$el = $(element);
+        
         if (isFunction(options)) {
             options = {
                 success: options
@@ -146,6 +146,8 @@
         if (theme && themes[theme]) {
             opt = $.extend(opt, themes[theme], options);
         }
+
+        me.$el = $(element);
         me.rules = new Rules(opt.rules, true);
         me.messages = new Messages(opt.messages, true);
         me.fields = {};
@@ -233,7 +235,7 @@
                     .on('focusin', INPUT_SELECTOR, proxy(me, '_focus'))
                     .on('focusout validate', INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click', ':radio,:checkbox', proxy(me, '_click'));
-                if (opt.timely === 'input') me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'));
+                if (opt.timely === 2) me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'));
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
                 //初始化完成，阻止掉HTML5默认的表单验证，同时作为已经初始化的依据
@@ -314,8 +316,8 @@
                 if (e.type === 'validate') must = true;
                 //不是手动触发的验证, 也不是实时的验证, 那就不继续了
                 else if ($(el).is('[notimely]')) return;
-                //timely为input时, 只在keyup事件触发时验证
-                else if (opt.timely === 'input' && e.type !== 'keyup') return;
+                //只在keyup事件触发时验证
+                else if (opt.timely === 2 && e.type !== 'keyup') return;
                 //如果当前字段被忽略了
                 if (opt.ignore && $(el).is(opt.ignore)) return;
 
