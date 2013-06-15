@@ -3,7 +3,7 @@
 * http://niceue.github.io/validator/
 */
 .msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1;margin:0;padding:0;vertical-align:top}
-.msg-box{position:relative;font-size:12px;vertical-align:top;*zoom:1;}
+.msg-box{position:relative;font-size:12px;vertical-align:top;outline:none;*zoom:1;}
 .msg-box .msg-wrap{white-space:nowrap}
 .msg-box .n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
 .msg-box .n-arrow{position:absolute;overflow:hidden;font-size:12px;}
