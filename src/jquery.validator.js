@@ -822,7 +822,12 @@
                 'data-for': datafor
             });
             if (opt.cls) $msgbox.addClass(opt.cls);
-            $msgbox[!opt.pos || opt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
+            if ($el.is(':checkbox,:radio')) {
+                var $parent = $el.parent();
+                $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
+            } else {
+                $msgbox[!opt.pos || opt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
+            }
         }
         return $msgbox;
     }
@@ -837,9 +842,6 @@
             loading: CLS_MSG_LOADING
         }[opt.type || (opt.type = 'error')];
 
-        if ($(el).is(':checkbox,:radio')) {
-            el = getGroupTarget(el, opt.pos === 'left');
-        }
         $msgbox = getMsgDOM(el, opt, context);
         $msg = $msgbox.find('span.msg-wrap');
         if (!$msg.length) {
@@ -864,10 +866,6 @@
 
     function hideMsg(el, opt, context) {
         opt = opt || {};
-        if ($(el).is(':checkbox,:radio')) {
-            opt.pos = opt.pos || getPos(defaults.msgTheme);
-            el = getGroupTarget(el, opt.pos === 'left');
-        }
         var $msgbox = getMsgDOM(el, opt, context),
             $msg,
             effect = opt.effect;
@@ -879,10 +877,6 @@
         } else {
             $msgbox[0].style.display = 'none';
         }
-    }
-
-    function getGroupTarget(el, isFirst) {
-        return $(el).closest('.n-' + NS).find('input[name="' + el.name + '"]')[isFirst ? 'first' : 'last']()[0];
     }
 
     $(function() {
