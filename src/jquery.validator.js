@@ -22,7 +22,7 @@
         rDoubleBytes = /[^\x00-\xff]/g, //全角字符
         rPos = /^.*(top|right|bottom|left).*$/,
         rAjaxType = /(?:(post|get):)?(.+)/i,
-        rUnsafe = /[<>\&\/]/g, //危险字符
+        rUnsafe = /<|>|&lt;|&gt;/g, //危险字符
 
         noop = $.noop,
         proxy = $.proxy,
@@ -1084,7 +1084,7 @@
         },
 
         /** 过滤器，直接过滤不提示错误(支持自定义正则)
-         *  filter          过滤<>&/
+         *  filter          过滤<>
          *  filter(regexp)  过滤正则匹配的字符
          */
         filter: function(element, params) {
