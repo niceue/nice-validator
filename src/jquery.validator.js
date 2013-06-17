@@ -886,13 +886,12 @@
             } else {
                 $(this).removeAttr('data-rule');
             }
-        }).on('submit', 'form:not([novalidate])', function(e) {
-            var $form = $(this),
-                me;
+        }).on('click submit', 'form:not([novalidate])', function(e) {
+            var $form = $(this), me;
             if (!$form.data(NS)) {
                 me = $form[NS]().data(NS);
                 if (!$.isEmptyObject(me.fields)) {
-                    me._submit(e);
+                    e.type==='submit' && me._submit(e);
                 } else {
                     $form.attr('novalidate', true).removeData(NS);
                 }
