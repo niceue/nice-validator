@@ -1090,6 +1090,7 @@
         filter: function(element, params) {
             var reg = params ? (new RegExp("[" + params[0] + "]", "g")) : rUnsafe;
             element.value = element.value.replace(reg, '');
+            return true;
         }
     });
 
