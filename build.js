@@ -10,9 +10,9 @@ var fs = require('fs'),
 var pkg = JSON.parse(fs.readFileSync(__dirname + '/package.json')),
     NS = pkg.name,
     COPYRIGHT = '/*! '+ pkg.title +' '+ pkg.version +'\n'
-              + '* (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
-              + '* '+ pkg.homepage +'\n'
-              + '*/\n',
+              + ' * (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
+              + ' * '+ pkg.homepage +'\n'
+              + ' */\n',
     SRC  = __dirname + '/src/',
     OUT  = __dirname + '/';
     
@@ -43,6 +43,9 @@ function buildJS(name) {
     code = ast.print_to_string() + '\n';
     console.log('compiled: ' + filename);
     fs.writeFile(OUT + filename, COPYRIGHT+code);
+    
+    content = content.replace(/\/\*\![\s\S]+?\*\/\n+/, COPYRIGHT);
+    fs.writeFile(SRC+ filename, content);
 }
 
 function buildStyl(name) {

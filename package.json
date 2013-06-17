@@ -2,9 +2,9 @@
     "name": "jquery.validator",
     "title": "Validator",
     "description": "Simple, smart and pleasant verification solution.",
-    "version": "1.0.0-alpha",
+    "version": "0.1.0-alpha",
     "keywords": ["validator"],
-    "homepage": "http://niceue.github.io/validator/",
+    "homepage": "http://niceue.com/validator/",
     "author": "Jony Zhang <zj86@live.cn>",
     "repository": {
         "type": "git",

@@ -1,7 +1,7 @@
-/*! Validator 1.0.0-alpha
-* (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
-* http://niceue.github.io/validator/
-*/
+/*! Validator 0.1.0-alpha
+ * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
+ * http://niceue.com/validator/
+ */
 .msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1;margin:0;padding:0;vertical-align:top}
 .msg-box{position:relative;font-size:12px;vertical-align:top;outline:none;*zoom:1;}
 .msg-box .msg-wrap{white-space:nowrap}

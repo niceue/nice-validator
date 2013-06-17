@@ -1,6 +1,6 @@
-/*! Validator 1.0.0-alpha
+/*! Validator 0.1.0-alpha
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
- * http://niceue.github.io/validator/
+ * http://niceue.com/validator/
  */
 /*jshint browser:true, evil:true*/
 (function($, undefined) {
