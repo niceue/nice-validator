@@ -656,6 +656,7 @@
         showMsg: function(el, opt) {
             opt = this._getMsgOpt(opt);
             if (!opt.msg && !opt.showOk) return;
+            el = $(el).get(0);
             //标记消息状态
             attr(el, DATA_INPUT_STATUS, opt.type);
             showMsg(el, opt, this.$el);
@@ -664,7 +665,7 @@
         //隐藏消息接口
         hideMsg: function(el, opt) {
             opt = this._getMsgOpt(opt);
-            hideMsg(el, opt, this.$el);
+            hideMsg($(el).get(0), opt, this.$el);
         },
 
         //用来显示服务器的验证消息。(提交表单并且服务器验证完毕后，返回一个name为键、msg为value的json传入此方法中)
@@ -719,7 +720,7 @@
 
         if (!isObject(obj)) return;
         for (var k in obj) {
-            that[k] = wrapRule(obj[k]);
+            that[k] = getRule(obj[k]);
         }
     }
 
@@ -733,7 +734,7 @@
         }
     }
 
-    function wrapRule(fn) {
+    function getRule(fn) {
         switch ($.type(fn)) {
             case 'function':
                 return fn;
@@ -774,7 +775,7 @@
         var fn = $.trim(attr(el, 'data-rule-' + method));
         if (!fn) return;
         fn = (new Function("return " + fn))();
-        if (fn) return wrapRule(fn);
+        if (fn) return getRule(fn);
     }
 
     //获取节点上的自定义消息
@@ -866,6 +867,7 @@
 
     function hideMsg(el, opt, context) {
         opt = opt || {};
+
         var $msgbox = getMsgDOM(el, opt, context),
             $msg,
             effect = opt.effect;
@@ -1089,8 +1091,6 @@
 
     //公共静态接口
     Validator.defaults = defaults;
-    Validator.showMsg = showMsg;
-    Validator.hideMsg = hideMsg;
 
     /** 设置主题接口
      *  .setTheme( name, obj )
