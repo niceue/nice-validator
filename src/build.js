@@ -7,14 +7,14 @@ var fs = require('fs'),
     //http://learnboost.github.io/stylus/
     stylus = require('stylus');
 
-var pkg = JSON.parse(fs.readFileSync(__dirname + '/package.json')),
+var SRC  = '',
+    OUT  = '../',
+    pkg = JSON.parse(fs.readFileSync(OUT + 'package.json')),
     NS = pkg.name,
     COPYRIGHT = '/*! '+ pkg.title +' '+ pkg.version +'\n'
               + ' * (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
               + ' * '+ pkg.homepage +'\n'
-              + ' */\n',
-    SRC  = __dirname + '/src/',
-    OUT  = __dirname + '/';
+              + ' */\n';
     
 console.log('building and minifying...');
 buildJS(NS);
@@ -54,7 +54,7 @@ function buildStyl(name) {
 
         stylus(content)
             .set('filename', filename)
-            .set('paths', [__dirname + '/src'])
+            .set('paths', [__dirname])
             .set('compress', true)
             .render(function(err, css){
                 if (err) throw err;
