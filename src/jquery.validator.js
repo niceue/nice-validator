@@ -783,7 +783,7 @@
         var msg = field.msg;
         if (isObject(msg) && item) msg = msg[item];
         if (!isString(msg)) {
-            msg = attr(el, 'data-msg-' + item) || '';
+            msg = attr(el, 'data-msg-' + item) || attr(el, 'data-msg') || '';
         }
         return msg;
     }
