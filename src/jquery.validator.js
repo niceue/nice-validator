@@ -1,4 +1,4 @@
-/*! Validator 0.1.0-alpha
+/*! Nice Validator 0.1.0
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -443,7 +443,7 @@
             } else {
                 msgOpt.valid = true;
                 if (!showOk) {
-                    var okmsg = attr(el, 'data-ok');
+                    var okmsg = field.ok || attr(el, 'data-ok');
                     if (okmsg) {
                         showOk = true;
                         msgOpt.msg = okmsg;

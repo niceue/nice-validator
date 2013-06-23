@@ -14,7 +14,7 @@ var SRC  = '',
     COPYRIGHT = '/*! '+ pkg.title +' '+ pkg.version +'\n'
               + ' * (c) 2012-2013 '+ pkg.author +', MIT Licensed\n'
               + ' * '+ pkg.homepage +'\n'
-              + ' */\n';
+              + ' */';
     
 console.log('building and minifying...');
 buildJS(NS);
@@ -42,10 +42,9 @@ function buildJS(name) {
 
     code = ast.print_to_string() + '\n';
     console.log('compiled: ' + filename);
-    fs.writeFile(OUT + filename, COPYRIGHT+code);
-    
-    content = content.replace(/\/\*\![\s\S]+?\*\/\n+/, COPYRIGHT);
-    fs.writeFile(SRC+ filename, content);
+
+    fs.writeFile(OUT + filename, COPYRIGHT + '\n' + code);
+    fs.writeFile(SRC+ filename, content.replace(/\/\*\![\s\S]+?\*\//, COPYRIGHT));
 }
 
 function buildStyl(name) {
@@ -59,6 +58,6 @@ function buildStyl(name) {
             .render(function(err, css){
                 if (err) throw err;
                 console.log('compiled: ' + filename);
-                fs.writeFile(OUT + name + '.css', COPYRIGHT+css);
+                fs.writeFile(OUT + name + '.css', COPYRIGHT + '\n' + css);
             });
 }
