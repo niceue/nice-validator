@@ -14,6 +14,7 @@
         CLS_INPUT_INVALID = 'n-invalid',
         CLS_MSG_BOX = 'msg-box',
         ARIA_INVALID = 'aria-invalid',
+        DATA_RULE = 'data-rule',
         DATA_INPUT_STATUS = 'data-inputstatus',
         INPUT_SELECTOR = ':input:not(:button,:submit,:reset,:disabled)',
 
@@ -192,12 +193,12 @@
                     key = el.id;
 
                 if (!key || !('#' + key in fields)) key = el.name; //不是Id模式
-                if (!key) return; //既没有id也没有name的字段不做验证
+                if (!key) return attr(el, DATA_RULE, null); //既没有id也没有name的字段不做验证
 
                 field = fields[key] || {};
-                if (!field.rule) field.rule = attr(el, 'data-rule') || '';
+                if (!field.rule) field.rule = attr(el, DATA_RULE) || '';
                 field.rules = [];
-                attr(el, 'data-rule', null);
+                attr(el, DATA_RULE, null);
                 if (!field.rule) return;
 
                 field.name = field.name || el.name;
@@ -772,7 +773,7 @@
 
     //获取节点上的相应规则
     function getDataRule(el, method) {
-        var fn = $.trim(attr(el, 'data-rule-' + method));
+        var fn = $.trim(attr(el, DATA_RULE + '-' + method));
         if (!fn) return;
         fn = (new Function("return " + fn))();
         if (fn) return getRule(fn);
@@ -882,11 +883,11 @@
     }
 
     $(function() {
-        $('body').on('focusin', ':input[data-rule]', function() {
+        $('body').on('focusin', ':input['+DATA_RULE+']', function() {
             if (getInstance(this)) {
                 $(this).trigger('focusin');
             } else {
-                $(this).removeAttr('data-rule');
+                $(this).removeAttr(DATA_RULE);
             }
         }).on('click submit', 'form:not([novalidate])', function(e) {
             var $form = $(this), me;
