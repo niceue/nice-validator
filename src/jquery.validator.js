@@ -50,6 +50,7 @@
         },
         defaults = {
             debug: 0,
+            theme: 'default',
             timely: 2,
             stopOnError: 0,
             showError: 1,
@@ -131,7 +132,7 @@
     };
 
     function Validator(element, options) {
-        var me = this, opt, theme, dataOpt;
+        var me = this, themeOpt, dataOpt;
         if (!me instanceof Validator) return new Validator(element, options);
         
         if (isFunction(options)) {
@@ -139,17 +140,16 @@
                 success: options
             };
         }
-        dataOpt = attr(element, 'data-'+NS+'-option');
-        dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : null;
-        opt = me.options = $.extend({}, defaults, options, dataOpt);
-        theme = opt.theme;
-        if (theme && themes[theme]) {
-            opt = $.extend(opt, themes[theme], options);
-        }
+        options = options || {};
 
+        dataOpt = attr(element, 'data-'+NS+'-option');
+        dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
+        themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
+
+        me.options = $.extend({}, defaults, themeOpt, dataOpt, options);
         me.$el = $(element);
-        me.rules = new Rules(opt.rules, true);
-        me.messages = new Messages(opt.messages, true);
+        me.rules = new Rules(me.options.rules, true);
+        me.messages = new Messages(me.options.messages, true);
         me.fields = {};
         me.elements = {};
         me.isValid = true;
