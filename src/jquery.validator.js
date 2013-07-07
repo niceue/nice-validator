@@ -950,7 +950,7 @@
          *  match[gt, count]   值必须大于count字段的值
          *  match[gte, count]  值必须大于或等于count字段的值
          **/
-        match: function(element, params) {
+        match: function(element, params, field) {
             var a = element.value,
                 b,
                 key, msg, type = 'eq',
@@ -965,6 +965,12 @@
             }
             el2 = $(key.charAt(0) === '#' ? key : ':input[name="' + key + '"]', this.$el)[0];
             if (!el2) return;
+            if (!field.init_match) {
+                this.$el.on('valid.field', '[name="'+ key +'"]', function(){
+                    if (element.value) $(element).trigger('validate');
+                });
+                field.init_match = true;
+            }
             field2 = this.getField(el2);
             msg = this.messages.match[type].replace('{1}', field2.display || key);
             b = el2.value;
