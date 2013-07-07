@@ -395,9 +395,9 @@
                 $(showError).html(msgOpt.msg || '');
             } else if (msgOpt.msg || msgOpt.showOk) {
                 me.showMsg(el, msgOpt);
-                return;
+            } else {
+                me.hideMsg(el, msgOpt);
             }
-            (el.value || me.submiting) && me.hideMsg(el, msgOpt);
         },
 
         //验证完一个规则
