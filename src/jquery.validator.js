@@ -800,22 +800,25 @@
     }
 
     function getMsgDOM(el, opt, context) {
-        var $el, $msgbox, datafor, tpl, tgt;
+        var $el = $(el), $msgbox, datafor, tpl, tgt;
         
-        if (opt.target) {
-            $el = $(opt.target, context);
-            if ($el.length) el = $el[0];
-        } else {
-            tgt = attr(el, 'data-target');
-            if (tgt) tgt = $(tgt, context);
-            if (tgt && tgt.length && tgt.is('.'+CLS_MSG_BOX)) {
-                $msgbox = tgt;
+        if ($el.is(':input')) {
+            tgt = opt.target || attr(el, 'data-target');
+            //如果有target
+            if (tgt) {
+                tgt = $(tgt, context);
+                if (tgt.length) {
+                    $msgbox = tgt;
+                }
             }
+            datafor = el.name || '#' + el.id;
+            $msgbox = $msgbox || $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
+        } else {
+            //如果el不是一个input控件，直接认为是msg容器
+            $msgbox = $el;
         }
-        datafor = el.name || '#' + el.id;
-        $msgbox = $msgbox || $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
         if (!$msgbox.length) {
-            $el = $(tgt || el);
+            $el = $(tgt || el, context);
             tpl = getTpl(opt.tpl);
             $msgbox = $(tpl).addClass(CLS_MSG_BOX).attr({
                 tabindex: -1,
