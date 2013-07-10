@@ -3,13 +3,13 @@
  * http://niceue.com/validator/
  */
 .msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1;margin:0;padding:0;vertical-align:top}
-.msg-box{position:relative;font-size:12px;line-height:1;vertical-align:top;outline:none;*zoom:1}
-.msg-wrap{white-space:nowrap}
+.msg-box{position:relative;font-size:0;line-height:0;vertical-align:top;outline:0;*zoom:1;background:#06f}
+.msg-wrap{position:absolute;white-space:nowrap}
 .n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
 .n-arrow{position:absolute;overflow:hidden;font-size:12px;}
 .n-arrow b,.n-arrow i{position:absolute;left:0;top:0;font-style:normal;font-family:simsun !important}
 .n-arrow i{text-shadow:none}
-.n-msg{line-height:16px;margin-left:2px;font-size:12px;font-family:simsun}
+.n-msg{line-height:16px;margin-left:2px;font-size:12px;font-family:tahoma}
 .n-invald,.n-error{color:#c33}
 .n-ok{color:#390}
 .n-tip,.n-loading{color:#808080}
@@ -18,19 +18,22 @@
 .n-loading .n-icon{background:url("images/loading.gif") 0 center no-repeat !important}
 .n-top .n-arrow,.n-bottom .n-arrow{height:6px;width:12px;left:6px}
 .n-left .n-arrow,.n-right .n-arrow{height:12px;width:6px;top:5px;*top:4px}
-.n-top .msg-wrap{position:absolute;bottom:100%;margin-bottom:6px}
+.n-top .msg-wrap{bottom:100%;margin-bottom:6px}
 .n-top .n-arrow{bottom:-6px;}
 .n-top .n-arrow b{top:-8px}
 .n-top .n-arrow i{top:-9px}
-.n-bottom .msg-wrap{position:absolute;margin-top:2px;margin-top:3px\9}
+.n-bottom{position:absolute;}
+.n-bottom .msg-wrap{margin-top:3px}
 .n-bottom .n-arrow{top:-6px;}
 .n-bottom .n-arrow b{top:-2px}
 .n-bottom .n-arrow i{top:-1px}
-.n-left .msg-wrap{position:absolute;right:100%;margin-right:6px}
+.n-left{font-size:12px;}
+.n-left .msg-wrap{right:100%;margin-right:6px}
 .n-left .n-arrow{right:-6px;}
 .n-left .n-arrow b{left:-6px}
 .n-left .n-arrow i{left:-7px}
-.n-right .msg-wrap{position:absolute;margin-left:6px}
+.n-right{font-size:12px;}
+.n-right .msg-wrap{margin-left:6px}
 .n-right .n-arrow{left:-6px;}
 .n-right .n-arrow b{left:1px}
 .n-right .n-arrow i{left:2px}

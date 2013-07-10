@@ -1,3 +1,7 @@
+/*********************
+ * utils
+ *********************/
+
 theme($ft_color, $bg_color=#fff, $bd_color=#FFBB76, $sd_color){
     background-color: $bg_color;
     border-color: $bd_color;
@@ -22,9 +26,11 @@ inline-block() {
     display:inline-block; *display:inline; *zoom:1;
 }
 
+
 /*********************
  * global settings
  *********************/
+
 .msg-wrap,.n-icon,.n-msg {
     inline-block()
     margin:0; padding:0;
@@ -33,15 +39,16 @@ inline-block() {
 
 .msg-box {
     position: relative;
-    //top: 1px;
-    font-size: 12px;
-    line-height: 1;
+    font-size: 0;
+    line-height: 0;
     vertical-align:top;
-    outline: none;
+    outline: 0;
     *zoom:1;
+    background: #06f;
 }
 
 .msg-wrap {
+    position:absolute;
     white-space: nowrap;
 }
 .n-icon {
@@ -64,7 +71,7 @@ inline-block() {
     line-height:16px; 
     margin-left:2px;
     font-size: 12px;
-    font-family: simsun;
+    font-family: tahoma;
 }
 
 // invalid input
@@ -88,7 +95,7 @@ inline-block() {
 
 /** top **/
 .n-top {
-    .msg-wrap {position:absolute; bottom:100%; margin-bottom:6px;}
+    .msg-wrap { bottom:100%; margin-bottom:6px;}
     .n-arrow {
         bottom: -6px;
         b {top: -8px;}
@@ -97,10 +104,9 @@ inline-block() {
 }
 /** bottom **/
 .n-bottom {
+    position: absolute;
     .msg-wrap {
-        position:absolute; 
-        margin-top: 2px;
-        margin-top: s("3px\9");
+        margin-top: 3px;
     }
     .n-arrow {
         top: -6px;
@@ -110,7 +116,8 @@ inline-block() {
 }
 /** left **/
 .n-left {
-    .msg-wrap {position:absolute; right:100%; margin-right:6px;}
+    font-size: 12px;
+    .msg-wrap {right:100%; margin-right:6px;}
     .n-arrow {
         right:-6px;
         b {left:-6px;}
@@ -119,7 +126,8 @@ inline-block() {
 }
 /** right **/
 .n-right {
-    .msg-wrap {position:absolute; margin-left:6px;}
+    font-size: 12px;
+    .msg-wrap { margin-left:6px; }
     .n-arrow {
         left:-6px;
         b {left:1px;}

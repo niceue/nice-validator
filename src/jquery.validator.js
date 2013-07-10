@@ -853,7 +853,10 @@
             $msg = $('<span class="msg-wrap"></span>').appendTo($msgbox);
         }
         if ($msgbox[0].className.indexOf('bottom') !== -1) {
-            $msg[0].style.top = $(el).outerHeight() - (gtIE7 ? (parseInt($(el).css('padding-top'))+4) : 0 ) + 'px';
+            $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
+        }
+        else if (gtIE7 && $msgbox[0].className.indexOf('top') !== -1) {
+            $msg[0].style.bottom = $(el).outerHeight() - parseInt($(el).css('padding-top')) - 4 + 'px';
         }
         $msg[0].innerHTML = (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
         $msg[0].className = 'msg-wrap ' + cls;
