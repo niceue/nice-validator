@@ -9,7 +9,7 @@
 .n-arrow b,.n-arrow i{position:absolute;left:0;top:0;font-style:normal;font-size:12px;line-height:12px;font-family:sans-serif !important}
 .n-arrow i{text-shadow:none}
 .n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
-.n-msg{line-height:16px;margin-left:1px;margin-top:-1px;margin-top:0\9;*padding-top:2px;_padding-top:0;font-size:12px;font-family:tahoma}
+.n-msg{line-height:16px;margin-left:2px;margin-top:-1px;margin-top:0\9;*padding-top:2px;_padding-top:0;font-size:12px;font-family:tahoma}
 .n-invald,.n-error{color:#c33}
 .n-ok{color:#390}
 .n-tip,.n-loading{color:#808080}
