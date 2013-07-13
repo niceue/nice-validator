@@ -2,31 +2,33 @@
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
-.msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1;margin:0;padding:0;vertical-align:top}
-.msg-box{position:relative;font-size:0;line-height:0;vertical-align:top;outline:0;*zoom:1;background:#06f}
-.msg-wrap{position:absolute;white-space:nowrap}
-.n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
-.n-arrow{position:absolute;overflow:hidden;font-size:12px;}
-.n-arrow b,.n-arrow i{position:absolute;left:0;top:0;font-style:normal;font-family:simsun !important}
+.msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1;vertical-align:top}
+.msg-box{position:absolute;font-size:0;line-height:0;vertical-align:top;outline:0;*zoom:1}
+.msg-wrap{position:relative;white-space:nowrap}
+.n-arrow{position:absolute;overflow:hidden;}
+.n-arrow b,.n-arrow i{position:absolute;left:0;top:0;font-style:normal;font-size:12px;line-height:12px;font-family:sans-serif !important}
 .n-arrow i{text-shadow:none}
-.n-msg{line-height:16px;margin-left:2px;font-size:12px;font-family:tahoma}
+.n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
+.n-msg{line-height:16px;margin-left:1px;margin-top:-1px;margin-top:0\9;*padding-top:2px;_padding-top:0;font-size:12px;font-family:tahoma}
 .n-invald,.n-error{color:#c33}
 .n-ok{color:#390}
 .n-tip,.n-loading{color:#808080}
 .n-error .n-icon{background-position:0 0}
 .n-ok .n-icon{background-position:-16px 0}
+.n-tip .n-icon{background-position:-32px 0}
 .n-loading .n-icon{background:url("images/loading.gif") 0 center no-repeat !important}
-.n-top .n-arrow,.n-bottom .n-arrow{height:6px;width:12px;left:6px}
-.n-left .n-arrow,.n-right .n-arrow{height:12px;width:6px;top:5px;*top:4px}
-.n-top .msg-wrap{bottom:100%;margin-bottom:6px}
+.n-top .n-arrow,.n-bottom .n-arrow{height:6px;width:12px;left:8px}
+.n-left .n-arrow,.n-right .n-arrow{width:6px;height:12px;top:6px}
+.n-top{bottom:100%;}
+.n-top .msg-wrap{margin-bottom:6px}
 .n-top .n-arrow{bottom:-6px;}
-.n-top .n-arrow b{top:-8px}
-.n-top .n-arrow i{top:-9px}
-.n-bottom{position:absolute;}
-.n-bottom .msg-wrap{margin-top:3px}
+.n-top .n-arrow b{top:-6px}
+.n-top .n-arrow i{top:-7px}
+.n-bottom{vertical-align:bottom;top:100%;_top:auto;}
+.n-bottom .msg-wrap{margin-top:6px}
 .n-bottom .n-arrow{top:-6px;}
-.n-bottom .n-arrow b{top:-2px}
-.n-bottom .n-arrow i{top:-1px}
+.n-bottom .n-arrow b{top:-1px}
+.n-bottom .n-arrow i{top:0}
 .n-left{font-size:12px;}
 .n-left .msg-wrap{right:100%;margin-right:6px}
 .n-left .n-arrow{right:-6px;}
@@ -37,16 +39,18 @@
 .n-right .n-arrow{left:-6px;}
 .n-right .n-arrow b{left:1px}
 .n-right .n-arrow i{left:2px}
+.n-default .n-left,.n-default .n-right{margin-top:5px}
 .n-default .msg-wrap .n-icon{background-image:url("images/validator_default.png")}
 .n-default .n-tip .n-icon{display:none}
 .n-simple .msg-wrap .n-icon{background-image:url("images/validator_simple.png")}
+.n-simple .n-left,.n-simple .n-right{margin-top:5px}
+.n-simple .n-bottom .msg-wrap{margin-top:3px}
 .n-simple .n-tip .n-icon{display:none}
-.n-yellow .msg-box{position:relative}
-.n-yellow .msg-wrap{position:absolute;z-index:10;padding:4px 6px;font-size:12px;border:1px solid transparent;background-color:#fffcef;border-color:#ffbb76;color:#db7c22;box-shadow:0 1px 3px #ddd;border-radius:2px;}
-.n-yellow .msg-wrap .n-arrow b{color:#ffbb76;text-shadow:0 0 2px #ddd}
+.n-yellow .msg-wrap{padding:4px 6px;font-size:12px;border:1px solid transparent;background-color:#fffcef;border-color:#ffbb76;color:#db7c22;box-shadow:0 1px 3px #ccc;border-radius:2px;}
+.n-yellow .msg-wrap .n-arrow b{color:#ffbb76;text-shadow:0 0 2px #ccc}
 .n-yellow .msg-wrap .n-arrow i{color:#fffcef}
 .n-yellow .msg-wrap .n-icon{background-image:url("images/validator_simple.png")}
-.n-yellow .n-tip,.n-yellow .n-ok,.n-yellow .n-loading{background-color:#f8fdff;border-color:#ddd;color:#333;box-shadow:0 1px 3px #ddd;}
-.n-yellow .n-tip .n-arrow b,.n-yellow .n-ok .n-arrow b,.n-yellow .n-loading .n-arrow b{color:#ddd;text-shadow:0 0 2px #ddd}
+.n-yellow .n-tip,.n-yellow .n-ok,.n-yellow .n-loading{background-color:#f8fdff;border-color:#ddd;color:#333;box-shadow:0 1px 3px #ccc;}
+.n-yellow .n-tip .n-arrow b,.n-yellow .n-ok .n-arrow b,.n-yellow .n-loading .n-arrow b{color:#ddd;text-shadow:0 0 2px #ccc}
 .n-yellow .n-tip .n-arrow i,.n-yellow .n-ok .n-arrow i,.n-yellow .n-loading .n-arrow i{color:#f8fdff}
 .n-yellow .n-tip .n-icon{display:none}

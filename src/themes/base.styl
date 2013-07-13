@@ -1,24 +1,26 @@
 /*********************
  * utils
  *********************/
-
-theme($ft_color, $bg_color=#fff, $bd_color=#FFBB76, $sd_color){
-    background-color: $bg_color;
-    border-color: $bd_color;
-    if $ft_color {
-        color: $ft_color;
+/*
+ * To define a message box
+ */
+theme($font_color, $background_color=#fff, $border_color=#FFBB76, $shadow_color){
+    background-color: $background_color;
+    border-color: $border_color;
+    if $font_color {
+        color: $font_color;
     }
-    if $sd_color {
-        box-shadow: 0 1px 3px $sd_color;
+    if $shadow_color {
+        box-shadow: 0 1px 3px $shadow_color;
     }
     .n-arrow {
         b {
-            color: $bd_color;
-            if $sd_color {
-                text-shadow: 0 0 2px $sd_color;
+            color: $border_color;
+            if $shadow_color {
+                text-shadow: 0 0 2px $shadow_color;
             }
         }
-        i {color: $bg_color;}
+        i {color: $background_color;}
     }
 }
 
@@ -33,46 +35,49 @@ inline-block() {
 
 .msg-wrap,.n-icon,.n-msg {
     inline-block()
-    margin:0; padding:0;
     vertical-align:top;
 }
-
 .msg-box {
-    position: relative;
+    position:absolute;
     font-size: 0;
     line-height: 0;
     vertical-align:top;
     outline: 0;
     *zoom:1;
-    background: #06f;
 }
-
 .msg-wrap {
-    position:absolute;
+    position: relative;
     white-space: nowrap;
+}
+.n-arrow {
+    position: absolute; 
+    overflow: hidden;
+    b, i {
+        position: absolute;
+        left: 0; top: 0; 
+        font-style: normal; 
+        font-size: 12px;
+        line-height: 12px;
+        font-family: sans-serif !important;
+    }
+    i {text-shadow:none;}
 }
 .n-icon {
     width:16px; height:16px;
     overflow:hidden;
     background-repeat:no-repeat;
 }
-.n-arrow {
-    position: absolute; 
-    overflow: hidden;
-    font-size: 12px;
-    b, i {
-        position: absolute; 
-        left: 0; top: 0; 
-        font-style: normal; font-family: simsun!important;
-    }
-    i {text-shadow:none;}
-}
 .n-msg {
-    line-height:16px; 
-    margin-left:2px;
+    line-height:16px;
+    margin-left: 1px;
+    margin-top: -1px;
+    margin-top: s("0\9");
+    *padding-top: 2px;
+    _padding-top: 0;
     font-size: 12px;
     font-family: tahoma;
 }
+
 
 // invalid input
 .n-invald {}
@@ -82,42 +87,47 @@ inline-block() {
 .n-ok {color:#390;}
 .n-tip,.n-loading {color:#808080;}
 
+
 // icons
 .n-error .n-icon {background-position:0 0;}
 .n-ok .n-icon {background-position:-16px -0;}
+.n-tip .n-icon {background-position:-32px -0;}
 .n-loading .n-icon {background: url(images/loading.gif) 0 center no-repeat !important;}
+
 
 /** arrow and position **/
 .n-top .n-arrow,
-.n-bottom .n-arrow {height: 6px; width: 12px; left:6px;}
+.n-bottom .n-arrow {height: 6px; width: 12px; left:8px;}
 .n-left .n-arrow,
-.n-right .n-arrow {height: 12px; width: 6px; top: 5px; *top: 4px;}
+.n-right .n-arrow {width: 6px; height: 12px; top: 6px; }
+
 
 /** top **/
 .n-top {
-    .msg-wrap { bottom:100%; margin-bottom:6px;}
+    bottom: 100%;
+    .msg-wrap { margin-bottom:6px; }
     .n-arrow {
         bottom: -6px;
-        b {top: -8px;}
-        i {top: -9px;}
+        b {top: -6px;}
+        i {top: -7px;}
     }
 }
 /** bottom **/
 .n-bottom {
-    position: absolute;
-    .msg-wrap {
-        margin-top: 3px;
-    }
+    vertical-align: bottom;
+    top: 100%;
+    _top: auto;
+    .msg-wrap { margin-top: 6px; }
     .n-arrow {
         top: -6px;
-        b {top: -2px;}
-        i {top: -1px;}
+        b {top: -1px;}
+        i {top: 0;}
     }
 }
 /** left **/
 .n-left {
     font-size: 12px;
-    .msg-wrap {right:100%; margin-right:6px;}
+    .msg-wrap {right: 100%; margin-right:6px; }
     .n-arrow {
         right:-6px;
         b {left:-6px;}

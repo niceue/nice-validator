@@ -89,8 +89,7 @@
     $.validator.setTheme({
         'simple_right': {
             formClass: 'n-simple',
-            msgClass: 'n-right',
-            msgStyle: 'margin-left:10px;'
+            msgClass: 'n-right'
         },
         'simple_bottom': {
             formClass: 'n-simple',
