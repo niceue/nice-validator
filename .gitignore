@@ -12,4 +12,5 @@ Thumbs.db
 *.patch
 *.diff
 *.bak
+/src/libs
 /src/test.html
