@@ -8,9 +8,10 @@
     $.validator.config({
         //debug: true,
         //stopOnError: false,
+        //theme: 'default',
         defaultMsg: '{0}格式不正确',
         loadingMsg: '正在验证...',
-        theme: 'default',
+        
         //自定义规则
         rules: {
             digits: [/^\d*$/, "{0}只能输入数字"], //纯数字
@@ -110,8 +111,7 @@
             msgClass: 'n-right',
             msgArrow: TPL_ARROW,
             stopOnError: true,
-            effect: [
-            function($el, type){
+            msgShow: function($el, type){
                 if ($el.is(':animated')) return;
                 if (type === 'error') {
                     $el.css({
@@ -132,12 +132,12 @@
                     }).fadeIn(200);
                 }
             },
-            function($el){
+            msgHide: function($el, type){
                 $el.stop().delay(100).show().animate({
                     left: '20px',
                     opacity: 0
                 }, 300);
-            }]
+            }
         }
     });
 })(jQuery);
