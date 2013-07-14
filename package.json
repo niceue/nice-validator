@@ -2,7 +2,7 @@
     "name": "jquery.validator",
     "title": "Nice Validator",
     "description": "Simple, smart and pleasant verification solution.",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "keywords": ["validator"],
     "homepage": "http://niceue.com/validator/",
     "author": "Jony Zhang <zj86@live.cn>",
