@@ -15,8 +15,11 @@
         CLS_MSG_BOX = 'msg-box',
         ARIA_INVALID = 'aria-invalid',
         DATA_RULE = 'data-rule',
+        DATA_TARGET = 'data-target',
+        DATA_TIP = 'data-tip',
         DATA_INPUT_STATUS = 'data-inputstatus',
         INPUT_SELECTOR = ':input:not(:button,:submit,:reset,:disabled)',
+        TPL_MSG_WRAP = '<span class="msg-wrap" role="alert"></span>',
 
         rRule = /(\w+)(?:[\[\(]([^\]\)]*)[\]\)])?/,
         rDisplay = /(?:([^:\[]*):)?\s*(.*)/,
@@ -49,26 +52,31 @@
             info: noop,
             warn: noop
         },
+
         defaults = {
             debug: 0,
-            theme: 'default',
             timely: 2,
-            stopOnError: 0,
-            showError: 1,
-            showOk: 1,
-            defaultMsg: '{0} is not valid.',
-            loadingMsg: 'Validating...',
+            theme: 'default',
+            stopOnError: true,
+            //showOk: true,
+            ignore: '',
+            valid: noop,
+            invalid: noop,
+
             msgTemplate: '<span>{#msg}</span>',
             msgIcon: '<span class="n-icon"></span>',
             msgArrow: '',
             msgClass: '',
-            formClass: 'n-default',
-            ignore: '',
-            valid: noop,
-            invalid: noop
+            msgHandler: null,
+            msgShow: null,
+            msgHide: null,
+
+            defaultMsg: '{0} is not valid.',
+            loadingMsg: 'Validating...'
         },
         themes = {
             'default': {
+                formClass: 'n-default',
                 msgClass: 'n-right',
                 showOk: ''
             }
@@ -76,35 +84,41 @@
 
     /** jQuery Plugin
      * @param {Object} options
-        debug       {Boolean}   false, 是否启用调试模式（启用后，验证结果会同时在控制台输出，并且不阻止表单提交）
-        timely      {Boolean}   true,  是否启用及时验证（表单元素失去焦点时）
-        stopOnError {Boolean}   false, 验证出错时是否停止继续验证
-        showError   {Boolean|Number}    验证失败时是否显示提示
-        ignore      {jqSelector}  '',  忽略的字段(jQuery选择器)
+        debug       {Boolean}   false,      是否启用调试模式（启用后，验证结果会同时在控制台输出，并且不阻止表单提交）
+        timely      {Boolean}   true,       是否启用及时验证（表单元素失去焦点时）
+        theme       {String}   'default'    主题样式
+        stopOnError {Boolean}   false,      验证出错时是否停止继续验证
+        ignore      {jqSelector}  '',       忽略的字段(jQuery选择器)，可以是一个范围
         
-        defaultMsg  {String}           默认的错误消息
-        loadingMsg  {String}           异步加载中的提示
-        msgTemplate {String}           消息模板
-        msgIcon     {String}    ''     icon图标模板
-        msgArrow    {String}    ''     小箭头模板
-        msgClass    {String}    ''     给消息额外添加的class名
-        formClass   {String}    ''     给表单额外添加的class名
-        
-        rules       {Object}    null,  自定义用于当前实例的规则
-        messages    {Object}    null,  自定义用于当前实例的消息
-        
-        valid       {Function}  表单验证成功后的回调
-        invalid     {Function}  表单验证失败后的回调
+        valid       {Function}              表单验证成功后的回调
+        invalid     {Function}              表单验证失败后的回调
 
-        fields      {Object}     待验证字段规则集合
+        msgHandler  {Function}  null        如果传递此参数，所有错误消息将被该回调接管，所有其他消息将被忽略
+        msgShow     {Function}  null        消息显示之前的回调，可用于自定义消息动画
+        msgHide     {Function}  null        消息隐藏之前的回调，可用于自定义消息动画
+        
+        msgTemplate {String}                消息模板
+        msgIcon     {String}    ''          icon图标模板
+        msgArrow    {String}    ''          小箭头模板
+        msgClass    {String}    ''          给消息额外添加的class名
+        formClass   {String}    ''          给表单额外添加的class名
+
+        defaultMsg  {String}                默认的错误消息
+        loadingMsg  {String}                异步加载中的提示
+        
+        rules       {Object}    null,       自定义用于当前实例的规则
+        messages    {Object}    null,       自定义用于当前实例的消息
+        
+        fields      {Object}                待验证字段规则集合
         {String} key    name|#id
-        {String|Object} value
-        fields[key][rule]     {String}                    规则字符串
-        fields[key][tip]      {String}                    自定义获得焦点时的提示信息
-        fields[key][ok]       {String}                    字段验证成功后显示的消息
-        fields[key][msg]      {Object}                    自定义验证失败的消息
-        fields[key][timely]   {Boolean}                   是否启用实时验证
-        fields[key][target]   {jqSelector}                验证当前字段，但是消息却可以显示在target指向的元素周围
+        {String|Object} value               规则字符串，或者一个对象传递更多参数
+
+        fields[key][rule]     {String}      规则字符串
+        fields[key][tip]      {String}      自定义获得焦点时的提示信息
+        fields[key][ok]       {String}      字段验证成功后显示的消息
+        fields[key][msg]      {Object}      自定义验证失败的消息
+        fields[key][timely]   {Boolean}     是否启用实时验证
+        fields[key][target]   {jqSelector}  验证当前字段，但是消息却可以显示在target指向的元素周围
      */
     $.fn[NS] = function(options) {
         var that = this,
@@ -209,8 +223,8 @@
                 if ('timely' in field && !field.timely || !opt.timely) {
                     attr(el, 'notimely', true);
                 }
-                if (isString(field.target)) attr(el, 'data-target', field.target);
-                if (isString(field.tip)) attr(el, 'data-tip', field.tip);
+                if (isString(field.target)) attr(el, DATA_TARGET, field.target);
+                if (isString(field.tip)) attr(el, DATA_TIP, field.tip);
 
                 fields[key] = me._parseField(field);
             });
@@ -224,7 +238,8 @@
                 icon: opt.msgIcon,
                 arrow: opt.msgArrow,
                 style: opt.msgStyle,
-                effect: opt.effect
+                show: opt.msgShow,
+                hide: opt.msgHide
             };
 
             //处理事件与缓存
@@ -233,9 +248,9 @@
                     .on('reset', proxy(me, '_reset'))
                     .on('validated.field', INPUT_SELECTOR, proxy(me, '_validatedField'))
                     .on('validated.rule', INPUT_SELECTOR, proxy(me, '_validatedRule'))
-                    .on('focusin', INPUT_SELECTOR, proxy(me, '_focus'))
                     .on('focusout validate', INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click', ':radio,:checkbox', proxy(me, '_click'));
+                if (!opt.msgHandler) me.$el.on('focusin', INPUT_SELECTOR, proxy(me, '_focus'));
                 if (opt.timely === 2) me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'));
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
@@ -267,10 +282,23 @@
                     return false;
                 }
             });
+
+            //如果被msgHandler接管消息
+            if ( isFunction(opt.msgHandler) ) {
+                var errorMsgs = [];
+                $.map(me.fields, function(field){
+                    if (field.errorMsg) errorMsgs.push(field.errorMsg);
+                });
+                opt.msgHandler.call(me, errorMsgs);
+            }
+
+            //定位到出错的元素
             if (!me.isValid && !opt.stopOnError) {
                 $(':input.' + CLS_INPUT_INVALID + ':first', me.$el).trigger(FOCUS_EVENT).trigger(FOCUS_EVENT);
             }
+            //表单验证失败，并且表单没有action属性，就阻止掉默认事件
             if (!me.isValid || !attr(form, 'action') && e) e.preventDefault();
+
             ret = (me.isValid || opt.debug === 2) ? 'valid' : 'invalid';
             opt[ret].call(me, form);
             me.$el.trigger(ret + '.form', [form]);
@@ -278,10 +306,8 @@
         },
 
         _reset: function() {
-            var me = this, showError = me.options.showError;
-            if (isString(showError)) {
-                $(showError).html('');
-            } else {
+            var me = this, showError = !me.options.msgHandler;
+            if (showError) {
                $('[data-for].' + CLS_MSG_BOX, me.$el).map(function() {
                     this.style.display = 'none';
                 });
@@ -298,7 +324,7 @@
             var el = e.target;
             if (this.submiting || el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip')) return;
             this.showMsg(el, {
-                msg: attr(el, 'data-tip'),
+                msg: attr(el, DATA_TIP),
                 type: 'tip'
             });
         },
@@ -378,7 +404,6 @@
         _validatedField: function(e, field, msgOpt) {
             var me = this,
                 opt = me.options,
-                showError = opt.showError,
                 el = e.target,
                 isValid = field.isValid = !!msgOpt.valid;
 
@@ -390,13 +415,16 @@
             field.old.ret = msgOpt;
             me.elements[field.key] = el;
 
-            if (!showError) return;
-            if (isString(showError)) {
-                $(showError).html(msgOpt.msg || '');
-            } else if (msgOpt.msg || msgOpt.showOk) {
-                me.showMsg(el, msgOpt);
+            //msgHandler接管消息
+            if (opt.msgHandler) {
+                field.errorMsg = isValid ? '' : msgOpt.msg;
             } else {
-                me.hideMsg(el, msgOpt);
+                //error Message or ok Message
+                if ( (!msgOpt.showOk && msgOpt.msg) || (msgOpt.showOk && opt.showOk !== false ) ) {
+                    me.showMsg(el, msgOpt);
+                } else {
+                    me.hideMsg(el, msgOpt);
+                }
             }
         },
 
@@ -586,7 +614,8 @@
 
         //检测某个元素的值是否符合某个规则
         test: function(el, rule) {
-            var ret,
+            var me = this,
+                ret,
                 parts = rRule.exec(rule),
                 method,
                 params;
@@ -594,8 +623,8 @@
             if (!parts) return true;
             method = parts[1];
             params = parts[2] ? $.trim(parts[2]).split(', ') : undefined;
-            if (method in this.rules) {
-                ret = this.rules[method].call(this, el, params);
+            if (method in me.rules) {
+                ret = me.rules[method].call(me, el, params);
             }
             return ret === true || ret === undefined || ret;
         },
@@ -711,8 +740,9 @@
             me._init();
         },
 
+        //销毁表单验证（事件、数据、UI）
         destroy: function() {
-            this.$el.off().removeData(NS);
+            this.$el.trigger('reset').off().removeData(NS);
         }
     };
 
@@ -796,33 +826,34 @@
     }
 
     function getTpl(str) {
-        return (str || defaults.msgTemplate).replace('{#msg}', '<span class="msg-wrap"></span>');
+        return (str || defaults.msgTemplate).replace('{#msg}', TPL_MSG_WRAP);
     }
 
     function getMsgDOM(el, opt, context) {
         var $el = $(el), $msgbox, datafor, tpl, tgt;
         
         if ($el.is(':input')) {
-            tgt = opt.target || attr(el, 'data-target');
-            //如果有target
+            tgt = opt.target || attr(el, DATA_TARGET);
             if (tgt) {
                 tgt = $(tgt, context);
                 if (tgt.length) {
-                    $msgbox = tgt;
+                    if (!tgt.is(':input')) {
+                        $msgbox = tgt;
+                    } else {
+                        el = tgt.get(0);
+                    }
                 }
             }
             datafor = el.name || '#' + el.id;
             $msgbox = $msgbox || $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
         } else {
-            //如果el不是一个input控件，直接认为是msg容器
             $msgbox = $el;
         }
+
         if (!$msgbox.length) {
             $el = $(tgt || el, context);
             tpl = getTpl(opt.tpl);
             $msgbox = $(tpl).addClass(CLS_MSG_BOX).attr({
-                tabindex: -1,
-                role: "alert",
                 style: opt.style || '',
                 'data-for': datafor
             });
@@ -838,7 +869,7 @@
     }
 
     function showMsg(el, opt, context) {
-        var cls, fn, $msgbox, $msg, effect = opt.effect;
+        var cls, $msgbox, $msg;
         
         cls = {
             error: CLS_MSG_INVALID,
@@ -849,37 +880,27 @@
 
         $msgbox = getMsgDOM(el, opt, context);
         $msg = $msgbox.find('span.msg-wrap');
-        if (!$msg.length) {
-            $msg = $('<span class="msg-wrap"></span>').appendTo($msgbox);
-        }
+        if (!$msg.length) $msg = $(TPL_MSG_WRAP).appendTo($msgbox);
         if (isIE6 && $msgbox[0].className.indexOf('bottom') !== -1) {
             $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
         }
+
         $msg[0].innerHTML = (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
         $msg[0].className = 'msg-wrap ' + cls;
         $msgbox[0].style.display = '';
 
-        if (effect) {
-            if (isFunction(effect)) {
-                fn = effect;
-            } else if (isArray(effect) && isFunction(effect[0])) {
-                fn = effect[0];
-            }
-            fn && fn($msg, opt.type);
-        }
+        isFunction(opt.show) && opt.show($msg, opt.type);
     }
 
     function hideMsg(el, opt, context) {
         opt = opt || {};
 
-        var $msgbox = getMsgDOM(el, opt, context),
-            $msg,
-            effect = opt.effect;
+        var $msgbox = getMsgDOM(el, opt, context);
         if (!$msgbox.length) return;
-        if (isArray(effect) && isFunction(effect[1])) {
-            $msg = $msgbox.find('span.msg-wrap');
+
+        if ( isFunction(opt.hide) ) {
             $msgbox[0].style.display = '';
-            effect[1]($msg, opt.type);
+            opt.hide($msgbox.find('span.msg-wrap'), opt.type);
         } else {
             $msgbox[0].style.display = 'none';
         }
