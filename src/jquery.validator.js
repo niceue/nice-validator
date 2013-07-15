@@ -1080,7 +1080,7 @@
             //有额外字段
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    postData[name] = $(':input[name="' + name + '"]', this.$el).val();
+                    postData[name] = $(':input[name="' + name + '"]', me.$el).val();
                 });
             }
             me.showMsg(element, {
