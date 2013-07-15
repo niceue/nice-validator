@@ -1096,13 +1096,13 @@
                     var msg = res.responseText, data;
                     if (msg === '') {
                         msg = true;
-                    } else if (!msg && status === 'error') {
-                        msg = 'Net error';
                     } else if (msg.charAt(0) === '{') {
                         msg = $.parseJSON(msg) || {};
                         data = parseData(msg);
                         if (data === undefined) data = parseData(msg.data);
                         msg = data || status === 'success';
+                    } else if (status === 'error') {
+                        msg = 'Net Error';
                     }
                     $(element).trigger('validated.rule', [msg, field]);
                 }
