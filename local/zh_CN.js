@@ -6,9 +6,8 @@
      * 可以覆盖默认配置, 也会被主题配置和调用时的传参覆盖
      */
     $.validator.config({
-        //debug: true,
         //stopOnError: false,
-        //theme: 'default',
+        //theme: 'yellow_right',
         defaultMsg: '{0}格式不正确',
         loadingMsg: '正在验证...',
         
@@ -61,8 +60,8 @@
             },
             range: {
                 rg: "请输入{1}到{2}的数",
-                gt: "请输入大于{1}的数",
-                lt: "请输入小于{1}的数"
+                gt: "请输入大于或等于{1}的数",
+                lt: "请输入小于或等于{1}的数"
             },
             checked: {
                 rg: "请选择{1}到{2}项",
@@ -101,16 +100,10 @@
             msgClass: 'n-right',
             msgArrow: TPL_ARROW
         },
-        'yellow_bottom': {
-            formClass: 'n-yellow',
-            msgClass: 'n-bottom',
-            msgArrow: TPL_ARROW
-        },
         'yellow_right_effect': {
             formClass: 'n-yellow',
             msgClass: 'n-right',
             msgArrow: TPL_ARROW,
-            stopOnError: true,
             msgShow: function($el, type){
                 if ($el.is(':animated')) return;
                 if (type === 'error') {
