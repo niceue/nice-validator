@@ -1,6 +1,9 @@
 ## nice Validator
 Simple, smart and pleasant verification solution.
 
+## Documention
+[简体中文](http://niceue.com/validator/)
+
 ## Dependencies
 [jQuery 1.7+](http://jquery.com)
 
