@@ -29,7 +29,7 @@
             password: [/^[0-9a-zA-Z]{6,16}$/, "密码由6-16位数字、字母组成"], //密码
             //可接受的后缀名
             accept: function(element, params){
-                if (!params) return;
+                if (!params) return true;
                 var ext = params[0];
                 return (ext === '*') 
                     || (new RegExp(".(?:" + (ext || "png|jpg|jpeg|gif") + ")$", "i")).test(element.value) 
