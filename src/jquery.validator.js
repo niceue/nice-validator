@@ -251,7 +251,10 @@
                     .on('focusout validate', INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click', ':radio,:checkbox', proxy(me, '_click'));
                 if (!opt.msgHandler) me.$el.on('focusin', INPUT_SELECTOR, proxy(me, '_focus'));
-                if (opt.timely === 2) me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'));
+                if (opt.timely === 2) {
+                    me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'))
+                          .on('change', 'select', proxy(me, '_click'));
+                }
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
                 //初始化完成，阻止掉HTML5默认的表单验证，同时作为已经初始化的依据
