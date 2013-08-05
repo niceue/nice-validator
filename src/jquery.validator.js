@@ -555,8 +555,22 @@
             old = field.old = field.old || {};
             must = must || field.must; //此为特殊情况必须每次验证
 
+            //如果有分组验证
+            if (groupFn) {
+                $.extend(msgOpt, groupFn);
+                ret = groupFn.call(me);
+                if (ret !== true) {
+                    if (isString(ret)) ret = {error: ret};
+                    field.vid = 0;
+                    field.rid = 'group';
+                    isValid = false;
+                } else {
+                    ret = undefined;
+                    me.hideMsg(el, msgOpt);
+                }
+            }
             //如果非必填项且值为空
-            if (!field.required && el.value === '' && !groupFn) {
+            if (isValid && !field.required && el.value === '') {
                 if (msgStatus === 'tip') return;
                 else me._focus({target: el});
                 old.value = '';
@@ -573,21 +587,6 @@
                     msgOpt = old.ret;
                     $el.trigger('validated.field', [field, msgOpt]);
                     return;
-                }
-            }
-            //如果有分组验证
-            else if (groupFn) {
-                $.extend(msgOpt, groupFn);
-                ret = groupFn.call(me);
-                if (ret === true) {
-                    ret = undefined;
-                    me.hideMsg(el, msgOpt);
-                } else {
-                    if (isString(ret)) ret = {error: ret};
-                    me.hideMsg(el);
-                    field.vid = 0;
-                    field.rid = 'group';
-                    isValid = false;
                 }
             }
 
