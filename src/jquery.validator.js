@@ -55,10 +55,9 @@
 
         defaults = {
             debug: 0,
-            timely: 2,
+            timely: 1,
             theme: 'default',
             stopOnError: true,
-            //showOk: true,
             ignore: '',
             valid: noop,
             invalid: noop,
@@ -67,9 +66,10 @@
             msgIcon: '<span class="n-icon"></span>',
             msgArrow: '',
             msgClass: '',
-            msgHandler: null,
-            msgShow: null,
-            msgHide: null,
+            //showOk: true,
+            //msgHandler: null,
+            //msgShow: null,
+            //msgHide: null,
 
             defaultMsg: '{0} is not valid.',
             loadingMsg: 'Validating...'
@@ -1183,9 +1183,6 @@
             return true;
         }
     });
-
-    //公共静态接口
-    Validator.defaults = defaults;
 
     /** 设置主题接口
      *  .setTheme( name, obj )
