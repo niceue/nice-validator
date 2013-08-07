@@ -250,7 +250,7 @@
 
             //处理事件与缓存
             if (!me.$el.data(NS)) {
-                me.$el.on('submit', proxy(me, '_submit'))
+                me.$el.on('submit.form', proxy(me, '_submit'))
                     .on('click', ':submit', proxy(me, '_clickSubmit'))
                     .on('reset', proxy(me, '_reset'))
                     .on('validated.field', INPUT_SELECTOR, proxy(me, '_validatedField'))
@@ -292,6 +292,7 @@
                 $.when.apply(null, $.map(me.deferreds, function(n){
                     return n;
                 })).done(function(){
+                    me.deferreds = {};
                     setTimeout(function(){
                         doneCallbacks.call(null, me.isValid);
                         //如果被msgHandler接管消息
@@ -362,14 +363,7 @@
                     $(this).removeClass(CLS_INPUT_INVALID);
                 });
             }
-            me._clearCache();
             me.isValid = true;
-        },
-
-        _clearCache: function(){
-            $.map(this.fields, function(field){
-                field.old = {};
-            });
         },
 
         _focus: function(e) {
@@ -563,6 +557,7 @@
         _checkRule: function(el, field) {
             var me = this,
                 ret,
+                key = field.key,
                 rule = field.rules[field.vid],
                 method = rule.method,
                 params = rule.params;
@@ -570,13 +565,14 @@
             field.rid = method;
             field.old.value = el.value;
 
+            if (me.deferreds[key]) me.deferreds[key].abort();
             ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
             
             if (isObject(ret) && isFunction(ret.then)) {
                 var parseData = function(data) {
                         if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
                     };
-                me.deferreds[field.key] = ret;
+                me.deferreds[key] = ret;
                 !me.checkOnly && me.showMsg(el, {
                     type: 'loading',
                     msg: me.options.loadingMsg
@@ -597,9 +593,7 @@
                     function(jqXHR, textStatus){
                         $(el).trigger('validated.rule', [textStatus, field]);
                     }
-                ).always(function(){
-                    delete me.deferreds[field.key];
-                });
+                );
                 //暂时还不知道通过没有
                 field.isValid = undefined;
             } else {
@@ -794,8 +788,10 @@
 
         //自定义规则（注重复用性，完全自定义，就不局限于内置的规则了）
         setRule: function(obj) {
-            this._clearCache();
             new Rules(obj, this.rules);
+            $.map(this.fields, function(field){
+                field.old = {};
+            });
         },
 
         /* 更新字段信息（如果是新字段就等于添加了一个字段）
