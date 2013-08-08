@@ -1,4 +1,4 @@
-/*! nice Validator 0.2.0
+/*! nice Validator 0.2.1
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -55,10 +55,9 @@
 
         defaults = {
             debug: 0,
-            timely: 2,
+            timely: 1,
             theme: 'default',
             stopOnError: true,
-            //showOk: true,
             ignore: '',
             valid: noop,
             invalid: noop,
@@ -67,9 +66,10 @@
             msgIcon: '<span class="n-icon"></span>',
             msgArrow: '',
             msgClass: '',
-            msgHandler: null,
-            msgShow: null,
-            msgHide: null,
+            //showOk: true,
+            //msgHandler: null,
+            //msgShow: null,
+            //msgHide: null,
 
             defaultMsg: '{0} is not valid.',
             loadingMsg: 'Validating...'
@@ -251,7 +251,10 @@
                     .on('focusout validate', INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click', ':radio,:checkbox', proxy(me, '_click'));
                 if (!opt.msgHandler) me.$el.on('focusin', INPUT_SELECTOR, proxy(me, '_focus'));
-                if (opt.timely === 2) me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'));
+                if (opt.timely === 2) {
+                    me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'))
+                          .on('change', 'select', proxy(me, '_click'));
+                }
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
                 //初始化完成，阻止掉HTML5默认的表单验证，同时作为已经初始化的依据
@@ -552,8 +555,22 @@
             old = field.old = field.old || {};
             must = must || field.must; //此为特殊情况必须每次验证
 
+            //如果有分组验证
+            if (groupFn) {
+                $.extend(msgOpt, groupFn);
+                ret = groupFn.call(me);
+                if (ret !== true) {
+                    if (isString(ret)) ret = {error: ret};
+                    field.vid = 0;
+                    field.rid = 'group';
+                    isValid = false;
+                } else {
+                    ret = undefined;
+                    me.hideMsg(el, msgOpt);
+                }
+            }
             //如果非必填项且值为空
-            if (!field.required && el.value === '' && !groupFn) {
+            if (isValid && !field.required && el.value === '') {
                 if (msgStatus === 'tip') return;
                 else me._focus({target: el});
                 old.value = '';
@@ -570,21 +587,6 @@
                     msgOpt = old.ret;
                     $el.trigger('validated.field', [field, msgOpt]);
                     return;
-                }
-            }
-            //如果有分组验证
-            else if (groupFn) {
-                $.extend(msgOpt, groupFn);
-                ret = groupFn.call(me);
-                if (ret === true) {
-                    ret = undefined;
-                    me.hideMsg(el, msgOpt);
-                } else {
-                    if (isString(ret)) ret = {error: ret};
-                    me.hideMsg(el);
-                    field.vid = 0;
-                    field.rid = 'group';
-                    isValid = false;
                 }
             }
 
@@ -1119,9 +1121,6 @@
             return true;
         }
     });
-
-    //公共静态接口
-    Validator.defaults = defaults;
 
     /** 设置主题接口
      *  .setTheme( name, obj )
