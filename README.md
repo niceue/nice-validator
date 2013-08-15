@@ -20,7 +20,7 @@ Simple, smart and pleasant verification solution.
 
 ### Build
 `nice Validator` use [UglifyJS2](https://github.com/mishoo/UglifyJS) ,and [Stylus](http://learnboost.github.io/stylus/) to build project,<br>
-you should have installed [nodejs](nodejs.org) and run `npm install uglify-js -g`, `npm install stylus -g`.
+you should have installed [nodejs](nodejs.org), cd the `validator` directory and run `npm install`.
 
 ### License
 `nice Validator`is available under the terms of the [MIT License](https://github.com/niceue/validator/blob/master/LICENSE.txt).
