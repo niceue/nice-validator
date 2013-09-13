@@ -1,8 +1,9 @@
-/*! nice Validator 0.3.0-pre
+/*! nice Validator 0.3.0
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
-.msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1;vertical-align:top}
+.n-inline-block,.n-validator input,.n-validator select,.n-validator textarea,.msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1}
+.msg-wrap,.n-icon,.n-msg{vertical-align:top}
 .msg-box{position:absolute;font-size:0;line-height:0;vertical-align:top;outline:0;*zoom:1}
 .msg-wrap{position:relative;white-space:nowrap}
 .n-arrow{position:absolute;overflow:hidden;}

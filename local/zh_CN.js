@@ -97,6 +97,11 @@
             formClass: 'n-simple',
             msgClass: 'n-bottom'
         },
+        'yellow_top': {
+            formClass: 'n-yellow',
+            msgClass: 'n-top',
+            msgArrow: TPL_ARROW
+        },
         'yellow_right': {
             formClass: 'n-yellow',
             msgClass: 'n-right',

@@ -32,9 +32,17 @@ inline-block() {
 /*********************
  * global settings
  *********************/
+.n-inline-block {
+    inline-block();
+}
+.n-validator {
+    input, select, textarea {
+        @extend .n-inline-block
+    }
+}
 
 .msg-wrap,.n-icon,.n-msg {
-    inline-block()
+    @extend .n-inline-block
     vertical-align:top;
 }
 .msg-box {
