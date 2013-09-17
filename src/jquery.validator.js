@@ -324,9 +324,13 @@
         // 验证整个表单
         _submit: function(e, mark) {
             var me = this;
+            if (me.submiting) {
+                isFunction(me.submiting) && me.submiting.call(me);
+                return e.preventDefault();
+            }
             // mark === only 时，不操作验证，让原生事件继续
             // 只接收在form上面触发的validate事件
-            if (me.submiting || mark === 'only' || e.type === 'validate' && $(e.target).is(':not(form)')) return;
+            if (mark === 'only' || e.type === 'validate' && $(e.target).is(':not(form)')) return;
             var opt = me.options,
                 form = e.target,
                 FOCUS_EVENT = 'focus.field',
@@ -366,11 +370,12 @@
                         // 触发submit事件，自然的提交表单
                         $(form).trigger('submit', ['only']);
                     }
+
+                    me.submiting = false;
+
                     ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid';
                     opt[ret].call(me, form);
                     me.$el.trigger(ret + '.form', [form]);
-                    
-                    me.submiting = false;
                 },
                 true
             );
@@ -640,15 +645,6 @@
             }
         },
 
-        // 验证一个字段
-        _checkField: function(el, field) {
-            field = field || this.getField(el);
-            if (!field) return true;
-            this._validate(el, field, true);
-            
-            return field.isValid;
-        },
-
         // 执行验证
         _validate: function(el, field, must) {
             var me = this,
@@ -867,6 +863,13 @@
             me._init();
         },
 
+        // 暂停或恢复submit事件
+        // 如果hold为回调函数，将在阻止提交表单的同时执行此回调
+        holdSubmit: function(hold) {
+            if (hold === undefined) hold = true;
+            this.submiting = hold;
+        },
+
         // 销毁表单验证（事件、数据、提示消息）
         destroy: function() {
             this._reset();
@@ -1046,7 +1049,7 @@
             } else {
                 $(this).removeAttr(DATA_RULE);
             }
-        }).on('click submit', 'form:not([novalidate=true])', function(e) {
+        }).on('click submit', 'form:not([novalidate])', function(e) {
             var $form = $(this), me;
             if (!$form.data(NS)) {
                 me = $form[NS]().data(NS);
