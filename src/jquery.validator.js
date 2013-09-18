@@ -18,15 +18,16 @@
         DATA_TARGET = 'data-target',
         DATA_TIP = 'data-tip',
         DATA_INPUT_STATUS = 'data-inputstatus',
+        NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':input:not(:button,:submit,:reset,:disabled)',
         TPL_MSG_WRAP = '<span class="msg-wrap" role="alert"></span>',
 
         rRule = /(\w+)(?:\[(.*)\]$|\((.*)\)$)?/,
         rDisplay = /(?:([^:]*):)?(.*)/,
-        rDoubleBytes = /[^\x00-\xff]/g, //全角字符
+        rDoubleBytes = /[^\x00-\xff]/g,
         rPos = /^.*(top|right|bottom|left).*$/,
         rAjaxType = /(?:(post|get):)?(.+)/i,
-        rUnsafe = /<|>/g, //危险字符
+        rUnsafe = /<|>/g,
 
         noop = $.noop,
         proxy = $.proxy,
@@ -140,6 +141,7 @@
         return this;
     };
 
+    // 验证某个字段，或者一个区域是否通过验证
     $.fn.isValid = function(callback, checkOnly) {
         var me = getInstance(this[0]), $inputs;
         if (!me) return true;
@@ -212,35 +214,7 @@
                 });
             }
             $(INPUT_SELECTOR, me.$el).each(function() {
-                var el = this,
-                    field,
-                    key = el.name;
-
-                // 如果js传递的key为id，识别为id模式
-                // 或者该字段没有name，自动识别为id模式
-                if (el.id && ('#' + el.id in fields) || !el.name) {
-                    key = '#' + el.id;
-                }
-                if (!key) return attr(el, DATA_RULE, null); // 既没有id也没有name的字段不做验证
-
-                field = fields[key] || {};
-                if (!field.rule) field.rule = attr(el, DATA_RULE) || '';
-                field.rules = [];
-                attr(el, DATA_RULE, null);
-                if (!field.rule) return;
-
-                field.name = field.name || el.name;
-                field.key = key;
-                field.required = field.rule.indexOf('required') !== -1;
-                field.must = field.rule.indexOf('match') !== -1 || field.rule.indexOf('checked') !== -1;
-                if (field.required) attr(el, 'aria-required', true);
-                if ('timely' in field && !field.timely || !opt.timely) {
-                    attr(el, 'notimely', true);
-                }
-                if (isString(field.target)) attr(el, DATA_TARGET, field.target);
-                if (isString(field.tip)) attr(el, DATA_TIP, field.tip);
-
-                fields[key] = me._parseField(field);
+                me._parse(this);
             });
 
             // 消息的参数
@@ -273,7 +247,7 @@
 
                 // 初始化完成，阻止掉HTML5默认的表单验证，同时作为已经初始化的依据
                 // jQuery的attr方法在IE7下会报错："SCRIPT3: 找不到成员"
-                attr(me.$el[0], 'novalidate', true);
+                attr(me.$el[0], NOVALIDATE, true);
             }
         },
 
@@ -287,9 +261,7 @@
             me.deferred = {};
 
             $inputs.each(function(i, el) {
-                var field;
-                if ( attr(el, 'novalidate') ) return;
-                field = me.getField(el);
+                var field = me.getField(el);
                 if (!field) return;
 
                 me._validate(el, field, must);
@@ -324,10 +296,12 @@
         // 验证整个表单
         _submit: function(e, mark) {
             var me = this;
+            // 如果表单正在提交中，防止重复提交（可通过回调控制提交频率）
             if (me.submiting) {
                 isFunction(me.submiting) && me.submiting.call(me);
                 return e.preventDefault();
             }
+
             // mark === only 时，不操作验证，让原生事件继续
             // 只接收在form上面触发的validate事件
             if (mark === 'only' || e.type === 'validate' && $(e.target).is(':not(form)')) return;
@@ -360,6 +334,9 @@
             me._multiValidate(
                 $inputs,
                 function(isValid){
+                    // 释放submit控制
+                    me.submiting = false;
+
                     if (!isValid) {
                         // 定位到出错的元素
                         var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
@@ -370,8 +347,6 @@
                         // 触发submit事件，自然的提交表单
                         $(form).trigger('submit', ['only']);
                     }
-
-                    me.submiting = false;
 
                     ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid';
                     opt[ret].call(me, form);
@@ -462,13 +437,47 @@
             this._blur(e, true);
         },
 
+        // 解析一个字段
+        _parse: function(el) {
+            var me = this,
+                field,
+                key = el.name;
+
+            // 如果js传递的key为id，识别为id模式
+            // 或者该字段没有name，自动识别为id模式
+            if (el.id && ('#' + el.id in me.fields) || !el.name) {
+                key = '#' + el.id;
+            }
+            // 既没有id也没有name的字段不做验证
+            if (!key) return attr(el, DATA_RULE, null);
+
+            field = me.fields[key] || {};
+            if (!field.rule) field.rule = attr(el, DATA_RULE) || '';
+            attr(el, DATA_RULE, null);
+            if (!field.rule) return;
+
+            field.name = field.name || el.name;
+            field.key = key;
+            field.required = field.rule.indexOf('required') !== -1;
+            field.must = field.must || field.rule.indexOf('match') !== -1 || field.rule.indexOf('checked') !== -1;
+            if (field.required) attr(el, 'aria-required', true);
+            if ('timely' in field && !field.timely || !me.options.timely) {
+                attr(el, 'notimely', true);
+            }
+            if (isString(field.target)) attr(el, DATA_TARGET, field.target);
+            if (isString(field.tip)) attr(el, DATA_TIP, field.tip);
+
+            me.fields[key] = me._parseRule(field);
+        },
+
         // 解析字段规则
-        _parseField: function(field) {
+        _parseRule: function(field) {
             var arr = rDisplay.exec(field.rule),
                 rules;
 
             if (!arr) return;
             field.display = arr[1];
+            field.rules = [];
             rules = (arr[2] || '').split(';');
             $.map(rules, function(rule) {
                 var parts = rRule.exec(rule);
@@ -647,6 +656,10 @@
 
         // 执行验证
         _validate: function(el, field, must) {
+            if ( !field.rules ) this._parse(el);
+            // 禁用或者标记novalidate的元素，暂时不验证
+            if ( el.disabled || attr(el, NOVALIDATE) ) return;
+
             var me = this,
                 opt = me.options,
                 $el = $(el),
@@ -654,12 +667,12 @@
                 groupFn = field.group,
                 old,
                 ret,
-                msgStatus = attr(el, DATA_INPUT_STATUS),
+                isCurrentTip = attr(el, DATA_INPUT_STATUS) === 'tip',
                 isValid = field.isValid = true;
 
-            if ( !field || !field.rules || el.disabled || attr(el, 'novalidate') ) return; // 等待验证状态，后面可能会验证
             old = field.old = field.old || {};
-            must = must || field.must; // 此为特殊情况必须每次验证
+            // 需要强制验证的情况
+            must = must || field.must;
 
             // 如果有分组验证
             if (groupFn) {
@@ -677,7 +690,7 @@
             }
             // 如果非必填项且值为空
             if (isValid && !field.required && el.value === '') {
-                if (msgStatus === 'tip') return;
+                if (isCurrentTip) return;
                 else me._focus({target: el});
                 old.value = '';
                 if (!$el.is(':checkbox,:radio')) {
@@ -687,8 +700,8 @@
             }
             // 如果值没变，就直接返回旧的验证结果
             else if (!must && old && old.ret !== undefined && old.value === el.value) {
-                //if (!old.ret.valid) isValid = me.isValid = false;
-                if (msgStatus === 'tip') return;
+                if (!old.ret.valid) me.isValid = false;
+                if (isCurrentTip) return;
                 if (el.value !== '') {
                     msgOpt = old.ret;
                     $el.trigger('validated.field', [field, msgOpt]);
@@ -721,6 +734,7 @@
             } else {
                 key = el.name;
             }
+            if (attr(el, DATA_RULE)) me._parse(el);
             return me.fields[key];
         },
 
@@ -1044,10 +1058,12 @@
 
     $(function() {
         $('body').on('focusin', ':input['+DATA_RULE+']', function() {
-            if (getInstance(this)) {
-                $(this).trigger('focusin');
+            var el = this, me = getInstance(el);
+            if (me) {
+                if (attr(el, DATA_RULE)) me._parse(el);
+                $(el).trigger('focusin');
             } else {
-                $(this).removeAttr(DATA_RULE);
+                attr(el, DATA_RULE, null);
             }
         }).on('click submit', 'form:not([novalidate])', function(e) {
             var $form = $(this), me;
@@ -1056,7 +1072,7 @@
                 if (!$.isEmptyObject(me.fields)) {
                     e.type==='submit' && me._submit(e);
                 } else {
-                    attr(this, 'novalidate', true);
+                    attr(this, NOVALIDATE, true);
                     $form.removeData(NS);
                 }
             }
