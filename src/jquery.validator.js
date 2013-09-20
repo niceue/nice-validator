@@ -166,7 +166,7 @@
         }
         options = options || {};
         // 如果传了valid参数，证明是要ajax提交的节奏
-        me.isPreventDefault = !!options.valid;
+        if (options.valid) me.isAjaxSubmit = true;
 
         dataOpt = attr(element, 'data-'+NS+'-option');
         dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
@@ -273,7 +273,7 @@
 
             // 需要等待所有字段验证完成（特别是异步验证）
             $.when.apply(
-                $.Deferred().promise(),
+                null,
                 $.map(me.deferred, function(v){return v;})
             ).done(function(){
                 doneCallbacks.call(me, me.isValid);
@@ -285,7 +285,6 @@
                     });
                     opt.msgHandler.call(me, errorMsgs);
                 }
-                //me.deferred = {};
             });
 
             // 如果表单中没有异步验证，这个返回值是准确的
@@ -313,21 +312,21 @@
 
             me._reset();
             me.submiting = true;
-            // 是否是ajax提交表单
-            me.isAjaxSubmit = true;
-
-            if ( attr(form, 'action') === null ) me.isPreventDefault = true;
-            if (!me.isPreventDefault) {
-                // 如果绑定了“valid.form”事件，也会自动阻止表单跳转
-                var events = me.$el.data("events").valid;
-                if (events &&
-                    $.map(events, function(e){
-                        return e.namespace === 'form' ? 1 : null;
-                    }).length
-                ) {
-                    me.isPreventDefault = true;
-                } else {
-                    me.isAjaxSubmit = false;
+            
+            if (me.isAjaxSubmit === undefined) {
+                if ( attr(form, 'action') === null ) me.isAjaxSubmit = true;
+                else {
+                    // 如果绑定了“valid.form”事件，也会自动阻止表单跳转
+                    var events = $[ $._data ? '_data' : 'data' ](me.$el[0], "events");
+                    if (events && events.valid &&
+                        $.map(events.valid, function(e){
+                            return e.namespace === 'form' ? 1 : null;
+                        }).length
+                    ) {
+                        me.isAjaxSubmit = true;
+                    } else {
+                        me.isAjaxSubmit = false;
+                    }
                 }
             }
 
@@ -355,7 +354,7 @@
                 true
             );
 
-            if (me.isPreventDefault || !$.isEmptyObject(me.deferred)) e.preventDefault();
+            if (me.isAjaxSubmit || !$.isEmptyObject(me.deferred)) e.preventDefault();
 
             return me.isValid;
         },
