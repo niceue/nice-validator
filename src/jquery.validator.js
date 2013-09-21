@@ -1,4 +1,4 @@
-/*! nice Validator 0.3.1-alpha
+/*! nice Validator 0.4.0
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -238,7 +238,7 @@
                     .on('validated.rule', INPUT_SELECTOR, proxy(me, '_validatedRule'))
                     .on('focusout validate', INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click', ':radio,:checkbox', proxy(me, '_click'));
-                if (!opt.msgHandler) me.$el.on('focusin', INPUT_SELECTOR, proxy(me, '_focus'));
+                if (!opt.msgHandler) me.$el.on('focusin click', INPUT_SELECTOR, proxy(me, '_focus'));
                 if (opt.timely >= 2) {
                     me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'))
                           .on('change', 'select', proxy(me, '_click'));
@@ -296,7 +296,7 @@
         _submit: function(e, mark) {
             var me = this;
             // 如果表单正在提交中，防止重复提交（可通过回调控制提交频率）
-            if (me.submiting) {
+            if (me.submiting && mark !== 'only') {
                 isFunction(me.submiting) && me.submiting.call(me);
                 return e.preventDefault();
             }
@@ -333,9 +333,6 @@
             me._multiValidate(
                 $inputs,
                 function(isValid){
-                    // 释放submit控制
-                    me.submiting = false;
-
                     if (!isValid) {
                         // 定位到出错的元素
                         var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
@@ -346,6 +343,8 @@
                         // 触发submit事件，自然的提交表单
                         $(form).trigger('submit', ['only']);
                     }
+                    // 释放submit控制
+                    me.submiting = false;
 
                     ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid';
                     opt[ret].call(me, form);
