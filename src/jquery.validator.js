@@ -1,4 +1,4 @@
-/*! nice Validator 0.4.0
+/*! nice Validator 0.5.0
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -23,7 +23,7 @@
         TPL_MSG_WRAP = '<span class="msg-wrap" role="alert"></span>',
 
         rRule = /(\w+)(?:\[(.*)\]$|\((.*)\)$)?/,
-        rDisplay = /(?:([^:]*):)?(.*)/,
+        rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
         rPos = /^.*(top|right|bottom|left).*$/,
         rAjaxType = /(?:(post|get):)?(.+)/i,
