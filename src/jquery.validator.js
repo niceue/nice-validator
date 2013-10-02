@@ -143,16 +143,18 @@
 
     // 验证某个字段，或者一个区域是否通过验证
     $.fn.isValid = function(callback, checkOnly) {
-        var me = getInstance(this[0]), $inputs;
+        var me = getInstance(this[0]), $inputs, ret;
         if (!me) return true;
         // 默认是只验证，不提示消息
         if (checkOnly === undefined) checkOnly = true;
         me.checkOnly = checkOnly;
         $inputs = this.is(':input') ? this : this.find(INPUT_SELECTOR);
-        return me._multiValidate($inputs, function(isValid){
+        ret = me._multiValidate($inputs, function(isValid){
             isFunction(callback) && callback.call(null, isValid);
             me.checkOnly = false;
         }, true);
+        // 如果是回调方式，就维持jQuery对象链
+        return isFunction(callback) ? this : ret;
     };
 
     function Validator(element, options) {
