@@ -1,4 +1,4 @@
-/*! nice Validator 0.5.0-pre
+/*! nice Validator 0.5.0-bata
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -20,7 +20,6 @@
         DATA_INPUT_STATUS = 'data-inputstatus',
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':input:not(:button,:submit,:reset,:disabled)',
-        TPL_MSG_WRAP = '<span class="msg-wrap" role="alert"></span>',
 
         rRule = /(\w+)(?:\[(.*)\]$|\((.*)\)$)?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
@@ -63,7 +62,22 @@
             valid: noop,
             invalid: noop,
 
-            msgTemplate: '<span>{#msg}</span>',
+            msgWrapper: 'span',
+            // 默认的消息构造器
+            msgHTML: function(opt) {
+                var html,
+                    cls = {
+                        error: CLS_MSG_INVALID,
+                        ok: CLS_MSG_VALID,
+                        tip: CLS_MSG_TIP,
+                        loading: CLS_MSG_LOADING
+                    }[opt.type];
+
+                html = '<span class="msg-wrap '+ cls +'" role="alert">';
+                html += (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
+                html += '</span>';
+                return html;
+            },
             msgIcon: '<span class="n-icon"></span>',
             msgArrow: '',
             msgClass: '',
@@ -98,7 +112,8 @@
         msgShow     {Function}  null        消息显示之前的回调，可用于自定义消息动画
         msgHide     {Function}  null        消息隐藏之前的回调，可用于自定义消息动画
         
-        msgTemplate {String}                消息模板
+        msgWrapper  {String}    'span'      消息占位的标签名
+        msgHTML     {Function}              消息的HTML
         msgIcon     {String}    ''          icon图标模板
         msgArrow    {String}    ''          小箭头模板
         msgClass    {String}    ''          给消息额外添加的class名
@@ -222,28 +237,27 @@
             // 消息的参数
             me.msgOpt = {
                 type: 'error',
-                tpl: getTpl(opt.msgTemplate),
                 pos: getPos(opt.msgClass),
                 cls: opt.msgClass,
+                style: opt.msgStyle,
                 icon: opt.msgIcon,
                 arrow: opt.msgArrow,
-                style: opt.msgStyle,
                 show: opt.msgShow,
                 hide: opt.msgHide
             };
 
             // 处理事件与缓存
             if (!me.$el.data(NS)) {
-                me.$el.on('submit validate', proxy(me, '_submit'))
-                    .on('reset', proxy(me, '_reset'))
-                    .on('validated.field', INPUT_SELECTOR, proxy(me, '_validatedField'))
-                    .on('validated.rule', INPUT_SELECTOR, proxy(me, '_validatedRule'))
-                    .on('focusout validate', INPUT_SELECTOR, proxy(me, '_blur'))
-                    .on('click', ':radio,:checkbox', proxy(me, '_click'));
-                if (!opt.msgHandler) me.$el.on('focusin click', INPUT_SELECTOR, proxy(me, '_focus'));
+                me.$el.on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
+                    .on('reset.'+NS, proxy(me, '_reset'))
+                    .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
+                    .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
+                    .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
+                    .on('click.'+NS, ':radio,:checkbox', proxy(me, '_click'));
+                if (!opt.msgHandler) me.$el.on('focusin.'+NS + ' click.'+NS, INPUT_SELECTOR, proxy(me, '_focus'));
                 if (opt.timely >= 2) {
-                    me.$el.on('keyup', INPUT_SELECTOR, proxy(me, '_blur'))
-                          .on('change', 'select', proxy(me, '_click'));
+                    me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
+                          .on('change.'+NS, 'select', proxy(me, '_click'));
                 }
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
@@ -296,7 +310,8 @@
 
         // 验证整个表单
         _submit: function(e, mark) {
-            var me = this;
+            var me = this,
+                form = e.target;
             // 如果表单正在提交中，防止重复提交（可通过回调控制提交频率）
             if (me.submiting && mark !== 'only') {
                 isFunction(me.submiting) && me.submiting.call(me);
@@ -305,16 +320,8 @@
 
             // mark === only 时，不操作验证，让原生事件继续
             // 只接收在form上面触发的validate事件
-            if (mark === 'only' || e.type === 'validate' && $(e.target).is(':not(form)')) return;
-            var opt = me.options,
-                form = e.target,
-                FOCUS_EVENT = 'focus.field',
-                ret,
-                $inputs = $(INPUT_SELECTOR, me.$el);
+            if (mark === 'only' || e.type === 'validate' && form.tagName !== 'FORM') return;
 
-            me._reset();
-            me.submiting = true;
-            
             if (me.isAjaxSubmit === undefined) {
                 if ( attr(form, 'action') === null ) me.isAjaxSubmit = true;
                 else {
@@ -332,9 +339,19 @@
                 }
             }
 
+            me._reset();
+            me.submiting = true;
+
             me._multiValidate(
-                $inputs,
+                me.$el.find(INPUT_SELECTOR),
                 function(isValid){
+                    var opt = me.options,
+                        FOCUS_EVENT = 'focus.field',
+                        ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid';
+
+                    opt[ret].call(me, form);
+                    me.$el.trigger(ret + '.form', [form]);
+
                     if (!isValid) {
                         // 定位到出错的元素
                         var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
@@ -347,10 +364,6 @@
                     }
                     // 释放submit控制
                     me.submiting = false;
-
-                    ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid';
-                    opt[ret].call(me, form);
-                    me.$el.trigger(ret + '.form', [form]);
                 },
                 true
             );
@@ -363,10 +376,8 @@
         _reset: function() {
             var me = this;
             if (!me.options.msgHandler) {
-               $('[data-for].' + CLS_MSG_BOX, me.$el).each(function() {
-                    this.style.display = 'none';
-                });
-                $(INPUT_SELECTOR, me.$el).each(function() {
+                me.$el.find(me.options.msgWrapper + '.' + CLS_MSG_BOX).hide();
+                me.$el.find(INPUT_SELECTOR).each(function() {
                     attr(this, DATA_INPUT_STATUS, null);
                     attr(this, ARIA_INVALID, null);
                     $(this).removeClass(CLS_INPUT_INVALID);
@@ -384,26 +395,31 @@
             });
         },
 
-        // 接收：focusout/validate/keyup/click 事件
+        // 处理 focusout/validate/keyup/click/paste 事件
         _blur: function(e, isClick) {
             var me = this,
                 opt = me.options,
                 field,
                 must,
                 el = e.target,
+                etype = e.type,
                 timer = 100;
 
-            if (!isClick) {
+            if (!isClick && etype !== 'paste') {
                 // 手动触发的事件, 强制验证
-                if (e.type === 'validate') must = true;
+                if (etype === 'validate') {
+                    must = true;
+                    timer = 0;
+                }
                 // 不是手动触发的验证, 也不是实时的验证, 那就不继续了
                 else if ( attr(el, 'notimely') ) return;
                 // 只在keyup事件触发时验证
-                else if (opt.timely >= 2 && e.type !== 'keyup') return;
+                else if (opt.timely >= 2 && etype !== 'keyup') return;
+
                 // 如果当前字段被忽略了
                 if (opt.ignore && $(el).is(opt.ignore)) return;
-
-                if (e.type === 'keyup') {
+                // 键盘输入
+                if (etype === 'keyup') {
                     var key = e.keyCode,
                         specialKey = {
                             8: 1,  // Backspace
@@ -427,10 +443,16 @@
             field = me.getField(el);
             if (!field) return;
 
-            if (field.timeout) clearTimeout(field.timeout);
-            field.timeout = setTimeout(function() {
+            if (timer) {
+                if (field.timeout) clearTimeout(field.timeout);
+                field.timeout = setTimeout(function() {
+                    me._validate(el, field, must);
+                }, timer);
+            } else {
+                // 对于validate事件，采用同步验证
                 me._validate(el, field, must);
-            }, timer);
+            }
+            
         },
 
         _click: function(e) {
@@ -806,6 +828,46 @@
             return tpl;
         },
 
+        _getMsgDOM: function(el, opt) {
+            var $el = $(el), $msgbox, datafor, tgt;
+            
+            if ($el.is(':input')) {
+                tgt = opt.target || attr(el, DATA_TARGET);
+                if (tgt) {
+                    tgt = $(tgt, this.$el);
+                    if (tgt.length) {
+                        if (!tgt.is(':input')) {
+                            $msgbox = tgt;
+                        } else {
+                            el = tgt.get(0);
+                        }
+                    }
+                }
+                if (!$msgbox) {
+                    datafor = !checkable(el) && el.id ? el.id : el.name;
+                    $msgbox = $(this.options.msgWrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]', this.$el);
+                }
+            } else {
+                $msgbox = $el;
+            }
+
+            if (!$msgbox.length) {
+                $el = $(tgt || el, this.$el);
+                $msgbox = $('<'+ this.options.msgWrapper + '>').attr({
+                    'class': CLS_MSG_BOX + (opt.cls ? ' '+opt.cls : ''),
+                    'style': opt.style || '',
+                    'for': datafor
+                });
+                if (checkable(el)) {
+                    var $parent = $el.parent();
+                    $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
+                } else {
+                    $msgbox[!opt.pos || opt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
+                }
+            }
+            return $msgbox;
+        },
+
         // 显示消息接口
         showMsg: function(el, opt) {
             opt = this._getMsgOpt(opt);
@@ -813,13 +875,34 @@
             el = $(el).get(0);
             //标记消息状态
             attr(el, DATA_INPUT_STATUS, opt.type);
-            showMsg(el, opt, this.$el);
+
+            var $msgbox = this._getMsgDOM(el, opt),
+                cls = $msgbox[0].className;
+                
+            if ( cls.indexOf(opt.cls) === -1 ) $msgbox.addClass(opt.cls);
+            if ( isIE6 && cls.indexOf('bottom') !== -1 ) {
+                $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
+            }
+            $msgbox.html(this.options.msgHTML(opt));
+            $msgbox[0].style.display = '';
+
+            isFunction(opt.show) && opt.show.call(this, $msgbox, opt.type);
         },
 
         // 隐藏消息接口
         hideMsg: function(el, opt) {
+            el = $(el).get(0);
             opt = this._getMsgOpt(opt);
-            hideMsg($(el).get(0), opt, this.$el);
+
+            var $msgbox = this._getMsgDOM(el, opt);
+            if (!$msgbox.length) return;
+
+            if ( isFunction(opt.hide) ) {
+                $msgbox[0].style.display = '';
+                opt.hide.call(this, $msgbox, opt.type);
+            } else {
+                $msgbox[0].style.display = 'none';
+            }
         },
 
         // 用来显示服务器的验证消息。(提交表单并且服务器验证完毕后，返回一个name为键、msg为value的json传入此方法中)
@@ -887,11 +970,12 @@
         // 销毁表单验证（事件、数据、提示消息）
         destroy: function() {
             this._reset();
-            this.$el.off().removeData(NS);
+            this.$el.off('.'+NS).removeData(NS);
         }
     };
 
-    // 规则类、工厂
+
+    // 规则类
     function Rules(obj, context) {
         var that = context ? context === true ? this : context : Rules.prototype;
 
@@ -901,7 +985,7 @@
         }
     }
 
-    // 消息类、工厂
+    // 消息类
     function Messages(obj, context) {
         var that = context ? context === true ? this : context : Messages.prototype;
 
@@ -912,6 +996,7 @@
         }
     }
 
+    // 规则转换工厂
     function getRule(fn) {
         switch ($.type(fn)) {
             case 'function':
@@ -927,6 +1012,7 @@
         }
     }
 
+    // 转换空格分隔的keys为jQuery选择器
     function keys2selector(keys) {
         var selector = '';
         $.map(keys.split(' '), function(k) {
@@ -951,7 +1037,7 @@
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
-    // 获取节点上的相应规则
+    // 获取节点上的自定义规则
     function getDataRule(el, method) {
         var fn = $.trim(attr(el, DATA_RULE + '-' + method));
         if (!fn) return;
@@ -969,93 +1055,20 @@
         return msg;
     }
 
+    // 获取位置信息
     function getPos(str) {
-        if (!str) return '';
-        var pos = rPos.exec(str);
+        var pos;
+        if (str) pos = rPos.exec(str);
         return pos ? pos[1] : '';
     }
 
-    function getTpl(str) {
-        return (str || defaults.msgTemplate).replace('{#msg}', TPL_MSG_WRAP);
+    // 检查元素是否为checkbox或radio
+    function checkable(el) {
+        return el.tagName === 'INPUT' && el.type === 'checkbox' || el.type === 'radio';
     }
 
-    function getMsgDOM(el, opt, context) {
-        var $el = $(el), $msgbox, datafor, tpl, tgt;
-        
-        if ($el.is(':input')) {
-            tgt = opt.target || attr(el, DATA_TARGET);
-            if (tgt) {
-                tgt = $(tgt, context);
-                if (tgt.length) {
-                    if (!tgt.is(':input')) {
-                        $msgbox = tgt;
-                    } else {
-                        el = tgt.get(0);
-                    }
-                }
-            }
-            datafor = el.name || '#' + el.id;
-            $msgbox = $msgbox || $('.' + CLS_MSG_BOX + '[data-for="' + datafor + '"]', context);
-        } else {
-            $msgbox = $el;
-        }
 
-        if (!$msgbox.length) {
-            $el = $(tgt || el, context);
-            tpl = getTpl(opt.tpl);
-            $msgbox = $(tpl).addClass(CLS_MSG_BOX).attr({
-                style: opt.style || '',
-                'data-for': datafor
-            });
-            if (opt.cls) $msgbox.addClass(opt.cls);
-            if ($el.is(':checkbox,:radio')) {
-                var $parent = $el.parent();
-                $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
-            } else {
-                $msgbox[!opt.pos || opt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
-            }
-        }
-        return $msgbox;
-    }
-
-    function showMsg(el, opt, context) {
-        var cls, $msgbox, $msg;
-        
-        cls = {
-            error: CLS_MSG_INVALID,
-            ok: CLS_MSG_VALID,
-            tip: CLS_MSG_TIP,
-            loading: CLS_MSG_LOADING
-        }[opt.type || (opt.type = 'error')];
-
-        $msgbox = getMsgDOM(el, opt, context);
-        $msg = $msgbox.find('span.msg-wrap');
-        if (!$msg.length) $msg = $(TPL_MSG_WRAP).appendTo($msgbox);
-        if (isIE6 && $msgbox[0].className.indexOf('bottom') !== -1) {
-            $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
-        }
-
-        $msg[0].innerHTML = (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
-        $msg[0].className = 'msg-wrap ' + cls;
-        $msgbox[0].style.display = '';
-
-        isFunction(opt.show) && opt.show.call(context, $msg, opt.type);
-    }
-
-    function hideMsg(el, opt, context) {
-        opt = opt || {};
-
-        var $msgbox = getMsgDOM(el, opt, context);
-        if (!$msgbox.length) return;
-
-        if ( isFunction(opt.hide) ) {
-            $msgbox[0].style.display = '';
-            opt.hide.call(context, $msgbox.find('span.msg-wrap'), opt.type);
-        } else {
-            $msgbox[0].style.display = 'none';
-        }
-    }
-
+    // 全局事件
     $(function() {
         $('body').on('focusin', ':input['+DATA_RULE+']', function() {
             var el = this, me = getInstance(el);
@@ -1065,7 +1078,8 @@
             } else {
                 attr(el, DATA_RULE, null);
             }
-        }).on('click submit', 'form:not([novalidate])', function(e) {
+        }).on('click submit', 'form', function(e) {
+            if (attr(this, "novalidate")) return;
             var $form = $(this), me;
             if (!$form.data(NS)) {
                 me = $form[NS]().data(NS);
@@ -1079,7 +1093,8 @@
         });
     });
 
-    // 内置规则
+
+    // 内置规则（全局）
     new Rules({
 
         /** 必填
@@ -1182,7 +1197,7 @@
          *  checked[3]     选择3项
          **/
         checked: function(element, params) {
-            if (!$(element).is(':radio,:checkbox')) return true;
+            if (!checkable(element)) return true;
             var count = $('input[name="' + element.name + '"]', this.$el).filter(function() {
                 return !this.disabled && this.checked && $(this).is(':visible');
             }).length;
@@ -1255,34 +1270,38 @@
         }
     });
 
-    /** 设置主题接口
-     *  .setTheme( name, obj )
-     *  .setTheme( obj )
-     */
-    Validator.setTheme = function(name, obj) {
-        if (isObject(name)) {
-            $.each(name, function(i, o) {
-                themes[i] = o;
+
+    // 静态接口
+    $[NS] = {
+
+        /** 配置参数接口
+         *  .config( obj )
+         */
+        config: function(obj) {
+            $.each(obj, function(k, o) {
+                if (k === 'rules') {
+                    new Rules(o);
+                } else if (k === 'messages') {
+                    new Messages(o);
+                } else {
+                    defaults[k] = o;
+                }
             });
-        } else if (isString(name) && isObject(obj)) {
-            themes[name] = obj;
+        },
+
+        /** 设置主题接口
+         *  .setTheme( name, obj )
+         *  .setTheme( obj )
+         */
+        setTheme: function(name, obj) {
+            if (isObject(name)) {
+                $.each(name, function(i, o) {
+                    themes[i] = o;
+                });
+            } else if (isString(name) && isObject(obj)) {
+                themes[name] = obj;
+            }
         }
     };
-
-    /** 配置参数接口
-     *  .config( obj )
-     */
-    Validator.config = function(obj) {
-        $.each(obj, function(k, o) {
-            if (k === 'rules') {
-                new Rules(o);
-            } else if (k === 'messages') {
-                new Messages(o);
-            } else {
-                defaults[k] = o;
-            }
-        });
-    };
-    $[NS] = Validator;
 
 })(jQuery);
