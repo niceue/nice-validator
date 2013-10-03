@@ -40,23 +40,18 @@ inline-block() {
         @extend .n-inline-block
     }
 }
-
+.msg-wrap {
+    position: relative;
+    white-space: nowrap;
+}
 .msg-wrap,.n-icon,.n-msg {
     @extend .n-inline-block
     vertical-align:top;
 }
 .msg-box {
-    position:absolute;
-    font-size: 0;
-    line-height: 0;
-    vertical-align:top;
-    outline: 0;
     *zoom:1;
 }
-.msg-wrap {
-    position: relative;
-    white-space: nowrap;
-}
+
 .n-arrow {
     position: absolute; 
     overflow: hidden;
@@ -109,7 +104,14 @@ inline-block() {
 .n-left .n-arrow,
 .n-right .n-arrow {width: 6px; height: 12px; top: 6px; }
 
-
+.n-top, .n-right, .n-bottom, .n-left {
+    display: inline;
+    font-size:0;
+    font-size: 0;
+    line-height: 0;
+    vertical-align:top;
+    outline: 0;
+}
 /** top **/
 .n-top {
     bottom: 100%;
