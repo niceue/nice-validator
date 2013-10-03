@@ -111,7 +111,8 @@
             formClass: 'n-yellow',
             msgClass: 'n-right',
             msgArrow: TPL_ARROW,
-            msgShow: function($el, type){
+            msgShow: function($msgbox, type){
+                var $el = $msgbox.children();
                 if ($el.is(':animated')) return;
                 if (type === 'error') {
                     $el.css({
@@ -132,7 +133,8 @@
                     }).fadeIn(200);
                 }
             },
-            msgHide: function($el, type){
+            msgHide: function($msgbox, type){
+                var $el = $msgbox.children();
                 $el.stop().delay(100).show().animate({
                     left: '20px',
                     opacity: 0
