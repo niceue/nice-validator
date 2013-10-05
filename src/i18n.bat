@@ -1,5 +1,5 @@
 @echo off
 
-node tools/build
+node tools/i18n
 
 pause
