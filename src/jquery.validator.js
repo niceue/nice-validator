@@ -63,7 +63,6 @@
             invalid: noop,
 
             msgWrapper: 'span',
-            // 默认的消息构造器
             msgHTML: function(opt) {
                 var html,
                     cls = {
@@ -99,42 +98,42 @@
 
     /** jQuery Plugin
      * @param {Object} options
-        debug       {Boolean}   false,      是否启用调试模式（启用后，验证结果会同时在控制台输出，并且不阻止表单提交）
-        timely      {Boolean}   true,       是否启用及时验证（表单元素失去焦点时）
-        theme       {String}   'default'    主题样式
-        stopOnError {Boolean}   false,      验证出错时是否停止继续验证
-        ignore      {jqSelector}  '',       忽略的字段(jQuery选择器)，可以是一个范围
+        debug       {Boolean}   false,      Whether to enable debug mode
+        timely      {Boolean}   true,       Whether to enable timely verification
+        theme       {String}   'default'    Using which theme
+        stopOnError {Boolean}   false,      Whether to stop validate when found an error input
+        ignore      {jqSelector}  '',       Ignored fields (Using jQuery selector)
         
-        valid       {Function}              表单验证成功后的回调
-        invalid     {Function}              表单验证失败后的回调
+        valid       {Function}              If form is valid, will trigger this callback
+        invalid     {Function}              If form is invalid, will trigger this callback
 
-        msgHandler  {Function}  null        如果传递此参数，所有错误消息将被该回调接管，所有其他消息将被忽略
-        msgShow     {Function}  null        消息显示之前的回调，可用于自定义消息动画
-        msgHide     {Function}  null        消息隐藏之前的回调，可用于自定义消息动画
+        msgHandler  {Function}  null        Handle messages
+        msgShow     {Function}  null        When show a message, will trigger this callback
+        msgHide     {Function}  null        When hide a message, will trigger this callback
         
-        msgWrapper  {String}    'span'      消息占位的标签名
-        msgHTML     {Function}              消息的HTML
-        msgIcon     {String}    ''          icon图标模板
-        msgArrow    {String}    ''          小箭头模板
-        msgClass    {String}    ''          给消息额外添加的class名
-        formClass   {String}    ''          给表单额外添加的class名
+        msgWrapper  {String}    'span'      Message wrapper tag name
+        msgHTML     {Function}              Message's inner HTML
+        msgIcon     {String}    ''          Icon template
+        msgArrow    {String}    ''          Small arrow template
+        msgClass    {String}    ''          Additional added to the message class names
+        formClass   {String}    ''          Additional added to the form class names
 
-        defaultMsg  {String}                默认的错误消息
-        loadingMsg  {String}                异步加载中的提示
+        defaultMsg  {String}                Default error message
+        loadingMsg  {String}                Tips for asynchronous loading
         
-        rules       {Object}    null,       自定义用于当前实例的规则
-        messages    {Object}    null,       自定义用于当前实例的消息
+        rules       {Object}    null,       Custom rules for the current instance
+        messages    {Object}    null,       Custom messages for the current instance
         
-        fields      {Object}                待验证字段规则集合
+        fields      {Object}                Field set to be verified
         {String} key    name|#id
-        {String|Object} value               规则字符串，或者一个对象传递更多参数
+        {String|Object} value               Rule string, or an object is passed more arguments
 
-        fields[key][rule]     {String}      规则字符串
-        fields[key][tip]      {String}      自定义获得焦点时的提示信息
-        fields[key][ok]       {String}      字段验证成功后显示的消息
-        fields[key][msg]      {Object}      自定义验证失败的消息
-        fields[key][timely]   {Boolean}     是否启用实时验证
-        fields[key][target]   {jqSelector}  验证当前字段，但是消息却可以显示在target指向的元素周围
+        fields[key][rule]     {String}      Rule string
+        fields[key][tip]      {String}      Custom friendly message when focus the input
+        fields[key][ok]       {String}      Custom success message
+        fields[key][msg]      {Object}      Custom error message
+        fields[key][timely]   {Boolean}     Whether to enable timely verification
+        fields[key][target]   {jqSelector}  Verify the current field, but the message can be displayed on target element
      */
     $.fn[NS] = function(options) {
         var that = this,
@@ -156,11 +155,11 @@
         return this;
     };
 
-    // 验证某个字段，或者一个区域是否通过验证
+    // Validate a field, or an area
     $.fn.isValid = function(callback, checkOnly) {
         var me = getInstance(this[0]), $inputs, ret;
         if (!me) return true;
-        // 默认是只验证，不提示消息
+        // By default only verify without prompt message
         if (checkOnly === undefined) checkOnly = true;
         me.checkOnly = checkOnly;
         $inputs = this.is(':input') ? this : this.find(INPUT_SELECTOR);
@@ -168,10 +167,11 @@
             isFunction(callback) && callback.call(null, isValid);
             me.checkOnly = false;
         }, true);
-        // 如果是回调方式，就维持jQuery对象链
+        // If you pass a callback, we maintain the jQuery object chain
         return isFunction(callback) ? this : ret;
     };
 
+    // Constructor for validator
     function Validator(element, options) {
         var me = this, themeOpt, dataOpt;
         if (!me instanceof Validator) return new Validator(element, options);
@@ -182,7 +182,6 @@
             };
         }
         options = options || {};
-        // 如果传了valid参数，证明是要ajax提交的节奏
         if (options.valid) me.isAjaxSubmit = true;
 
         dataOpt = attr(element, 'data-'+NS+'-option');
@@ -206,7 +205,7 @@
                 opt = me.options,
                 fields = me.fields;
 
-            // 初始化分组验证
+            // Initialization group verification
             if (isArray(opt.groups)) {
                 $.map(opt.groups, function(obj) {
                     if (!isString(obj.fields) || !isFunction(obj.callback)) return null;
@@ -222,7 +221,7 @@
                 });
             }
 
-            // 处理字段信息
+            // Processing field information
             if (isObject(opt.fields)) {
                 $.each(opt.fields, function(k, v) {
                     if (v) fields[k] = isString(v) ? {
@@ -234,7 +233,7 @@
                 me._parse(this);
             });
 
-            // 消息的参数
+            // Message parameters
             me.msgOpt = {
                 type: 'error',
                 pos: getPos(opt.msgClass),
@@ -246,7 +245,7 @@
                 hide: opt.msgHide
             };
 
-            // 处理事件与缓存
+            // Processing events and cache
             if (!me.$el.data(NS)) {
                 me.$el.on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
                     .on('reset.'+NS, proxy(me, '_reset'))
@@ -261,13 +260,13 @@
                 }
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
-                // 初始化完成，阻止掉HTML5默认的表单验证，同时作为已经初始化的依据
-                // jQuery的attr方法在IE7下会报错："SCRIPT3: 找不到成员"
+                // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
+                // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(me.$el[0], NOVALIDATE, true);
             }
         },
 
-        // 验证一个区域
+        // Verify a zone
         _multiValidate: function($inputs, doneCallbacks, must){
             var me = this,
                 opt = me.options;
@@ -282,18 +281,18 @@
 
                 me._validate(el, field, must);
                 if (!me.isValid && opt.stopOnError) {
-                    // 停止继续验证
+                    // stop the verification
                     return false;
                 }
             });
 
-            // 需要等待所有字段验证完成（特别是异步验证）
+            // Need to wait for the completion of all field validation (especially asynchronous verification)
             $.when.apply(
                 null,
                 $.map(me.deferred, function(v){return v;})
             ).done(function(){
                 doneCallbacks.call(me, me.isValid);
-                //如果被msgHandler接管消息
+                // If msgHandler takeover messages
                 if ( isFunction(opt.msgHandler) ) {
                     var errorMsgs = [];
                     $.map(me.fields, function(field){
@@ -303,29 +302,29 @@
                 }
             });
 
-            // 如果表单中没有异步验证，这个返回值是准确的
-            // 否则需要获取doneCallbacks回调中的isValid值，来检测表单是否验证通过
+            // If the form does not contain asynchronous validation, the return value is correct.
+            // Otherwise, you should detect whether a form valid through "doneCallbacks".
             return !$.isEmptyObject(me.deferred) ? undefined : me.isValid;
         },
 
-        // 验证整个表单
+        // Verify the whole form
         _submit: function(e, mark) {
             var me = this,
                 form = e.target;
-            // 如果表单正在提交中，防止重复提交（可通过回调控制提交频率）
+            // Prevent duplicate submission
             if (me.submiting && mark !== 'only') {
                 isFunction(me.submiting) && me.submiting.call(me);
                 return e.preventDefault();
             }
 
-            // mark === only 时，不操作验证，让原生事件继续
-            // 只接收在form上面触发的validate事件
+            // We found the "only" mark, and make the native event continues.
+            // Receive the "validate" event only from the form.
             if (mark === 'only' || e.type === 'validate' && form.tagName !== 'FORM') return;
 
             if (me.isAjaxSubmit === undefined) {
                 if ( attr(form, 'action') === null ) me.isAjaxSubmit = true;
                 else {
-                    // 如果绑定了“valid.form”事件，也会自动阻止表单跳转
+                    // if there is "valid.form" event
                     var events = $[ $._data ? '_data' : 'data' ](me.$el[0], "events");
                     if (events && events.valid &&
                         $.map(events.valid, function(e){
@@ -353,16 +352,16 @@
                     me.$el.trigger(ret + '.form', [form]);
 
                     if (!isValid) {
-                        // 定位到出错的元素
+                        // navigate to the error element
                         var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
                         $input.trigger(FOCUS_EVENT);
-                        // IE6得再触发一次才能获得焦点
+                        // IE6 has to trigger once again to get the focus
                         isIE6 && $input.trigger(FOCUS_EVENT);
                     } else if (!me.isAjaxSubmit) {
-                        // 触发submit事件，自然的提交表单
+                        // trigger the native submit event
                         $(form).trigger('submit', ['only']);
                     }
-                    // 释放submit控制
+                    // releasing submit
                     me.submiting = false;
                 },
                 true
@@ -395,7 +394,7 @@
             });
         },
 
-        // 处理 focusout/validate/keyup/click/paste 事件
+        // Handle focusout/validate/keyup/click/paste events
         _blur: function(e, isClick) {
             var me = this,
                 opt = me.options,
@@ -406,19 +405,19 @@
                 timer = 100;
 
             if (!isClick && etype !== 'paste') {
-                // 手动触发的事件, 强制验证
+                // must be verified, if it is a manual trigger
                 if (etype === 'validate') {
                     must = true;
                     timer = 0;
                 }
-                // 不是手动触发的验证, 也不是实时的验证, 那就不继续了
+                // or doesn't require real-time verification, exit
                 else if ( attr(el, 'notimely') ) return;
-                // 只在keyup事件触发时验证
+                // or it isn't a "keyup" event, exit
                 else if (opt.timely >= 2 && etype !== 'keyup') return;
 
-                // 如果当前字段被忽略了
+                // if the current field is ignored, exit
                 if (opt.ignore && $(el).is(opt.ignore)) return;
-                // 键盘输入
+
                 if (etype === 'keyup') {
                     var key = e.keyCode,
                         specialKey = {
@@ -429,13 +428,13 @@
                             46: 1  // Delete
                         };
 
-                    // 这种情况只获取焦点，不进行验证
+                    // only gets focus, no verification
                     if (key === 9 && !el.value) return;
 
-                    // 这些键不触发验证(包含回车键，回车键触发的是提交表单，防止重复验证)
+                    // do not validate, if triggered by these keys
                     if (key < 48 && !specialKey[key]) return;
 
-                    // 键盘事件，降低验证频率
+                    // keyboard events, reducing the frequency of verification
                     timer = opt.timely >=100 ? opt.timely : 500;
                 }
             }
@@ -449,7 +448,7 @@
                     me._validate(el, field, must);
                 }, timer);
             } else {
-                // 对于validate事件，采用同步验证
+                // use synchronous verification for "validate" event
                 me._validate(el, field, must);
             }
             
@@ -459,18 +458,17 @@
             this._blur(e, true);
         },
 
-        // 解析一个字段
+        // Parsing a field
         _parse: function(el) {
             var me = this,
                 field,
                 key = el.name;
 
-            // 如果js传递的key为id，识别为id模式
-            // 或者该字段没有name，自动识别为id模式
+            // if the field has passed the key as id mode, or it doesn't has a name
             if (el.id && ('#' + el.id in me.fields) || !el.name) {
                 key = '#' + el.id;
             }
-            // 既没有id也没有name的字段不做验证
+            // doesn't verify a field that has neither id nor name
             if (!key) return attr(el, DATA_RULE, null);
 
             field = me.fields[key] || {};
@@ -492,7 +490,7 @@
             me.fields[key] = me._parseRule(field);
         },
 
-        // 解析字段规则
+        // Parsing field rules
         _parseRule: function(field) {
             var arr = rDisplay.exec(field.rule),
                 rules;
@@ -515,7 +513,7 @@
             return field;
         },
 
-        // 验证完一个字段
+        // Validated a field
         _validatedField: function(e, field, msgOpt) {
             var me = this,
                 opt = me.options,
@@ -530,12 +528,12 @@
             field.old.ret = msgOpt;
             me.elements[field.key] = el;
 
-            // msgHandler接管消息
+            // msgHandler takeover messages
             if (opt.msgHandler) {
                 field.errorMsg = isValid ? '' : msgOpt.msg;
             } else {
                 if (!me.checkOnly) {
-                    // error Message or ok Message
+                    // error message or ok message
                     if ( (!msgOpt.showOk && msgOpt.msg) || (msgOpt.showOk && opt.showOk !== false ) ) {
                         me.showMsg(el, msgOpt);
                     } else {
@@ -545,7 +543,7 @@
             }
         },
 
-        // 验证完一个规则
+        // Validated a rule
         _validatedRule: function(e, ret, field, msgOpt) {
             field = field || me.getField(el);
             var me = this,
@@ -561,13 +559,16 @@
             if (ret === true || ret === undefined) {
                 isValid = true;
             }
-            // ret可能为：false、字符串、对象
+            // ret may be: false, strings, objects
             else {
-                // rule消息优先级：1、自定义消息；2、规则返回的消息；3、内置规则消息；4、默认消息
-                // 1
+                /* rule message priority:
+                    1. custom message;
+                    2. rule returned message;
+                    3. built-in rules message;
+                    4. the default message
+                */
                 msg = getDataMsg(el, field, method);
                 if (!msg) {
-                    // 2
                     if (isString(ret)) {
                         msg = ret;
                         ret = {error: msg};
@@ -581,11 +582,10 @@
                         }
                     }
                 }
-                // 3 || 4
                 msgOpt.msg = (isValid ? msg : (msg || me.messages[method] || defaults.defaultMsg)).replace('{0}', field.display || '');
             }
 
-            // 消息处理, 以及抛出rule级别的事件
+            // message analysis, and throw rule level event
             if (!isValid) {
                 me.isValid = false;
                 $(el).trigger('invalid.rule', [method]);
@@ -605,28 +605,28 @@
                 $(el).trigger('valid.rule', [method]);
             }
 
-            // 控制台调试信息
+            // output the debug message
             if (opt.debug) {
                 debug[isValid ? 'info' : 'warn'](field.vid + ': ' + method + ' -> ' + (msgOpt.msg || true));
             }
-            // 刚刚验证完成，验证前的值却和现在的不一样了(快速输入-_-!), 需重新验证
+            // need to re-verify when the value is changed
             if (isValid && field.old.value !== undefined && field.old.value !== el.value) {
                 field.vid = 0;
                 me._checkRule(el, field);
             }
-            // 当前规则已通过，继续验证
+            // the current rule has passed, continue to validate
             else if (isValid && field.vid < field.rules.length - 1) {
                 field.vid++;
                 me._checkRule(el, field);
             }
-            // 字段验证失败，或者是字段的全部规则都验证成功
+            // field was invalid, or all fields was valid
             else {
                 field.vid = 0;
                 $(el).trigger('validated.field', [field, msgOpt]);
             }
         },
 
-        // 验证字段的一个规则
+        // Verify a rule form a field
         _checkRule: function(el, field) {
             var me = this,
                 ret,
@@ -635,7 +635,7 @@
                 method = rule.method,
                 params = rule.params;
 
-            // 请求已经发出去啦，等等再说
+            // request has been sent, wait it
             if (me.submiting && me.deferred[key]) return;
             field.rid = method;
             field.old.value = el.value;
@@ -669,17 +669,17 @@
                         $(el).trigger('validated.rule', [textStatus, field]);
                     }
                 );
-                // 暂时还不知道通过没有
+                // not yet know whether the field is valid
                 field.isValid = undefined;
             } else {
                 $(el).trigger('validated.rule', [ret, field]);
             }
         },
 
-        // 执行验证
+        // Processing the validation
         _validate: function(el, field, must) {
             if ( !field.rules ) this._parse(el);
-            // 禁用或者标记novalidate的元素，暂时不验证
+            // doesn't validate the element that has "disabled" attribute or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) ) return;
 
             var me = this,
@@ -693,10 +693,9 @@
                 isValid = field.isValid = true;
 
             old = field.old = field.old || {};
-            // 需要强制验证的情况
             must = must || field.must;
 
-            // 如果有分组验证
+            // group validation
             if (groupFn) {
                 $.extend(msgOpt, groupFn);
                 ret = groupFn.call(me);
@@ -710,7 +709,7 @@
                     me.hideMsg(el, msgOpt);
                 }
             }
-            // 如果非必填项且值为空
+            // if the field is not required and it has a blank value
             if (isValid && !field.required && el.value === '') {
                 if (isCurrentTip) return;
                 else me._focus({target: el});
@@ -720,7 +719,7 @@
                     return;
                 }
             }
-            // 如果值没变，就直接返回旧的验证结果
+            // If the value is not changed, just return the old result
             else if (!must && old && old.ret !== undefined && old.value === el.value) {
                 if (!old.ret.valid) me.isValid = false;
                 if (isCurrentTip) return;
@@ -731,10 +730,9 @@
                 }
             }
 
-            // 输出调试信息
             if (opt.debug) debug.log(el);
 
-            // 如果已经出来结果 (旧的验证结果，或者分组验证结果)
+            // if the results are out (old validation results, or grouping validation results)
             if (ret !== undefined) {
                 $el.trigger('validated.rule', [ret, field, msgOpt]);
             } else if (field.rule) {
@@ -746,7 +744,7 @@
             return $.extend({}, this.msgOpt, isString(obj) ? {msg: obj} : obj);
         },
 
-        // 根据元素获取字段信息
+        // Get field information
         getField: function(el) {
             var me = this,
                 key;
@@ -760,7 +758,10 @@
             return me.fields[key];
         },
 
-        // 检测某个元素的值是否符合某个规则
+        /* Detecting whether the value of an element that matches a rule
+         * 
+         * @interface: test
+         */
         test: function(el, rule) {
             var me = this,
                 ret,
@@ -778,8 +779,8 @@
             return ret === true || ret === undefined || ret;
         },
 
-        // 获得某个区间验证的消息
-        getRangeMsg: function(value, params, type, prefix) {
+        // Get a range of validation messages
+        getRangeMsg: function(value, params, type, suffix) {
             if (!params) return;
             var me = this,
                 msg = me.messages[type] || '',
@@ -809,14 +810,16 @@
                 c = 'eq';
             }
             if (msg) {
-                if (prefix && (prefix + c) in msg) {
-                    c = prefix + c;
+                if (suffix && msg[c + suffix]) {
+                    c += suffix;
                 }
                 args[0] = msg[c];
             }
             return me.renderMsg.apply(null, args);
         },
 
+        /* @interface: renderMsg
+         */
         renderMsg: function() {
             var args = arguments,
                 tpl = args[0],
@@ -868,12 +871,13 @@
             return $msgbox;
         },
 
-        // 显示消息接口
+        /* @interface: showMsg
+         */
         showMsg: function(el, opt) {
             opt = this._getMsgOpt(opt);
             if (!opt.msg && !opt.showOk) return;
             el = $(el).get(0);
-            //标记消息状态
+            // mark message status
             attr(el, DATA_INPUT_STATUS, opt.type);
 
             var $msgbox = this._getMsgDOM(el, opt),
@@ -889,7 +893,8 @@
             isFunction(opt.show) && opt.show.call(this, $msgbox, opt.type);
         },
 
-        // 隐藏消息接口
+        /* @interface: hideMsg
+         */
         hideMsg: function(el, opt) {
             el = $(el).get(0);
             opt = this._getMsgOpt(opt);
@@ -905,7 +910,8 @@
             }
         },
 
-        // 用来显示服务器的验证消息。(提交表单并且服务器验证完毕后，返回一个name为键、msg为value的json传入此方法中)
+        /* @interface: mapMsg
+         */
         mapMsg: function(obj) {
             var me = this;
 
@@ -915,12 +921,14 @@
             });
         },
 
-        // 自定义消息（优先于内置消息）
+        /* @interface: setMsg
+         */
         setMsg: function(obj) {
             new Messages(obj, this.messages);
         },
 
-        // 自定义规则（注重复用性，完全自定义，就不局限于内置的规则了）
+        /* @interface: setRule
+         */
         setRule: function(obj) {
             new Rules(obj, this.rules);
             $.map(this.fields, function(field){
@@ -928,26 +936,25 @@
             });
         },
 
-        /* 更新字段信息（如果是新字段就等于添加了一个字段）
-         * 删除字段信息（删除后将不再验证该字段）
+        /* @interface: setField
          */
         setField: function(key, obj) {
             var me = this,
                 fields = {};
             if (isString(key)) {
-                // 删除待验证字段信息
+                // remove this field
                 if (obj === null) {
                     $.map(key.split(' '), function(k) {
                         if (k && me.fields[k]) me.fields[k] = null;
                     });
                     return;
                 }
-                // 更新单个字段信息
+                // update this field
                 else if (obj) {
                     fields[key] = obj;
                 }
             }
-            // 批量更新字段信息
+            // update fields
             else if (isObject(key)) {
                 fields = key;
             }
@@ -960,14 +967,15 @@
             me._init();
         },
 
-        // 暂停或恢复submit事件
-        // 如果hold为回调函数，将在阻止提交表单的同时执行此回调
+        /* @interface: holdSubmit
+         */
         holdSubmit: function(hold) {
             if (hold === undefined) hold = true;
             this.submiting = hold;
         },
 
-        // 销毁表单验证（事件、数据、提示消息）
+        /* @interface: destroy
+         */
         destroy: function() {
             this._reset();
             this.$el.off('.'+NS).removeData(NS);
@@ -975,7 +983,7 @@
     };
 
 
-    // 规则类
+    // Rule class
     function Rules(obj, context) {
         var that = context ? context === true ? this : context : Rules.prototype;
 
@@ -985,7 +993,7 @@
         }
     }
 
-    // 消息类
+    // Message class
     function Messages(obj, context) {
         var that = context ? context === true ? this : context : Messages.prototype;
 
@@ -996,7 +1004,7 @@
         }
     }
 
-    // 规则转换工厂
+    // Rule converted factory
     function getRule(fn) {
         switch ($.type(fn)) {
             case 'function':
@@ -1012,7 +1020,7 @@
         }
     }
 
-    // 转换空格分隔的keys为jQuery选择器
+    // Convert space-separated keys to jQuery selector
     function keys2selector(keys) {
         var selector = '';
         $.map(keys.split(' '), function(k) {
@@ -1021,7 +1029,7 @@
         return selector.substring(1);
     }
 
-    // 根据元素获得验证的实例
+    // Get instance by an element
     function getInstance(el) {
         if (!el || !el.tagName) return;
         var wrap = el;
@@ -1037,7 +1045,7 @@
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
-    // 获取节点上的自定义规则
+    // Get custom rules on the node
     function getDataRule(el, method) {
         var fn = $.trim(attr(el, DATA_RULE + '-' + method));
         if (!fn) return;
@@ -1045,7 +1053,7 @@
         if (fn) return getRule(fn);
     }
 
-    // 获取节点上的自定义消息
+    // Get custom messages on the node
     function getDataMsg(el, field, item) {
         var msg = field.msg;
         if (isObject(msg) && item) msg = msg[item];
@@ -1055,20 +1063,20 @@
         return msg;
     }
 
-    // 获取位置信息
+    // Get message position
     function getPos(str) {
         var pos;
         if (str) pos = rPos.exec(str);
         return pos ? pos[1] : '';
     }
 
-    // 检查元素是否为checkbox或radio
+    // Check whether the element is checkbox or radio
     function checkable(el) {
         return el.tagName === 'INPUT' && el.type === 'checkbox' || el.type === 'radio';
     }
 
 
-    // 全局事件
+    // Global events
     $(function() {
         $('body').on('focusin', ':input['+DATA_RULE+']', function() {
             var el = this, me = getInstance(el);
@@ -1094,22 +1102,24 @@
     });
 
 
-    // 内置规则（全局）
+    // Built-in rules (global)
     new Rules({
 
-        /** 必填
-         *  required
+        /** required
+         * @example:
+            required
          */
         required: function(element) {
             return !!$.trim(element.value);
         },
 
-        /** 整数
-         *  integer
-         *  integer[+]
-         *  integer[+0]
-         *  integer[-]
-         *  integer[-0]
+        /** integer
+         * @example:
+            integer
+            integer[+]
+            integer[+0]
+            integer[-]
+            integer[-0]
          */
         integer: function(element, params) {
             var re, z = '0|',
@@ -1135,12 +1145,13 @@
             return new RegExp(re).test(element.value) || this.messages.integer[key];
         },
 
-        /** 是否匹配另一个字段
-         *  match[password]    匹配password字段 (两字段的值必须相同)
-         *  match[lt, count]   值必须小于count字段的值
-         *  match[lte, count]  值必须小于或等于count字段的值
-         *  match[gt, count]   值必须大于count字段的值
-         *  match[gte, count]  值必须大于或等于count字段的值
+        /** match another field
+         * @example:
+            match[password]    Match the password field (two values ​​must be the same)
+            match[lt, count]   The value must be less than the value of the count field
+            match[lte, count]  The value must be less than or equal to the value of the count field
+            match[gt, count]   The value must be greater than the value of the count field
+            match[gte, count]  The value must be greater than or equal to the value of the count field
          **/
         match: function(element, params, field) {
             var a = element.value,
@@ -1180,21 +1191,23 @@
             }
         },
 
-        /** 数值范围
-         *  range[0~99]    0-99的数
-         *  range[0~]      大于0的数
-         *  range[~100]    于100的数
+        /** range numbers
+         * @example:
+            range[0~99]    Number 0-99
+            range[0~]      Number greater than or equal to 0
+            range[~100]    Number less than or equal to 100
          **/
         range: function(element, params) {
             return this.getRangeMsg(+element.value, params, 'range');
         },
 
-        /** 针对checkbox选中的数目, 以及checkbox、radio是否有选中
-         *  checked;       不能为空，相当于required
-         *  checked[1~3]   选择1-3项
-         *  checked[1~]    选择大于1项
-         *  checked[~3]    选择少于3项
-         *  checked[3]     选择3项
+        /** how many checkbox or radio inputs that checked
+         * @example:
+            checked;       no empty, same to required
+            checked[1~3]   1-3 items
+            checked[1~]    greater than 1 item
+            checked[~3]    less than 3 items
+            checked[3]     3 items
          **/
         checked: function(element, params) {
             if (!checkable(element)) return true;
@@ -1208,31 +1221,33 @@
             }
         },
 
-        /** 验证长度 (可以传第二个参数"true", 将会计算字节长度)
-         *  length[6~16]    6-16个字符
-         *  length[6~]      大于6个字符
-         *  length[~16]     小于16个字符
-         *  length[~16, true]     小于16个字符, 非ASCII字符计算双字符
+        /** length of a characters (You can pass the second parameter "true", will calculate the length in bytes)
+         * @example:
+            length[6~16]        6-16 characters
+            length[6~]          Greater than 6 characters
+            length[~16]         Less than 16 characters
+            length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
         length: function(element, params) {
             var value = element.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
             if (params && params[0].charAt(0) === '~') params[0] = '0' + params[0];
-            return this.getRangeMsg(len, params, 'length', (params[1] ? '2_' : ''));
+            return this.getRangeMsg(len, params, 'length', (params[1] ? '_2' : ''));
         },
 
-        /** 远程验证 remote(url [, name1, [name2 ...]]);
-         *  适配3种结果(前面为成功，后面为失败):
-                1.返回text:
-                    ''  '错误消息'
-                2.返回json:
-                    {"ok": ""}  {"error": "错误消息"}
-                3.json包装格式:
-                    {"status": 1, "data": {"ok": ""}}  {"status": 1, "data": {"error": "错误消息"}}
+        /** remote validation
+         *  remote([get:]url [, name1, [name2 ...]]);
+         *  Adaptation three kinds of results (Front for the successful, followed by a failure):
+                1. text:
+                    ''  'Error Message'
+                2. json:
+                    {"ok": ""}  {"error": "Error Message"}
+                3. json wrapper:
+                    {"status": 1, "data": {"ok": ""}}  {"status": 1, "data": {"error": "Error Message"}}
          * @example:
-            最简单：remote(path/to/server.php);
-            带参数：remote(path/to/server.php, fieldName1, fieldName2, ...);
-            GET请求：remote(GET:path/to/server.php, fieldName1, fieldName2);
+            The simplest:       remote(path/to/server.php);
+            With parameters:    remote(path/to/server.php, name1, name2, ...);
+            By GET:             remote(get:path/to/server.php, name1, name2, ...);
          */
         remote: function(element, params) {
             var me = this,
@@ -1242,14 +1257,14 @@
             if (!params) return true;
             arr = rAjaxType.exec(params[0]);
             postData[element.name] = element.value;
-            // 有额外字段
+            // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
                     postData[name] = $(':input[name="' + name + '"]', me.$el).val();
                 });
             }
 
-            // 异步验证需要返回jqXHR对象（自定义ajax验证也是一样的原理）
+            // Asynchronous validation need to return jqXHR objects
             return $.ajax({
                 url: arr[2],
                 async: true,
@@ -1259,9 +1274,10 @@
             });
         },
 
-        /** 过滤器，直接过滤不提示错误(支持自定义正则)
-         *  filter          过滤<>
-         *  filter(regexp)  过滤正则匹配的字符
+        /** filters, direct filtration without prompting error (support custom regular expressions)
+         * @example:
+         *  filter          filter "<>"
+         *  filter(regexp)  filter the "regexp" matched characters
          */
         filter: function(element, params) {
             var reg = params ? (new RegExp("[" + params[0] + "]", "g")) : rUnsafe;
@@ -1271,11 +1287,12 @@
     });
 
 
-    // 静态接口
+    // Static interface
     $[NS] = {
 
-        /** 配置参数接口
-         *  .config( obj )
+        /** @interface: config
+         *  @usage:
+            .config( obj )
          */
         config: function(obj) {
             $.each(obj, function(k, o) {
@@ -1289,9 +1306,10 @@
             });
         },
 
-        /** 设置主题接口
-         *  .setTheme( name, obj )
-         *  .setTheme( obj )
+        /** @interface: setTheme
+         *  @usage:
+            .setTheme( name, obj )
+            .setTheme( obj )
          */
         setTheme: function(name, obj) {
             if (isObject(name)) {
