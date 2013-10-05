@@ -8,7 +8,7 @@ function Compiler(html) {
     var begin = '<%',
         end = '%>',
         ecp = function(str){
-            return str.replace(/('|\\)/g, '\\$1').replace(/\r\n/g, '\\r\\n');
+            return str.replace(/('|\\)/g, '\\$1').replace(/\r\n/g, '\\r\\n').replace(/\n/g, '\\n');
         },
         str = "var __='',echo=function(s){__+=s};with(_$||{}){",
         blen = begin.length,
