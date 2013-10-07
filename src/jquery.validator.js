@@ -171,11 +171,11 @@
         return isFunction(callback) ? this : ret;
     };
 
-    // A faster selector than ":input:not(:submit,:button,:reset,:disabled)"
+    // A faster selector than ":input:not(:submit,:button,:reset,:disabled,[novalidate])"
     $.expr[":"].validationinput = function(elem) {
         var name = elem.nodeName.toLowerCase();
         return (name === 'input' && elem.type !== 'submit' && elem.type !== 'button' && elem.type !== 'reset' ||
-                name === 'select' || name === 'textarea') && elem.disabled === false;
+                name === 'select' || name === 'textarea') && elem.disabled === false && !attr(elem, NOVALIDATE);
     };
 
     // Constructor for validator
