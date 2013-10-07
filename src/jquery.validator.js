@@ -7,10 +7,11 @@
     "use strict";
 
     var NS = 'validator',
-        CLS_MSG_VALID = 'n-ok',
-        CLS_MSG_INVALID = 'n-error',
+        CLS_MSG_OK = 'n-ok',
+        CLS_MSG_ERROR = 'n-error',
         CLS_MSG_TIP = 'n-tip',
         CLS_MSG_LOADING = 'n-loading',
+        CLS_INPUT_VALID = 'n-valid',
         CLS_INPUT_INVALID = 'n-invalid',
         CLS_MSG_BOX = 'msg-box',
         ARIA_INVALID = 'aria-invalid',
@@ -19,7 +20,7 @@
         DATA_TIP = 'data-tip',
         DATA_INPUT_STATUS = 'data-inputstatus',
         NOVALIDATE = 'novalidate',
-        INPUT_SELECTOR = ':input:not(:button,:submit,:reset,:disabled)',
+        INPUT_SELECTOR = ':validationinput',
 
         rRule = /(\w+)(?:\[(.*)\]$|\((.*)\)$)?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
@@ -57,17 +58,17 @@
             debug: 0,
             timely: 1,
             theme: 'default',
-            stopOnError: true,
+            stopOnError: false,
             ignore: '',
             valid: noop,
             invalid: noop,
 
             msgWrapper: 'span',
-            msgHTML: function(opt) {
+            msgMaker: function(opt) {
                 var html,
                     cls = {
-                        error: CLS_MSG_INVALID,
-                        ok: CLS_MSG_VALID,
+                        error: CLS_MSG_ERROR,
+                        ok: CLS_MSG_OK,
                         tip: CLS_MSG_TIP,
                         loading: CLS_MSG_LOADING
                     }[opt.type];
@@ -81,7 +82,6 @@
             msgArrow: '',
             msgClass: '',
             //showOk: true,
-            //msgHandler: null,
             //msgShow: null,
             //msgHide: null,
 
@@ -107,12 +107,11 @@
         valid       {Function}              If form is valid, will trigger this callback
         invalid     {Function}              If form is invalid, will trigger this callback
 
-        msgHandler  {Function}  null        Handle messages
         msgShow     {Function}  null        When show a message, will trigger this callback
         msgHide     {Function}  null        When hide a message, will trigger this callback
         
         msgWrapper  {String}    'span'      Message wrapper tag name
-        msgHTML     {Function}              Message's inner HTML
+        msgMaker    {Function}              Message HTML maker
         msgIcon     {String}    ''          Icon template
         msgArrow    {String}    ''          Small arrow template
         msgClass    {String}    ''          Additional added to the message class names
@@ -132,6 +131,7 @@
         fields[key][tip]      {String}      Custom friendly message when focus the input
         fields[key][ok]       {String}      Custom success message
         fields[key][msg]      {Object}      Custom error message
+        fields[key][msgMaker] {Function}    Custom message HTML maker
         fields[key][timely]   {Boolean}     Whether to enable timely verification
         fields[key][target]   {jqSelector}  Verify the current field, but the message can be displayed on target element
      */
@@ -171,6 +171,13 @@
         return isFunction(callback) ? this : ret;
     };
 
+    // A faster selector than ":input:not(:submit,:button,:reset,:disabled)"
+    $.expr[":"].validationinput = function(elem) {
+        var name = elem.nodeName.toLowerCase();
+        return (name === 'input' && elem.type !== 'submit' && elem.type !== 'button' && elem.type !== 'reset' ||
+                name === 'select' || name === 'textarea') && elem.disabled === false;
+    };
+
     // Constructor for validator
     function Validator(element, options) {
         var me = this, themeOpt, dataOpt;
@@ -194,8 +201,9 @@
         me.messages = new Messages(me.options.messages, true);
         me.elements = {};
         me.fields = {};
-        me.isValid = true;
         me.deferred = {};
+        me.errors = {};
+        me.isValid = true;
         me._init();
     }
 
@@ -209,7 +217,7 @@
             if (isArray(opt.groups)) {
                 $.map(opt.groups, function(obj) {
                     if (!isString(obj.fields) || !isFunction(obj.callback)) return null;
-                    var $elememts = $(keys2selector(obj.fields), me.$el),
+                    var $elememts = me.$el.find(keys2selector(obj.fields)),
                         fn = function() {
                             return obj.callback.call(me, $elememts);
                         };
@@ -229,7 +237,7 @@
                     } : v;
                 });
             }
-            $(INPUT_SELECTOR, me.$el).each(function() {
+            me.$el.find(INPUT_SELECTOR).each(function() {
                 me._parse(this);
             });
 
@@ -251,9 +259,9 @@
                     .on('reset.'+NS, proxy(me, '_reset'))
                     .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
                     .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
+                    .on('focusin.'+NS + ' click.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
                     .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click.'+NS, ':radio,:checkbox', proxy(me, '_click'));
-                if (!opt.msgHandler) me.$el.on('focusin.'+NS + ' click.'+NS, INPUT_SELECTOR, proxy(me, '_focus'));
                 if (opt.timely >= 2) {
                     me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                           .on('change.'+NS, 'select', proxy(me, '_click'));
@@ -292,14 +300,6 @@
                 $.map(me.deferred, function(v){return v;})
             ).done(function(){
                 doneCallbacks.call(me, me.isValid);
-                // If msgHandler takeover messages
-                if ( isFunction(opt.msgHandler) ) {
-                    var errorMsgs = [];
-                    $.map(me.fields, function(field){
-                        if (field.errorMsg) errorMsgs.push(field.errorMsg);
-                    });
-                    opt.msgHandler.call(me, errorMsgs);
-                }
             });
 
             // If the form does not contain asynchronous validation, the return value is correct.
@@ -346,21 +346,26 @@
                 function(isValid){
                     var opt = me.options,
                         FOCUS_EVENT = 'focus.field',
-                        ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid';
+                        ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid',
+                        errors;
 
-                    opt[ret].call(me, form);
-                    me.$el.trigger(ret + '.form', [form]);
-
-                    if (!isValid) {
+                    if (isValid) {
+                        if (!me.isAjaxSubmit) {
+                            // trigger the native submit event
+                            $(form).trigger('submit', ['only']);
+                        }
+                    } else {
                         // navigate to the error element
                         var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
                         $input.trigger(FOCUS_EVENT);
                         // IE6 has to trigger once again to get the focus
                         isIE6 && $input.trigger(FOCUS_EVENT);
-                    } else if (!me.isAjaxSubmit) {
-                        // trigger the native submit event
-                        $(form).trigger('submit', ['only']);
+                        errors = me.errors;
                     }
+
+                    opt[ret].call(me, form, errors);
+                    me.$el.trigger(ret + '.form', [form, errors]);
+
                     // releasing submit
                     me.submiting = false;
                 },
@@ -374,14 +379,14 @@
 
         _reset: function() {
             var me = this;
-            if (!me.options.msgHandler) {
-                me.$el.find(me.options.msgWrapper + '.' + CLS_MSG_BOX).hide();
-                me.$el.find(INPUT_SELECTOR).each(function() {
-                    attr(this, DATA_INPUT_STATUS, null);
-                    attr(this, ARIA_INVALID, null);
-                    $(this).removeClass(CLS_INPUT_INVALID);
-                });
-            }
+
+            me.$el.find(me.options.msgWrapper + '.' + CLS_MSG_BOX).hide();
+            me.$el.find(INPUT_SELECTOR).each(function() {
+                attr(this, DATA_INPUT_STATUS, null);
+                attr(this, ARIA_INVALID, null);
+                $(this).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
+            });
+            me.errors = {};
             me.isValid = true;
         },
 
@@ -476,10 +481,9 @@
             attr(el, DATA_RULE, null);
             if (!field.rule) return;
 
-            field.name = field.name || el.name;
             field.key = key;
             field.required = field.rule.indexOf('required') !== -1;
-            field.must = field.must || field.rule.indexOf('match') !== -1 || field.rule.indexOf('checked') !== -1;
+            field.must = field.must || !!field.rule.match(/match|checked/);
             if (field.required) attr(el, 'aria-required', true);
             if ('timely' in field && !field.timely || !me.options.timely) {
                 attr(el, 'notimely', true);
@@ -514,37 +518,37 @@
         },
 
         // Validated a field
-        _validatedField: function(e, field, msgOpt) {
+        _validatedField: function(e, field, ret) {
             var me = this,
                 opt = me.options,
                 el = e.target,
-                isValid = field.isValid = !!msgOpt.valid;
+                isValid = field.isValid = !!ret.valid;
 
-            isValid && (msgOpt.type = 'ok');
-            $(el)[isValid ? 'removeClass' : 'addClass'](CLS_INPUT_INVALID)
-                .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, msgOpt])
-                .attr(ARIA_INVALID, !isValid);
+            if (isValid) {
+                ret.type = 'ok';
+            } else if (me.submiting) {
+                me.errors[field.key] = ret.msg;
+            }
+            $(el).attr(ARIA_INVALID, !isValid)
+                .addClass(isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID)
+                .removeClass(isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID)
+                .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, ret]);
             
-            field.old.ret = msgOpt;
+            field.old.ret = ret;
             me.elements[field.key] = el;
 
-            // msgHandler takeover messages
-            if (opt.msgHandler) {
-                field.errorMsg = isValid ? '' : msgOpt.msg;
-            } else {
-                if (!me.checkOnly) {
-                    // error message or ok message
-                    if ( (!msgOpt.showOk && msgOpt.msg) || (msgOpt.showOk && opt.showOk !== false ) ) {
-                        me.showMsg(el, msgOpt);
-                    } else {
-                        me.hideMsg(el, msgOpt);
-                    }
+            if (field.msgMaker || opt.msgMaker && !me.checkOnly) {
+                // error message or ok message
+                if ( (!ret.showOk && ret.msg) || (ret.showOk && opt.showOk !== false ) ) {
+                    me.showMsg(el, ret, field);
+                } else {
+                    me.hideMsg(el, ret);
                 }
             }
         },
 
         // Validated a rule
-        _validatedRule: function(e, ret, field, msgOpt) {
+        _validatedRule: function(e, field, ret, msgOpt) {
             field = field || me.getField(el);
             var me = this,
                 opt = me.options,
@@ -588,7 +592,7 @@
             // message analysis, and throw rule level event
             if (!isValid) {
                 me.isValid = false;
-                $(el).trigger('invalid.rule', [method]);
+                $(el).trigger('invalid.rule', [method, msgOpt.msg]);
             } else {
                 msgOpt.valid = true;
                 if (!showOk) {
@@ -602,7 +606,7 @@
                     }
                 }
                 msgOpt.showOk = showOk;
-                $(el).trigger('valid.rule', [method]);
+                $(el).trigger('valid.rule', [method, msgOpt.msg]);
             }
 
             // output the debug message
@@ -651,7 +655,7 @@
                 !me.checkOnly && me.showMsg(el, {
                     type: 'loading',
                     msg: me.options.loadingMsg
-                });
+                }, field);
                 ret.then(
                     function(d, textStatus, jqXHR) {
                         var msg = jqXHR.responseText, data;
@@ -663,24 +667,24 @@
                             if (data === undefined) data = parseData(msg.data);
                             msg = data || true;
                         }
-                        $(el).trigger('validated.rule', [msg, field]);
+                        $(el).trigger('validated.rule', [field, msg]);
                     },
                     function(jqXHR, textStatus){
-                        $(el).trigger('validated.rule', [textStatus, field]);
+                        $(el).trigger('validated.rule', [field, textStatus]);
                     }
                 );
                 // not yet know whether the field is valid
                 field.isValid = undefined;
             } else {
-                $(el).trigger('validated.rule', [ret, field]);
+                $(el).trigger('validated.rule', [field, ret]);
             }
         },
 
         // Processing the validation
         _validate: function(el, field, must) {
-            if ( !field.rules ) this._parse(el);
             // doesn't validate the element that has "disabled" attribute or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) ) return;
+            if ( !field.rules ) this._parse(el);
 
             var me = this,
                 opt = me.options,
@@ -714,7 +718,7 @@
                 if (isCurrentTip) return;
                 else me._focus({target: el});
                 old.value = '';
-                if (!$el.is(':checkbox,:radio')) {
+                if (!checkable(el)) {
                     $el.trigger('validated.field', [field, {valid: true}]);
                     return;
                 }
@@ -734,7 +738,7 @@
 
             // if the results are out (old validation results, or grouping validation results)
             if (ret !== undefined) {
-                $el.trigger('validated.rule', [ret, field, msgOpt]);
+                $el.trigger('validated.rule', [field, ret, msgOpt]);
             } else if (field.rule) {
                 me._checkRule(el, field);
             }
@@ -759,7 +763,7 @@
         },
 
         /* Detecting whether the value of an element that matches a rule
-         * 
+         *
          * @interface: test
          */
         test: function(el, rule) {
@@ -837,7 +841,7 @@
             if ($el.is(':input')) {
                 tgt = opt.target || attr(el, DATA_TARGET);
                 if (tgt) {
-                    tgt = $(tgt, this.$el);
+                    tgt = this.$el.find(tgt);
                     if (tgt.length) {
                         if (!tgt.is(':input')) {
                             $msgbox = tgt;
@@ -848,14 +852,14 @@
                 }
                 if (!$msgbox) {
                     datafor = !checkable(el) && el.id ? el.id : el.name;
-                    $msgbox = $(this.options.msgWrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]', this.$el);
+                    $msgbox = this.$el.find(this.options.msgWrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
                 }
             } else {
                 $msgbox = $el;
             }
 
             if (!$msgbox.length) {
-                $el = $(tgt || el, this.$el);
+                $el = this.$el.find(tgt || el);
                 $msgbox = $('<'+ this.options.msgWrapper + '>').attr({
                     'class': CLS_MSG_BOX + (opt.cls ? ' '+opt.cls : ''),
                     'style': opt.style || '',
@@ -873,7 +877,7 @@
 
         /* @interface: showMsg
          */
-        showMsg: function(el, opt) {
+        showMsg: function(el, opt, /*INTERNAL*/ field) {
             opt = this._getMsgOpt(opt);
             if (!opt.msg && !opt.showOk) return;
             el = $(el).get(0);
@@ -884,10 +888,10 @@
                 cls = $msgbox[0].className;
                 
             if ( cls.indexOf(opt.cls) === -1 ) $msgbox.addClass(opt.cls);
-            if ( isIE6 && cls.indexOf('bottom') !== -1 ) {
+            if ( isIE6 && opt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
-            $msgbox.html(this.options.msgHTML(opt));
+            $msgbox.html( ( (field || this.getField(el)).msgMaker || this.options.msgMaker ).call(this, opt) );
             $msgbox[0].style.display = '';
 
             isFunction(opt.show) && opt.show.call(this, $msgbox, opt.type);
@@ -916,7 +920,7 @@
             var me = this;
 
             $.each(obj, function(name, msg) {
-                var el = me.elements[name] || $(':input[name="' + name + '"]', me.$el)[0];
+                var el = me.elements[name] || me.$el.find(':input[name="' + name + '"]')[0];
                 me.showMsg(el, msg);
             });
         },
@@ -1154,10 +1158,9 @@
             match[gte, count]  The value must be greater than or equal to the value of the count field
          **/
         match: function(element, params, field) {
-            var a = element.value,
-                b,
+            var a, b,
                 key, msg, type = 'eq',
-                el2, field2;
+                selector2, elem2, field2;
 
             if (!params) return;
             if (params.length === 1) {
@@ -1166,17 +1169,21 @@
                 type = params[0];
                 key = params[1];
             }
-            el2 = $(key.charAt(0) === '#' ? key : ':input[name="' + key + '"]', this.$el)[0];
-            if (!el2) return;
+            selector2 = key.charAt(0) === '#' ? key : ':input[name="' + key + '"]';
+            elem2 = this.$el.find(selector2)[0];
+            if (!elem2) return;
+            field2 = this.getField(elem2);
+
             if (!field.init_match) {
-                this.$el.on('valid.field', '[name="'+ key +'"]', function(){
-                    if (element.value) $(element).trigger('validate');
+                this.$el.on('valid.field.'+NS, selector2, function(){
+                    if ( !field.isValid && element.value ) $(element).trigger('validate');
                 });
-                field.init_match = true;
+                field.init_match = 1;
             }
-            field2 = this.getField(el2);
+
             msg = this.messages.match[type].replace('{1}', field2.display || key);
-            b = el2.value;
+            a = element.value;
+            b = elem2.value;
             switch (type) {
                 case 'lt':
                     return (+a < +b) || msg;
@@ -1211,7 +1218,7 @@
          **/
         checked: function(element, params) {
             if (!checkable(element)) return true;
-            var count = $('input[name="' + element.name + '"]', this.$el).filter(function() {
+            var count = this.$el.find('input[name="' + element.name + '"]').filter(function() {
                 return !this.disabled && this.checked && $(this).is(':visible');
             }).length;
             if (!params) {
@@ -1260,7 +1267,7 @@
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    postData[name] = $(':input[name="' + name + '"]', me.$el).val();
+                    postData[name] = me.$el.find(':input[name="' + name + '"]').val();
                 });
             }
 
