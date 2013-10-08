@@ -740,7 +740,7 @@
                 }
             }
 
-            if (opt.debug) debug.log(el);
+            if (opt.debug) debug.log(field.key);
 
             // if the results are out (old validation results, or grouping validation results)
             if (ret !== undefined) {
