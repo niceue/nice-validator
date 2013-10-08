@@ -105,6 +105,7 @@
         stopOnError {Boolean}   false,      Whether to stop validate when found an error input
         ignore      {jqSelector}  '',       Ignored fields (Using jQuery selector)
         
+        beforeSubmit{Function}              Do something before submitting the form
         valid       {Function}              If form is valid, will trigger this callback
         invalid     {Function}              If form is invalid, will trigger this callback
 
@@ -322,7 +323,9 @@
             // We found the "only" mark, and make the native event continues.
             // Receive the "validate" event only from the form.
             if (mark === 'only' || e.type === 'validate' && form.tagName !== 'FORM') return;
-
+            // If we do not want to submit the form.
+            if ( opt.beforeSubmit.call(me, form) === false ) return e.preventDefault();
+            
             if (me.isAjaxSubmit === undefined) {
                 if ( attr(form, 'action') === null ) me.isAjaxSubmit = true;
                 else {
@@ -340,7 +343,6 @@
                 }
             }
 
-            if ( opt.beforeSubmit.call(me, form) === false ) return;
             me._reset();
             me.submiting = true;
 
