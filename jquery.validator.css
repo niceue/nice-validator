@@ -7,7 +7,7 @@
 .msg-wrap,.n-icon,.n-msg{vertical-align:top}
 .msg-box{*zoom:1}
 .n-arrow{position:absolute;overflow:hidden;}
-.n-arrow b,.n-arrow i{position:absolute;left:0;top:0;font-style:normal;font-size:12px;line-height:12px;font-family:sans-serif !important}
+.n-arrow b,.n-arrow i{position:absolute;left:0;top:0;border:0;margin:0;padding:0;overflow:hidden;font-weight:400;font-style:normal;font-size:12px;line-height:14px;_line-height:15px;font-family:sans-serif !important}
 .n-arrow i{text-shadow:none}
 .n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
 .n-msg{line-height:16px;margin-left:2px;margin-top:-1px;margin-top:0\9;*padding-top:2px;_padding-top:0;font-size:12px;font-family:tahoma}
