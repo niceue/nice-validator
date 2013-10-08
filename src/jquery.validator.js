@@ -60,6 +60,7 @@
             theme: 'default',
             stopOnError: false,
             ignore: '',
+            beforeSubmit: noop,
             valid: noop,
             invalid: noop,
 
@@ -310,6 +311,7 @@
         // Verify the whole form
         _submit: function(e, mark) {
             var me = this,
+                opt = me.options,
                 form = e.target;
             // Prevent duplicate submission
             if (me.submiting && mark !== 'only') {
@@ -338,14 +340,14 @@
                 }
             }
 
+            if ( opt.beforeSubmit.call(me, form) === false ) return;
             me._reset();
             me.submiting = true;
 
             me._multiValidate(
                 me.$el.find(INPUT_SELECTOR),
                 function(isValid){
-                    var opt = me.options,
-                        FOCUS_EVENT = 'focus.field',
+                    var FOCUS_EVENT = 'focus.field',
                         ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid',
                         errors;
 
