@@ -135,7 +135,9 @@
                 $el.stop().delay(100).show().animate({
                     left: '20px',
                     opacity: 0
-                }, 300);
+                }, 300, function(){
+                    $msgbox.hide();
+                });
             }
         }
     });
