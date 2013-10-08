@@ -20,7 +20,7 @@
         DATA_TIP = 'data-tip',
         DATA_INPUT_STATUS = 'data-inputstatus',
         NOVALIDATE = 'novalidate',
-        INPUT_SELECTOR = ':validationinput',
+        INPUT_SELECTOR = ':verifiable',
 
         rRule = /(\w+)(?:\[(.*)\]$|\((.*)\)$)?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
@@ -173,7 +173,7 @@
     };
 
     // A faster selector than ":input:not(:submit,:button,:reset,:disabled,[novalidate])"
-    $.expr[":"].validationinput = function(elem) {
+    $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
         return (name === 'input' && elem.type !== 'submit' && elem.type !== 'button' && elem.type !== 'reset' ||
                 name === 'select' || name === 'textarea') && elem.disabled === false && !attr(elem, NOVALIDATE);
@@ -260,7 +260,7 @@
                     .on('reset.'+NS, proxy(me, '_reset'))
                     .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
                     .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
-                    .on('focusin.'+NS + ' click.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
+                    .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
                     .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                     .on('click.'+NS, ':radio,:checkbox', proxy(me, '_click'));
                 if (opt.timely >= 2) {
@@ -382,11 +382,11 @@
         _reset: function() {
             var me = this;
 
-            me.$el.find(me.options.msgWrapper + '.' + CLS_MSG_BOX).hide();
-            me.$el.find(INPUT_SELECTOR).each(function() {
-                attr(this, DATA_INPUT_STATUS, null);
-                attr(this, ARIA_INVALID, null);
-                $(this).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
+            $.each(me.elements, function(k, el){
+                attr(el, DATA_INPUT_STATUS, null);
+                attr(el, ARIA_INVALID, null);
+                $(el).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
+                me.hideMsg(el);
             });
             me.errors = {};
             me.isValid = true;
@@ -889,7 +889,7 @@
             var $msgbox = this._getMsgDOM(el, opt),
                 cls = $msgbox[0].className;
                 
-            if ( cls.indexOf(opt.cls) === -1 ) $msgbox.addClass(opt.cls);
+            !rPos.test(cls) && $msgbox.addClass(opt.cls);
             if ( isIE6 && opt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
@@ -909,7 +909,6 @@
             if (!$msgbox.length) return;
 
             if ( isFunction(opt.hide) ) {
-                $msgbox[0].style.display = '';
                 opt.hide.call(this, $msgbox, opt.type);
             } else {
                 $msgbox[0].style.display = 'none';
