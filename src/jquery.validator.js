@@ -333,7 +333,7 @@
                     var events = $[ $._data ? '_data' : 'data' ](me.$el[0], "events");
                     if (events && events.valid &&
                         $.map(events.valid, function(e){
-                            return e.namespace === 'form' ? 1 : null;
+                            return e.namespace.indexOf('form') !== -1 ? 1 : null;
                         }).length
                     ) {
                         me.isAjaxSubmit = true;
@@ -364,7 +364,9 @@
                         $input.trigger(FOCUS_EVENT);
                         // IE6 has to trigger once again to get the focus
                         isIE6 && $input.trigger(FOCUS_EVENT);
-                        errors = me.errors;
+                        errors = $.map(me.errors, function(err){
+                            return err;
+                        });
                     }
 
                     opt[ret].call(me, form, errors);
