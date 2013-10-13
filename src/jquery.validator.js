@@ -259,6 +259,7 @@
             if (!me.$el.data(NS)) {
                 me.$el.on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
                     .on('reset.'+NS, proxy(me, '_reset'))
+                    .on('showtip.'+NS, proxy(me, '_showTip'))
                     .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
                     .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
                     .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
@@ -313,19 +314,22 @@
         _submit: function(e, mark) {
             var me = this,
                 opt = me.options,
-                form = e.target;
-            // Prevent duplicate submission
-            if (me.submiting && mark !== 'only') {
-                isFunction(me.submiting) && me.submiting.call(me);
-                return e.preventDefault();
-            }
+                form = e.target,
+                isFormValid;
 
             // We found the "only" mark, and make the native event continues.
             // Receive the "validate" event only from the form.
-            if (mark === 'only' || e.type === 'validate' && form.tagName !== 'FORM') return;
-            // If we do not want to submit the form.
-            if ( opt.beforeSubmit.call(me, form) === false ) return e.preventDefault();
-            
+            if (mark === 'only' || e.type === 'validate' && me.$el[0] !== form) {
+                return;
+            }
+
+            // Prevent duplicate submission
+            if (me.submiting) {
+                isFunction(me.submiting) && me.submiting.call(me);
+                e.preventDefault();
+                return;
+            }
+
             if (me.isAjaxSubmit === undefined) {
                 if ( attr(form, 'action') === null ) me.isAjaxSubmit = true;
                 else {
@@ -343,10 +347,16 @@
                 }
             }
 
+            // trigger the beforeSubmit callback.
+            if ( opt.beforeSubmit.call(me, form) === false ) {
+                me.isAjaxSubmit && e.preventDefault();
+                return;
+            }
+            
             me._reset();
             me.submiting = true;
 
-            me._multiValidate(
+            isFormValid = me._multiValidate(
                 me.$el.find(INPUT_SELECTOR),
                 function(isValid){
                     var FOCUS_EVENT = 'focus.field',
@@ -364,11 +374,12 @@
                         });
                     }
 
-                    opt[ret].call(me, form, errors);
-                    me.$el.trigger(ret + '.form', [form, errors]);
-
                     // releasing submit
                     me.submiting = false;
+
+                    // trigger callback and event
+                    opt[ret].call(me, form, errors);
+                    me.$el.trigger(ret + '.form', [form, errors]);
 
                     if (isValid && !me.isAjaxSubmit) {
                         // trigger the native submit event
@@ -378,27 +389,34 @@
                 true
             );
 
-            if (me.isAjaxSubmit || !$.isEmptyObject(me.deferred)) e.preventDefault();
-
-            return me.isValid;
+            // isFormValid == false || isFormValid === undefined || isAjaxSubmit
+            if (!isFormValid || me.isAjaxSubmit) e.preventDefault();
         },
 
-        _reset: function() {
+        _reset: function(e) {
             var me = this;
 
-            $.each(me.elements, function(k, el){
-                attr(el, DATA_INPUT_STATUS, null);
-                attr(el, ARIA_INVALID, null);
-                $(el).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
-                me.hideMsg(el);
-            });
             me.errors = {};
             me.isValid = true;
+
+            if (e) {
+                me.$el.find(":verifiable").each( function(i, el){
+                    me.hideMsg(el);
+                    attr(el, DATA_INPUT_STATUS, null);
+                    attr(el, ARIA_INVALID, null);
+                    $(el).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
+                });
+            }
         },
 
         _focus: function(e) {
             var el = e.target;
-            if (this.submiting || el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip')) return;
+
+            if (e.type !== 'showtip') {
+                if ( this.submiting ) return;
+                if ( el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip') ) return;
+            }
+            
             this.showMsg(el, {
                 msg: attr(el, DATA_TIP),
                 type: 'tip'
@@ -467,6 +485,17 @@
 
         _click: function(e) {
             this._blur(e, true);
+        },
+
+        _showTip: function(e){
+            var me = this;
+            if (me.$el[0] !== e.target) return;
+            me.$el.find("input,select,textarea").filter(":verifiable").each(function(){
+                me.showMsg(this, {
+                    msg: attr(this, DATA_TIP),
+                    type: 'tip'
+                });
+            });
         },
 
         // Parsing a field
@@ -656,12 +685,16 @@
                 var parseData = function(data) {
                         if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
                     };
+
                 me.deferred[key] = ret;
                 
+                // show loading message
                 !me.checkOnly && me.showMsg(el, {
                     type: 'loading',
                     msg: me.options.loadingMsg
                 }, field);
+
+                // waiting to parse the response data
                 ret.then(
                     function(d, textStatus, jqXHR) {
                         var msg = jqXHR.responseText, data;
@@ -679,8 +712,10 @@
                         $(el).trigger('validated.rule', [field, textStatus]);
                     }
                 );
+
                 // not yet know whether the field is valid
                 field.isValid = undefined;
+
             } else {
                 $(el).trigger('validated.rule', [field, ret]);
             }
@@ -786,7 +821,7 @@
             if (method in me.rules) {
                 ret = me.rules[method].call(me, el, params);
             }
-            return ret === true || ret === undefined || ret;
+            return ret === true || ret === undefined || false;
         },
 
         // Get a range of validation messages
@@ -990,7 +1025,7 @@
         /* @interface: destroy
          */
         destroy: function() {
-            this._reset();
+            this._reset(true);
             this.$el.off('.'+NS).removeData(NS);
         }
     };
@@ -1303,39 +1338,37 @@
     });
 
 
-    // Static interface
-    $[NS] = {
-
-        /** @interface: config
-         *  @usage:
-            .config( obj )
-         */
-        config: function(obj) {
-            $.each(obj, function(k, o) {
-                if (k === 'rules') {
-                    new Rules(o);
-                } else if (k === 'messages') {
-                    new Messages(o);
-                } else {
-                    defaults[k] = o;
-                }
-            });
-        },
-
-        /** @interface: setTheme
-         *  @usage:
-            .setTheme( name, obj )
-            .setTheme( obj )
-         */
-        setTheme: function(name, obj) {
-            if (isObject(name)) {
-                $.each(name, function(i, o) {
-                    themes[i] = o;
-                });
-            } else if (isString(name) && isObject(obj)) {
-                themes[name] = obj;
+    /** @interface: config
+     *  @usage:
+        .config( obj )
+     */
+    Validator.config = function(obj) {
+        $.each(obj, function(k, o) {
+            if (k === 'rules') {
+                new Rules(o);
+            } else if (k === 'messages') {
+                new Messages(o);
+            } else {
+                defaults[k] = o;
             }
+        });
+    };
+
+    /** @interface: setTheme
+     *  @usage:
+        .setTheme( name, obj )
+        .setTheme( obj )
+     */
+    Validator.setTheme = function(name, obj) {
+        if (isObject(name)) {
+            $.each(name, function(i, o) {
+                themes[i] = o;
+            });
+        } else if (isString(name) && isObject(obj)) {
+            themes[name] = obj;
         }
     };
+
+    $[NS] = Validator;
 
 })(jQuery);
