@@ -353,12 +353,7 @@
                         ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid',
                         errors;
 
-                    if (isValid) {
-                        if (!me.isAjaxSubmit) {
-                            // trigger the native submit event
-                            $(form).trigger('submit', ['only']);
-                        }
-                    } else {
+                    if (!isValid) {
                         // navigate to the error element
                         var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
                         $input.trigger(FOCUS_EVENT);
@@ -374,6 +369,11 @@
 
                     // releasing submit
                     me.submiting = false;
+
+                    if (isValid && !me.isAjaxSubmit) {
+                        // trigger the native submit event
+                        $(form).trigger('submit', ['only']);
+                    }
                 },
                 true
             );
@@ -887,9 +887,13 @@
             opt = this._getMsgOpt(opt);
             if (!opt.msg && !opt.showOk) return;
             el = $(el).get(0);
-            // mark message status
-            attr(el, DATA_INPUT_STATUS, opt.type);
 
+            if ($(el).is(":verifiable")) {
+                // mark message status
+                attr(el, DATA_INPUT_STATUS, opt.type);
+                field = field || this.getField(el);
+            }
+            
             var $msgbox = this._getMsgDOM(el, opt),
                 cls = $msgbox[0].className;
                 
@@ -897,7 +901,7 @@
             if ( isIE6 && opt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
-            $msgbox.html( ( (field || this.getField(el)).msgMaker || this.options.msgMaker ).call(this, opt) );
+            $msgbox.html( ( (field || {}).msgMaker || this.options.msgMaker ).call(this, opt) );
             $msgbox[0].style.display = '';
 
             isFunction(opt.show) && opt.show.call(this, $msgbox, opt.type);
