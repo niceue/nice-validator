@@ -712,11 +712,12 @@
                         $(el).trigger('validated.rule', [field, textStatus]);
                     }
                 );
-
-                // not yet know whether the field is valid
+                // whether the field valid is unknown
                 field.isValid = undefined;
-
-            } else {
+            }
+            
+            // we use the null result to break validation of a field
+            else if (ret !== null) {
                 $(el).trigger('validated.rule', [field, ret]);
             }
         },
@@ -755,7 +756,7 @@
                 }
             }
             // if the field is not required and it has a blank value
-            if (isValid && !field.required && el.value === '') {
+            if (isValid && !field.required && !field.must && el.value === '') {
                 if (isCurrentTip) return;
                 else me._focus({target: el});
                 old.value = '';
@@ -1215,8 +1216,12 @@
             }
             selector2 = key.charAt(0) === '#' ? key : ':input[name="' + key + '"]';
             elem2 = this.$el.find(selector2)[0];
+            // If the compared field is not exist
             if (!elem2) return;
+
             field2 = this.getField(elem2);
+            a = element.value;
+            b = elem2.value;
 
             if (!field.init_match) {
                 this.$el.on('valid.field.'+NS, selector2, function(){
@@ -1225,9 +1230,19 @@
                 field.init_match = 1;
             }
 
+            // If both fields are blank
+            if (!field.required && a === "" && b === "") {
+                attr(element, DATA_INPUT_STATUS) === "error" && this.hideMsg(element);
+                return null;
+            }
+
+            // If the compared field is incorrect, we only ensure that this field is correct.
+            if (type !== "eq" && !isNaN(+a) && isNaN(+b)) {
+                return true;
+            }
+
             msg = this.messages.match[type].replace('{1}', field2.display || key);
-            a = element.value;
-            b = elem2.value;
+            
             switch (type) {
                 case 'lt':
                     return (+a < +b) || msg;
