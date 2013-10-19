@@ -1128,6 +1128,11 @@
         return el.tagName === 'INPUT' && el.type === 'checkbox' || el.type === 'radio';
     }
 
+    // parse date string to timestamp
+    function parseDate(str) {
+        return Date.parse(str.replace(/\.|\-/g, '/'));
+    }
+
 
     // Global events
     $(document)
@@ -1243,6 +1248,16 @@
             if (!field.required && a === "" && b === "") {
                 attr(element, DATA_INPUT_STATUS) === "error" && this.hideMsg(element);
                 return null;
+            }
+
+            if (params[2]) {
+                if (params[2] === 'date') {
+                    a = parseDate(a);
+                    b = parseDate(b);
+                } else if (params[2] === 'time') {
+                    a = +a.replace(':', '');
+                    b = +b.replace(':', '');
+                }
             }
 
             // If the compared field is incorrect, we only ensure that this field is correct.
