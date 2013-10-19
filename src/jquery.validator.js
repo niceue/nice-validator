@@ -177,7 +177,7 @@
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
         return (name === 'input' && elem.type !== 'submit' && elem.type !== 'button' && elem.type !== 'reset' ||
-                name === 'select' || name === 'textarea') && elem.disabled === false && !attr(elem, NOVALIDATE);
+                name === 'select' || name === 'textarea') && elem.disabled === false && attr(elem, NOVALIDATE) === null;
     };
 
     // Constructor for validator
@@ -264,7 +264,7 @@
                     .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
                     .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
                     .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
-                    .on('click.'+NS, ':radio,:checkbox', proxy(me, '_click'));
+                    .on('click.'+NS, 'input:radio,input:checkbox', proxy(me, '_click'));
                 if (opt.timely >= 2) {
                     me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                           .on('change.'+NS, 'select', proxy(me, '_click'));
@@ -317,6 +317,10 @@
                 form = e.target,
                 isFormValid;
 
+            if (attr(form, 'novalidateonce')) {
+                attr(form, 'novalidateonce', null);
+                return;
+            }
             // We found the "only" mark, and make the native event continues.
             // Receive the "validate" event only from the form.
             if (mark === 'only' || e.type === 'validate' && me.$el[0] !== form) {
@@ -725,7 +729,7 @@
         // Processing the validation
         _validate: function(el, field, must) {
             // doesn't validate the element that has "disabled" attribute or "novalidate" attribute
-            if ( el.disabled || attr(el, NOVALIDATE) ) return;
+            if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
             if ( !field.rules ) this._parse(el);
 
             var me = this,
@@ -1126,28 +1130,33 @@
 
 
     // Global events
-    $(function() {
-        $('body').on('focusin', ':input['+DATA_RULE+']', function() {
-            var el = this, me = getInstance(el);
-            if (me) {
-                if (attr(el, DATA_RULE)) me._parse(el);
-                $(el).trigger('focusin');
+    $(document)
+    .on('focusin', ':input['+DATA_RULE+']', function() {
+        var el = this, me = getInstance(el);
+        if (me) {
+            if (attr(el, DATA_RULE)) me._parse(el);
+            $(el).trigger('focusin');
+        } else {
+            attr(el, DATA_RULE, null);
+        }
+    })
+    .on('click', 'button:submit,input:submit', function(){
+        if (attr(this, NOVALIDATE) !== null) {
+            attr(this.form, 'novalidateonce', true);
+        }
+    })
+    .on('submit', 'form', function(e) {
+        if (attr(this, NOVALIDATE) !== null) return;
+        var $form = $(this), me;
+        if (!$form.data(NS)) {
+            me = $form[NS]().data(NS);
+            if (!$.isEmptyObject(me.fields)) {
+                e.type==='submit' && me._submit(e);
             } else {
-                attr(el, DATA_RULE, null);
+                attr(this, NOVALIDATE, true);
+                $form.removeData(NS);
             }
-        }).on('click submit', 'form', function(e) {
-            if (attr(this, "novalidate")) return;
-            var $form = $(this), me;
-            if (!$form.data(NS)) {
-                me = $form[NS]().data(NS);
-                if (!$.isEmptyObject(me.fields)) {
-                    e.type==='submit' && me._submit(e);
-                } else {
-                    attr(this, NOVALIDATE, true);
-                    $form.removeData(NS);
-                }
-            }
-        });
+        }
     });
 
 
