@@ -42,6 +42,7 @@
             },
             match: {
                 eq: "<%=match_eq%>",
+                neq: "<%=match_neq%>",
                 lt: "<%=match_lt%>",
                 gt: "<%=match_gt%>",
                 lte: "<%=match_lte%>",

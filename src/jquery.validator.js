@@ -1145,7 +1145,7 @@
             attr(el, DATA_RULE, null);
         }
     })
-    .on('click', 'button:submit,input:submit', function(){
+    .on('click', ':submit', function(){
         if (attr(this, NOVALIDATE) !== null) {
             attr(this.form, 'novalidateonce', true);
         }
@@ -1276,6 +1276,8 @@
                     return (+a >= +b) || msg;
                 case 'gt':
                     return (+a > +b) || msg;
+                case 'neq':
+                    return (a !== b) || msg;
                 default:
                     return (a === b) || msg;
             }

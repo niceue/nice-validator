@@ -16,6 +16,7 @@ exports.lang = {
     integer_nz: "Please enter a negative integer or 0.",
 
     match_eq: "{0} must be equal to {1}.",
+    match_neq: "{0} must be not equal to {1}.",
     match_lt: "{0} must be less than {1}.",
     match_gt: "{0} must be greater than {1}.",
     match_lte: "{0} must be less than or equal to {1}.",

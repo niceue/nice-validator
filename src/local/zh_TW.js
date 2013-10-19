@@ -16,6 +16,7 @@ exports.lang = {
     integer_nz: "請輸入負整數或0", 
 
     match_eq: "{0}與{1}不一致",
+    match_neq: "{0}與{1}不能相同",
     match_lt: "{0}必須小於{1}",
     match_gt: "{0}必須大於{1}",
     match_lte: "{0}必須小於或等於{1}",

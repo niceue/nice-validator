@@ -33,6 +33,7 @@
             },
             match: {
                 eq: "{0} must be equal to {1}.",
+                neq: "{0} must be not equal to {1}.",
                 lt: "{0} must be less than {1}.",
                 gt: "{0} must be greater than {1}.",
                 lte: "{0} must be less than or equal to {1}.",

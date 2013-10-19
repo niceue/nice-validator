@@ -4,7 +4,7 @@ exports.lang = {
     defaultMsg: "This field is not valid.",
     loadingMsg: "Validating...",
 
-    digits: "Please enter only digits.",
+    digits: "xxxx",
 
     required: "xxxx",
     remote: "xxxx",
@@ -16,6 +16,7 @@ exports.lang = {
     integer_nz: "xxxx", 
 
     match_eq: "xxxx",
+    match_neq: "xxxx",
     match_lt: "xxxx",
     match_gt: "xxxx",
     match_lte: "xxxx",
