@@ -1183,8 +1183,24 @@
          * @example:
             required
          */
-        required: function(element) {
-            return !!$.trim(element.value);
+        required: function(element, params) {
+            var val = $.trim(element.value),
+                isValid = true;
+            if (params) {
+                if (params.length === 1) {
+                    if (!val && !this.test(element, params[0]) ) {
+                        attr(element, DATA_INPUT_STATUS) !== "tip" && this.hideMsg(element);
+                        return null;
+                    }
+                } else if (params[0] === 'not') {
+                    $.map(params.slice(1), function(v) {
+                        if ( val === $.trim(v) ) {
+                            isValid = false;
+                        }
+                    });
+                }
+            }
+            return isValid && !!val;
         },
 
         /** integer
