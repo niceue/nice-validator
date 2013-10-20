@@ -401,8 +401,6 @@
             var me = this;
 
             me.errors = {};
-            me.isValid = true;
-
             if (e) {
                 me.$el.find(":verifiable").each( function(i, el){
                     me.hideMsg(el);
@@ -581,7 +579,7 @@
                 if ( (!ret.showOk && ret.msg) || (ret.showOk && opt.showOk !== false ) ) {
                     me.showMsg(el, ret, field);
                 } else {
-                    me.hideMsg(el, ret);
+                    attr(el, DATA_INPUT_STATUS) !== "tip" && me.hideMsg(el, ret);
                 }
             }
         },
@@ -685,6 +683,7 @@
 
             ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
             
+            // asynchronous validation
             if (isObject(ret) && isFunction(ret.then)) {
                 var dataFilter = function(data) {
                         if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
@@ -731,9 +730,12 @@
                 // whether the field valid is unknown
                 field.isValid = undefined;
             }
-            
-            // we use the null result to break validation of a field
-            else if (ret !== null) {
+            // use null to break validation from a field
+            else if (ret === null) {
+                $(el).trigger('validated.field', [field, {valid: true, showOk: false}]);
+            }
+            // other result
+            else {
                 $(el).trigger('validated.rule', [field, ret]);
             }
         },
@@ -1201,7 +1203,6 @@
             if (params) {
                 if (params.length === 1) {
                     if (!val && !this.test(element, params[0]) ) {
-                        attr(element, DATA_INPUT_STATUS) !== "tip" && this.hideMsg(element);
                         return null;
                     }
                 } else if (params[0] === 'not') {
@@ -1287,7 +1288,6 @@
 
             // If both fields are blank
             if (!field.required && a === "" && b === "") {
-                attr(element, DATA_INPUT_STATUS) === "error" && this.hideMsg(element);
                 return null;
             }
 
