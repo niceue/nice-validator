@@ -1098,6 +1098,16 @@
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
+    function initByElement(el) {
+        var me = getInstance(el);
+        if (me) {
+            if (attr(el, DATA_RULE)) me._parse(el);
+            $(el).trigger('focusin');
+        } else {
+            attr(el, DATA_RULE, null);
+        }
+    }
+
     // Get custom rules on the node
     function getDataRule(el, method) {
         var fn = $.trim(attr(el, DATA_RULE + '-' + method));
@@ -1137,17 +1147,18 @@
     // Global events
     $(document)
     .on('focusin', ':input['+DATA_RULE+']', function() {
-        var el = this, me = getInstance(el);
-        if (me) {
-            if (attr(el, DATA_RULE)) me._parse(el);
-            $(el).trigger('focusin');
-        } else {
-            attr(el, DATA_RULE, null);
-        }
+        initByElement(this);
     })
-    .on('click', ':submit', function(){
-        if (attr(this, NOVALIDATE) !== null) {
+    .on('click', 'input,button', function(){
+        if (!this.form) return;
+        if (this.type === 'submit' && attr(this, NOVALIDATE) !== null) {
             attr(this.form, 'novalidateonce', true);
+        } else if (this.name && checkable(this)) {
+            var elem0 = this.form.elements[this.name][0];
+            if (attr(elem0, DATA_RULE)) {
+                initByElement(elem0);
+                $(elem0).trigger('validate');
+            }
         }
     })
     .on('submit', 'form', function(e) {
@@ -1211,6 +1222,8 @@
         /** match another field
          * @example:
             match[password]    Match the password field (two values ​​must be the same)
+            match[eq, password]  Ditto
+            match[neq, count]  The value must be not equal to the value of the count field
             match[lt, count]   The value must be less than the value of the count field
             match[lte, count]  The value must be less than or equal to the value of the count field
             match[gt, count]   The value must be greater than the value of the count field
@@ -1301,13 +1314,16 @@
             checked[~3]    less than 3 items
             checked[3]     3 items
          **/
-        checked: function(element, params) {
+        checked: function(element, params, field) {
             if (!checkable(element)) return true;
-            var count = this.$el.find('input[name="' + element.name + '"]').filter(function() {
+            var elem, count;
+
+            count = this.$el.find('input[name="' + element.name + '"]').filter(function() {
+                if (!elem && checkable(this)) elem = this;
                 return !this.disabled && this.checked && $(this).is(':visible');
             }).length;
             if (!params) {
-                return !!count || this.messages.required;
+                return !!count || getDataMsg(elem, field, 'checked') || this.messages.required;
             } else {
                 return this.getRangeMsg(count, params, 'checked');
             }
