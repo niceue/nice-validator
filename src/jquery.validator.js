@@ -686,7 +686,7 @@
             ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
             
             if (isObject(ret) && isFunction(ret.then)) {
-                var parseData = function(data) {
+                var dataFilter = function(data) {
                         if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
                     };
 
@@ -701,13 +701,25 @@
                 // waiting to parse the response data
                 ret.then(
                     function(d, textStatus, jqXHR) {
-                        var msg = jqXHR.responseText, data;
-                        if (msg === '') {
-                            msg = true;
+                        var msg = jqXHR.responseText,
+                            data,
+                            filter = field.dataFilter || me.options.dataFilter;
+
+                        // detect if it is json format
+                        if (this.dataType === 'json') {
+                            msg = d;
                         } else if (msg.charAt(0) === '{') {
                             msg = $.parseJSON(msg) || {};
-                            data = parseData(msg);
-                            if (data === undefined) data = parseData(msg.data);
+                        }
+
+                        // filter data
+                        if (isFunction(filter)) {
+                            msg = filter(msg);
+                        } else if (msg === '') {
+                            msg = true;
+                        } else {
+                            data = dataFilter(msg);
+                            if (data === undefined) data = dataFilter(msg.data);
                             msg = data || true;
                         }
                         $(el).trigger('validated.rule', [field, msg]);
