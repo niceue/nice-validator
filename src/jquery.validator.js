@@ -99,18 +99,19 @@
 
     /** jQuery Plugin
      * @param {Object} options
-        debug       {Boolean}   false,      Whether to enable debug mode
-        timely      {Boolean}   true,       Whether to enable timely verification
-        theme       {String}   'default'    Using which theme
-        stopOnError {Boolean}   false,      Whether to stop validate when found an error input
-        ignore      {jqSelector}  '',       Ignored fields (Using jQuery selector)
+        debug         {Boolean}   false,    Whether to enable debug mode
+        timely        {Boolean}   true,     Whether to enable timely verification
+        theme         {String}   'default'  Using which theme
+        stopOnError   {Boolean}   false,    Whether to stop validate when found an error input
+        ignore        {jqSelector}  '',     Ignored fields (Using jQuery selector)
         
-        beforeSubmit{Function}              Do something before submitting the form
-        valid       {Function}              If form is valid, will trigger this callback
-        invalid     {Function}              If form is invalid, will trigger this callback
+        beforeSubmit  {Function}            Do something before submitting the form
+        dataFilter    {Function}            Conversion ajax results
+        valid         {Function}            Triggered when the form is valid
+        invalid       {Function}            Triggered when the form is invalid
 
-        msgShow     {Function}  null        When show a message, will trigger this callback
-        msgHide     {Function}  null        When hide a message, will trigger this callback
+        msgShow       {Function}  null      When show a message, will trigger this callback
+        msgHide       {Function}  null      When hide a message, will trigger this callback
         
         msgWrapper  {String}    'span'      Message wrapper tag name
         msgMaker    {Function}              Message HTML maker
@@ -129,13 +130,17 @@
         {String} key    name|#id
         {String|Object} value               Rule string, or an object is passed more arguments
 
-        fields[key][rule]     {String}      Rule string
-        fields[key][tip]      {String}      Custom friendly message when focus the input
-        fields[key][ok]       {String}      Custom success message
-        fields[key][msg]      {Object}      Custom error message
-        fields[key][msgMaker] {Function}    Custom message HTML maker
-        fields[key][timely]   {Boolean}     Whether to enable timely verification
-        fields[key][target]   {jqSelector}  Verify the current field, but the message can be displayed on target element
+        fields[key][rule]       {String}      Rule string
+        fields[key][tip]        {String}      Custom friendly message when focus the input
+        fields[key][ok]         {String}      Custom success message
+        fields[key][msg]        {Object}      Custom error message
+        fields[key][msgMaker]   {Function}    Custom message HTML maker
+        fields[key][dataFilter] {Function}    Conversion ajax results
+        fields[key][valid]      {Function}    Triggered when this field is valid
+        fields[key][invalid]    {Function}    Triggered when this field is invalid
+        fields[key][must]       {Boolean}     If set true, we always check the field even has remote checking
+        fields[key][timely]     {Boolean}     Whether to enable timely verification
+        fields[key][target]     {jqSelector}  Verify the current field, but the message can be displayed on target element
      */
     $.fn[NS] = function(options) {
         var that = this,
@@ -559,18 +564,20 @@
             var me = this,
                 opt = me.options,
                 el = e.target,
-                isValid = field.isValid = !!ret.valid;
+                isValid = field.isValid = !!ret.isValid;
 
             if (isValid) {
                 ret.type = 'ok';
+                isFunction(field.valid) && field.valid.call(me, field, ret);
             } else if (me.submiting) {
                 me.errors[field.key] = ret.msg;
+                isFunction(field.invalid) && field.invalid.call(me, field, ret);
             }
             $(el).attr(ARIA_INVALID, !isValid)
                 .addClass(isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID)
                 .removeClass(isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID)
                 .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, ret]);
-            
+
             field.old.ret = ret;
             me.elements[field.key] = el;
 
@@ -631,7 +638,7 @@
                 me.isValid = false;
                 $(el).trigger('invalid.rule', [method, msgOpt.msg]);
             } else {
-                msgOpt.valid = true;
+                msgOpt.isValid = true;
                 if (!showOk) {
                     var okmsg = field.ok || attr(el, 'data-ok');
                     if (okmsg) {
@@ -679,7 +686,6 @@
             // request has been sent, wait it
             if (me.submiting && me.deferred[key]) return;
             field.rid = method;
-            field.old.value = el.value;
 
             ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
             
@@ -732,7 +738,7 @@
             }
             // use null to break validation from a field
             else if (ret === null) {
-                $(el).trigger('validated.field', [field, {valid: true, showOk: false}]);
+                $(el).trigger('validated.field', [field, {isValid: true}]);
             }
             // other result
             else {
@@ -742,7 +748,7 @@
 
         // Processing the validation
         _validate: function(el, field, must) {
-            // doesn't validate the element that has "disabled" attribute or "novalidate" attribute
+            // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
             if ( !field.rules ) this._parse(el);
 
@@ -779,13 +785,13 @@
                 else me._focus({target: el});
                 old.value = '';
                 if (!checkable(el)) {
-                    $el.trigger('validated.field', [field, {valid: true}]);
+                    $el.trigger('validated.field', [field, {isValid: true}]);
                     return;
                 }
             }
             // If the value is not changed, just return the old result
             else if (!must && old && old.ret !== undefined && old.value === el.value) {
-                if (!old.ret.valid) me.isValid = false;
+                if (!old.ret.isValid) me.isValid = false;
                 if (isCurrentTip) return;
                 if (el.value !== '') {
                     msgOpt = old.ret;
@@ -794,6 +800,7 @@
                 }
             }
 
+            old.value = el.value;
             if (opt.debug) debug.log(field.key);
 
             // if the results are out (old validation results, or grouping validation results)
@@ -1280,10 +1287,10 @@
             b = elem2.value;
 
             if (!field.init_match) {
-                this.$el.on('valid.field.'+NS, selector2, function(){
-                    if ( !field.isValid && element.value ) $(element).trigger('validate');
+                $(elem2).on('valid.field.'+NS, function(){
+                    $(element).trigger('validate');
                 });
-                field.init_match = 1;
+                field.init_match = field2.init_match = 1;
             }
 
             // If both fields are blank
