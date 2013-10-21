@@ -394,8 +394,7 @@
                         // trigger the native submit event
                         $(form).trigger('submit', ['only']);
                     }
-                },
-                true
+                }
             );
 
             // isFormValid == false || isFormValid === undefined || isAjaxSubmit
