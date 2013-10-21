@@ -1408,24 +1408,39 @@
         remote: function(element, params) {
             var me = this,
                 arr,
-                postData = {};
+                search,
+                url,
+                type,
+                data = {};
 
             if (!params) return true;
             arr = rAjaxType.exec(params[0]);
-            postData[element.name] = element.value;
+            url = arr[2];
+            type = (arr[1] || 'POST').toUpperCase();
+
+            data[element.name] = element.value;
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    postData[name] = me.$el.find(':input[name="' + name + '"]').val();
+                    data[ $.trim(name) ] = me.$el.find(':input[name="' + name + '"]').val();
                 });
+            }
+            data = $.param(data);
+
+            if (type === 'POST') {
+                search = url.indexOf('?');
+                if (search !== -1) {
+                    data += '&' + url.substring(search + 1, url.length);
+                    url = url.substring(0, search);
+                }
             }
 
             // Asynchronous validation need to return jqXHR objects
             return $.ajax({
-                url: arr[2],
+                url: url,
+                type: type,
+                data: data,
                 async: true,
-                type: arr[1] || 'POST',
-                data: postData,
                 cache: false
             });
         },
