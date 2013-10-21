@@ -60,9 +60,10 @@
             theme: 'default',
             stopOnError: false,
             ignore: '',
-            beforeSubmit: noop,
-            valid: noop,
-            invalid: noop,
+            //beforeSubmit: null,
+            //dataFilter: null,
+            //valid: null,
+            //invalid: null,
 
             msgWrapper: 'span',
             msgMaker: function(opt) {
@@ -196,8 +197,6 @@
             };
         }
         options = options || {};
-        if (options.valid) me.isAjaxSubmit = true;
-
         dataOpt = attr(element, 'data-'+NS+'-option');
         dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
         themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
@@ -210,7 +209,6 @@
         me.fields = {};
         me.deferred = {};
         me.errors = {};
-        me.isValid = true;
         me._init();
     }
 
@@ -218,7 +216,8 @@
         _init: function() {
             var me = this,
                 opt = me.options,
-                fields = me.fields;
+                fields = me.fields,
+                form = me.$el[0];
 
             // Initialization group verification
             if (isArray(opt.groups)) {
@@ -260,6 +259,23 @@
                 hide: opt.msgHide
             };
 
+            // Guess whether ajax submit
+            if (opt.valid || attr(form, 'action') === null) {
+                me.isAjaxSubmit = true;
+            } else {
+                // if there is "valid.form" event
+                var events = $[ $._data ? '_data' : 'data' ](form, "events");
+                if (events && events.valid &&
+                    $.map(events.valid, function(e){
+                        return e.namespace.indexOf('form') !== -1 ? 1 : null;
+                    }).length
+                ) {
+                    me.isAjaxSubmit = true;
+                } else {
+                    me.isAjaxSubmit = false;
+                }
+            }
+
             // Processing events and cache
             if (!me.$el.data(NS)) {
                 me.$el.on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
@@ -278,7 +294,7 @@
 
                 // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
                 // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
-                attr(me.$el[0], NOVALIDATE, true);
+                attr(form, NOVALIDATE, true);
             }
         },
 
@@ -339,25 +355,8 @@
                 return;
             }
 
-            if (me.isAjaxSubmit === undefined) {
-                if ( attr(form, 'action') === null ) me.isAjaxSubmit = true;
-                else {
-                    // if there is "valid.form" event
-                    var events = $[ $._data ? '_data' : 'data' ](me.$el[0], "events");
-                    if (events && events.valid &&
-                        $.map(events.valid, function(e){
-                            return e.namespace.indexOf('form') !== -1 ? 1 : null;
-                        }).length
-                    ) {
-                        me.isAjaxSubmit = true;
-                    } else {
-                        me.isAjaxSubmit = false;
-                    }
-                }
-            }
-
             // trigger the beforeSubmit callback.
-            if ( opt.beforeSubmit.call(me, form) === false ) {
+            if ( isFunction(opt.beforeSubmit) && opt.beforeSubmit.call(me, form) === false ) {
                 me.isAjaxSubmit && e.preventDefault();
                 return;
             }
@@ -387,7 +386,7 @@
                     me.submiting = false;
 
                     // trigger callback and event
-                    opt[ret].call(me, form, errors);
+                    isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + '.form', [form, errors]);
 
                     if (isValid && !me.isAjaxSubmit) {
@@ -416,15 +415,18 @@
         },
 
         _focus: function(e) {
-            var el = e.target;
+            var el = e.target,
+                msg;
 
             if (e.type !== 'showtip') {
                 if ( this.submiting ) return;
                 if ( el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip') ) return;
             }
             
+            msg = attr(el, DATA_TIP);
+            if (!msg) return;
             this.showMsg(el, {
-                msg: attr(el, DATA_TIP),
+                msg: msg,
                 type: 'tip'
             });
         },
@@ -496,7 +498,7 @@
         _showTip: function(e){
             var me = this;
             if (me.$el[0] !== e.target) return;
-            me.$el.find("input,select,textarea").filter(":verifiable").each(function(){
+            me.$el.find(":verifiable["+ DATA_TIP +"]").each(function(){
                 me.showMsg(this, {
                     msg: attr(this, DATA_TIP),
                     type: 'tip'
@@ -508,18 +510,20 @@
         _parse: function(el) {
             var me = this,
                 field,
-                key = el.name;
+                key = el.name,
+                dataRule = attr(el, DATA_RULE);
+
+            dataRule && attr(el, DATA_RULE, null);
 
             // if the field has passed the key as id mode, or it doesn't has a name
             if (el.id && ('#' + el.id in me.fields) || !el.name) {
                 key = '#' + el.id;
             }
             // doesn't verify a field that has neither id nor name
-            if (!key) return attr(el, DATA_RULE, null);
+            if (!key) return;
 
             field = me.fields[key] || {};
-            if (!field.rule) field.rule = attr(el, DATA_RULE) || '';
-            attr(el, DATA_RULE, null);
+            field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
 
             field.key = key;
@@ -563,25 +567,31 @@
             var me = this,
                 opt = me.options,
                 el = e.target,
-                isValid = field.isValid = !!ret.isValid;
-
-            if (isValid) {
-                ret.type = 'ok';
-                isFunction(field.valid) && field.valid.call(me, field, ret);
-            } else if (me.submiting) {
-                me.errors[field.key] = ret.msg;
-                isFunction(field.invalid) && field.invalid.call(me, field, ret);
-            }
-            $(el).attr(ARIA_INVALID, !isValid)
-                .addClass(isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID)
-                .removeClass(isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID)
-                .trigger((isValid ? 'valid' : 'invalid') + '.field', [field, ret]);
+                isValid = field.isValid = !!ret.isValid,
+                callback = isValid ? 'valid' : 'invalid';
 
             field.old.ret = ret;
             me.elements[field.key] = el;
 
-            if (field.msgMaker || opt.msgMaker && !me.checkOnly) {
-                // error message or ok message
+            if (me.checkOnly) return;
+
+            ret.key = field.key;
+            ret.rule = field.rid;
+            if (isValid) {
+                ret.type = 'ok';
+            } else if (me.submiting) {
+                me.errors[field.key] = ret.msg;
+            }
+
+            // trigger callback
+            isFunction(field[callback]) && field[callback].call(me, el, ret);
+            $(el).attr( ARIA_INVALID, !isValid )
+                 .addClass( isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID )
+                 .removeClass( isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID )
+                 .trigger( callback + '.field', [ret, me] );
+
+            // show or hide the message
+            if (field.msgMaker || opt.msgMaker) {
                 if ( (!ret.showOk && ret.msg) || (ret.showOk && opt.showOk !== false ) ) {
                     me.showMsg(el, ret, field);
                 } else {
@@ -614,8 +624,10 @@
                     3. built-in rules message;
                     4. the default message
                 */
+                // get message from element or field
                 msg = getDataMsg(el, field, method);
                 if (!msg) {
+                    // get message from result
                     if (isString(ret)) {
                         msg = ret;
                         ret = {error: msg};
@@ -633,10 +645,7 @@
             }
 
             // message analysis, and throw rule level event
-            if (!isValid) {
-                me.isValid = false;
-                $(el).trigger('invalid.rule', [method, msgOpt.msg]);
-            } else {
+            if (isValid) {
                 msgOpt.isValid = true;
                 if (!showOk) {
                     var okmsg = field.ok || attr(el, 'data-ok');
@@ -650,6 +659,10 @@
                 }
                 msgOpt.showOk = showOk;
                 $(el).trigger('valid.rule', [method, msgOpt.msg]);
+            } else {
+                // so, form is invalid
+                me.isValid = false;
+                $(el).trigger('invalid.rule', [method, msgOpt.msg]);
             }
 
             // output the debug message
@@ -686,6 +699,7 @@
             if (me.submiting && me.deferred[key]) return;
             field.rid = method;
 
+            // get validation result of the current rule
             ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
             
             // asynchronous validation
@@ -1286,7 +1300,7 @@
             b = elem2.value;
 
             if (!field.init_match) {
-                $(elem2).on('valid.field.'+NS, function(){
+                this.$el.on('valid.field.'+NS, selector2, function(){
                     $(element).trigger('validate');
                 });
                 field.init_match = field2.init_match = 1;
