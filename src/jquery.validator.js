@@ -83,10 +83,10 @@
             msgIcon: '<span class="n-icon"></span>',
             msgArrow: '',
             msgClass: '',
-            //showOk: true,
+            //msgStyle: null,
             //msgShow: null,
             //msgHide: null,
-
+            //showOk: true,
             defaultMsg: '{0} is not valid.',
             loadingMsg: 'Validating...'
         },
@@ -251,6 +251,7 @@
             me.msgOpt = {
                 type: 'error',
                 pos: getPos(opt.msgClass),
+                wrapper: opt.msgWrapper,
                 cls: opt.msgClass,
                 style: opt.msgStyle,
                 icon: opt.msgIcon,
@@ -932,7 +933,7 @@
                 }
                 if (!$msgbox) {
                     datafor = !checkable(el) && el.id ? el.id : el.name;
-                    $msgbox = this.$el.find(this.options.msgWrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
+                    $msgbox = this.$el.find(opt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
                 }
             } else {
                 $msgbox = $el;
@@ -940,7 +941,7 @@
 
             if (!$msgbox.length) {
                 $el = this.$el.find(tgt || el);
-                $msgbox = $('<'+ this.options.msgWrapper + '>').attr({
+                $msgbox = $('<'+ opt.wrapper + '>').attr({
                     'class': CLS_MSG_BOX + (opt.cls ? ' '+opt.cls : ''),
                     'style': opt.style || '',
                     'for': datafor
@@ -966,6 +967,8 @@
                 // mark message status
                 attr(el, DATA_INPUT_STATUS, opt.type);
                 field = field || this.getField(el);
+                if (field.msgStyle) opt.style = field.msgStyle;
+                if (field.msgWrapper) opt.wrapper = field.msgWrapper;
             }
             
             var $msgbox = this._getMsgDOM(el, opt),
