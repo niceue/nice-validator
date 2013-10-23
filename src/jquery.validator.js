@@ -786,7 +786,6 @@
             // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
             if ( !field.rules ) this._parse(el);
-            if ( !field.rule ) return;
 
             var me = this,
                 opt = me.options,
