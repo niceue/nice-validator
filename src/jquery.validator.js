@@ -100,41 +100,44 @@
 
     /** jQuery Plugin
      * @param {Object} options
-        debug         {Boolean}   false,    Whether to enable debug mode
-        timely        {Boolean}   true,     Whether to enable timely verification
-        theme         {String}   'default'  Using which theme
-        stopOnError   {Boolean}   false,    Whether to stop validate when found an error input
-        ignore        {jqSelector}  '',     Ignored fields (Using jQuery selector)
+        debug         {Boolean}     false     Whether to enable debug mode
+        timely        {Boolean}     true      Whether to enable timely verification
+        theme         {String}     'default'  Using which theme
+        stopOnError   {Boolean}     false     Whether to stop validate when found an error input
+        ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
         
-        beforeSubmit  {Function}            Do something before submitting the form
-        dataFilter    {Function}            Conversion ajax results
-        valid         {Function}            Triggered when the form is valid
-        invalid       {Function}            Triggered when the form is invalid
+        beforeSubmit  {Function}              Do something before submitting the form
+        dataFilter    {Function}              Conversion ajax results
+        valid         {Function}              Triggered when the form is valid
+        invalid       {Function}              Triggered when the form is invalid
 
-        msgShow       {Function}  null      When show a message, will trigger this callback
-        msgHide       {Function}  null      When hide a message, will trigger this callback
-        
-        msgWrapper  {String}    'span'      Message wrapper tag name
-        msgMaker    {Function}              Message HTML maker
-        msgIcon     {String}    ''          Icon template
-        msgArrow    {String}    ''          Small arrow template
-        msgClass    {String}    ''          Additional added to the message class names
-        formClass   {String}    ''          Additional added to the form class names
+        msgShow       {Function}    null      When show a message, will trigger this callback
+        msgHide       {Function}    null      When hide a message, will trigger this callback
+        msgWrapper    {String}     'span'     Message wrapper tag name
+        msgMaker      {Function}              Message HTML maker
+        msgIcon       {String}                Icon template
+        msgArrow      {String}                Small arrow template
+        msgStyle      {String}                Custom message style
+        msgClass      {String}                Additional added to the message class names
+        formClass     {String}                Additional added to the form class names
 
-        defaultMsg  {String}                Default error message
-        loadingMsg  {String}                Tips for asynchronous loading
+        defaultMsg    {String}                Default error message
+        loadingMsg    {String}                Tips for asynchronous loading
+        messages      {Object}      null      Custom messages for the current instance
         
-        rules       {Object}    null,       Custom rules for the current instance
-        messages    {Object}    null,       Custom messages for the current instance
-        
-        fields      {Object}                Field set to be verified
+        rules         {Object}      null      Custom rules for the current instance
+
+        fields        {Object}                Field set to be verified
         {String} key    name|#id
-        {String|Object} value               Rule string, or an object is passed more arguments
+        {String|Object} value                 Rule string, or an object is passed more arguments
 
         fields[key][rule]       {String}      Rule string
         fields[key][tip]        {String}      Custom friendly message when focus the input
         fields[key][ok]         {String}      Custom success message
         fields[key][msg]        {Object}      Custom error message
+        fields[key][msgStyle]   {String}      Custom message style
+        fields[key][msgClass]   {String}      Additional added to the message class names
+        fields[key][msgWrapper] {String}      Message wrapper tag name
         fields[key][msgMaker]   {Function}    Custom message HTML maker
         fields[key][dataFilter] {Function}    Conversion ajax results
         fields[key][valid]      {Function}    Triggered when this field is valid
@@ -146,6 +149,7 @@
     $.fn[NS] = function(options) {
         var that = this,
             args = arguments;
+
         if (that.is(':input')) return that;
         !that.is('form') && (that = this.find('form'));
         !that.length && (that = this);
@@ -160,12 +164,16 @@
                 new Validator(this, options);
             }
         });
+
         return this;
     };
 
     // Validate a field, or an area
     $.fn.isValid = function(callback, checkOnly) {
-        var me = getInstance(this[0]), $inputs, ret;
+        var me = getInstance(this[0]),
+            $inputs,
+            ret;
+
         if (!me) return true;
         // By default only verify without prompt message
         if (checkOnly === undefined) checkOnly = true;
@@ -175,6 +183,7 @@
             isFunction(callback) && callback.call(null, isValid);
             me.checkOnly = false;
         }, true);
+
         // If you pass a callback, we maintain the jQuery object chain
         return isFunction(callback) ? this : ret;
     };
@@ -182,6 +191,7 @@
     // A faster selector than ":input:not(:submit,:button,:reset,:disabled,[novalidate])"
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
+
         return (name === 'input' && elem.type !== 'submit' && elem.type !== 'button' && elem.type !== 'reset' ||
                 name === 'select' || name === 'textarea') && elem.disabled === false && attr(elem, NOVALIDATE) === null;
     };
@@ -189,6 +199,7 @@
     // Constructor for validator
     function Validator(element, options) {
         var me = this, themeOpt, dataOpt;
+
         if (!me instanceof Validator) return new Validator(element, options);
         
         if (isFunction(options)) {
@@ -280,13 +291,13 @@
             // Processing events and cache
             if (!me.$el.data(NS)) {
                 me.$el.on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
-                    .on('reset.'+NS, proxy(me, '_reset'))
-                    .on('showtip.'+NS, proxy(me, '_showTip'))
-                    .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
-                    .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
-                    .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
-                    .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
-                    .on('click.'+NS, 'input:radio,input:checkbox', proxy(me, '_click'));
+                      .on('reset.'+NS, proxy(me, '_reset'))
+                      .on('showtip.'+NS, proxy(me, '_showTip'))
+                      .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
+                      .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
+                      .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
+                      .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
+                      .on('click.'+NS, 'input:radio,input:checkbox', proxy(me, '_click'));
                 if (opt.timely >= 2) {
                     me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                           .on('change.'+NS, 'select', proxy(me, '_click'));
@@ -303,10 +314,11 @@
         _multiValidate: function($inputs, doneCallbacks, must){
             var me = this,
                 opt = me.options;
-            if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             me.isValid = true;
             me.deferred = {};
+
+            if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             $inputs.each(function(i, el) {
                 var field = me.getField(el);
@@ -423,9 +435,9 @@
                 if ( this.submiting ) return;
                 if ( el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip') ) return;
             }
-            
             msg = attr(el, DATA_TIP);
             if (!msg) return;
+
             this.showMsg(el, {
                 msg: msg,
                 type: 'tip'
@@ -498,6 +510,7 @@
 
         _showTip: function(e){
             var me = this;
+
             if (me.$el[0] !== e.target) return;
             me.$el.find(":verifiable["+ DATA_TIP +"]").each(function(){
                 me.showMsg(this, {
@@ -546,20 +559,26 @@
                 rules;
 
             if (!arr) return;
+
             field.display = arr[1];
             field.rules = [];
             rules = (arr[2] || '').split(';');
+
             $.map(rules, function(rule) {
                 var parts = rRule.exec(rule);
+
                 if (!parts) return null;
                 if (parts[3]) parts[2] = parts[3];
+
                 field.rules.push({
                     method: parts[1],
                     params: parts[2] ? $.trim(parts[2]).split(', ') : undefined
                 });
             });
+
             field.vid = 0;
             field.rid = field.rules[0].method;
+
             return field;
         },
 
@@ -584,7 +603,7 @@
                 me.errors[field.key] = ret.msg;
             }
 
-            // trigger callback
+            // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             $(el).attr( ARIA_INVALID, !isValid )
                  .addClass( isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID )
@@ -603,16 +622,17 @@
 
         // Validated a rule
         _validatedRule: function(e, field, ret, msgOpt) {
-            field = field || me.getField(el);
             var me = this,
                 opt = me.options,
                 el = e.target,
                 msg = '',
-                method = field.rid,
+                method,
                 isValid = false,
                 showOk = false;
 
             msgOpt = msgOpt || {};
+            field = field || me.getField(el);
+            method = field.rid;
 
             if (ret === true || ret === undefined) {
                 isValid = true;
@@ -670,6 +690,7 @@
             if (opt.debug) {
                 debug[isValid ? 'info' : 'warn'](field.vid + ': ' + method + ' -> ' + (msgOpt.msg || true));
             }
+
             // need to re-verify when the value is changed
             if (isValid && field.old.value !== undefined && field.old.value !== el.value) {
                 field.vid = 0;
@@ -765,6 +786,7 @@
             // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
             if ( !field.rules ) this._parse(el);
+            if ( !field.rule ) return;
 
             var me = this,
                 opt = me.options,
@@ -840,6 +862,7 @@
                 key = el.name;
             }
             if (attr(el, DATA_RULE)) me._parse(el);
+
             return me.fields[key];
         },
 
@@ -861,12 +884,14 @@
             if (method in me.rules) {
                 ret = me.rules[method].call(me, el, params);
             }
+
             return ret === true || ret === undefined || false;
         },
 
         // Get a range of validation messages
         getRangeMsg: function(value, params, type, suffix) {
             if (!params) return;
+
             var me = this,
                 msg = me.messages[type] || '',
                 p = params[0].split('~'),
@@ -894,12 +919,14 @@
                 args.push(a);
                 c = 'eq';
             }
+
             if (msg) {
                 if (suffix && msg[c + suffix]) {
                     c += suffix;
                 }
                 args[0] = msg[c];
             }
+
             return me.renderMsg.apply(null, args);
         },
 
@@ -909,10 +936,13 @@
             var args = arguments,
                 tpl = args[0],
                 i = args.length;
+
             if (!tpl) return;
+
             while (--i) {
                 tpl = tpl.replace('{' + i + '}', args[i]);
             }
+
             return tpl;
         },
 
@@ -942,7 +972,7 @@
             if (!$msgbox.length) {
                 $el = this.$el.find(tgt || el);
                 $msgbox = $('<'+ opt.wrapper + '>').attr({
-                    'class': CLS_MSG_BOX + (opt.cls ? ' '+opt.cls : ''),
+                    'class': CLS_MSG_BOX + (opt.cls ? ' ' + opt.cls : ''),
                     'style': opt.style || '',
                     'for': datafor
                 });
@@ -953,6 +983,7 @@
                     $msgbox[!opt.pos || opt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
                 }
             }
+
             return $msgbox;
         },
 
@@ -968,6 +999,7 @@
                 attr(el, DATA_INPUT_STATUS, opt.type);
                 field = field || this.getField(el);
                 if (field.msgStyle) opt.style = field.msgStyle;
+                if (field.msgClass) opt.cls = field.msgClass;
                 if (field.msgWrapper) opt.wrapper = field.msgWrapper;
             }
             
@@ -1031,6 +1063,7 @@
         setField: function(key, obj) {
             var me = this,
                 fields = {};
+
             if (isString(key)) {
                 // remove this field
                 if (obj === null) {
@@ -1078,6 +1111,7 @@
         var that = context ? context === true ? this : context : Rules.prototype;
 
         if (!isObject(obj)) return;
+
         for (var k in obj) {
             that[k] = getRule(obj[k]);
         }
@@ -1088,6 +1122,7 @@
         var that = context ? context === true ? this : context : Messages.prototype;
 
         if (!isObject(obj)) return;
+
         for (var k in obj) {
             if (!obj[k]) return;
             that[k] = obj[k];
@@ -1113,16 +1148,20 @@
     // Convert space-separated keys to jQuery selector
     function keys2selector(keys) {
         var selector = '';
+
         $.map(keys.split(' '), function(k) {
             selector += ',' + (k.charAt(0) === '#' ? k : '[name="' + k + '"]');
         });
+
         return selector.substring(1);
     }
 
     // Get instance by an element
     function getInstance(el) {
         if (!el || !el.tagName) return;
+
         var wrap = el;
+
         switch (el.tagName) {
             case 'INPUT':
             case 'SELECT':
@@ -1132,11 +1171,13 @@
             default:
                 wrap = $(el).closest('.n-' + NS);
         }
+
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
     function initByElement(el) {
         var me = getInstance(el);
+
         if (me) {
             if (attr(el, DATA_RULE)) me._parse(el);
             $(el).trigger('focusin');
@@ -1148,6 +1189,7 @@
     // Get custom rules on the node
     function getDataRule(el, method) {
         var fn = $.trim(attr(el, DATA_RULE + '-' + method));
+
         if (!fn) return;
         fn = (new Function("return " + fn))();
         if (fn) return getRule(fn);
@@ -1156,16 +1198,19 @@
     // Get custom messages on the node
     function getDataMsg(el, field, item) {
         var msg = field.msg;
+
         if (isObject(msg) && item) msg = msg[item];
         if (!isString(msg)) {
             msg = attr(el, 'data-msg-' + item) || attr(el, 'data-msg') || '';
         }
+
         return msg;
     }
 
     // Get message position
     function getPos(str) {
         var pos;
+
         if (str) pos = rPos.exec(str);
         return pos ? pos[1] : '';
     }
@@ -1186,21 +1231,28 @@
     .on('focusin', ':input['+DATA_RULE+']', function() {
         initByElement(this);
     })
+
     .on('click', 'input,button', function(){
         if (!this.form) return;
+
         if (this.type === 'submit' && attr(this, NOVALIDATE) !== null) {
             attr(this.form, 'novalidateonce', true);
-        } else if (this.name && checkable(this)) {
+        }
+        else if (this.name && checkable(this)) {
             var elem0 = this.form.elements[this.name][0];
+
             if (attr(elem0, DATA_RULE)) {
                 initByElement(elem0);
                 $(elem0).trigger('validate');
             }
         }
     })
+
     .on('submit', 'form', function(e) {
         if (attr(this, NOVALIDATE) !== null) return;
+
         var $form = $(this), me;
+
         if (!$form.data(NS)) {
             me = $form[NS]().data(NS);
             if (!$.isEmptyObject(me.fields)) {
@@ -1223,6 +1275,7 @@
         required: function(element, params) {
             var val = $.trim(element.value),
                 isValid = true;
+
             if (params) {
                 if (params.length === 1) {
                     if (!val && !this.test(element, params[0]) ) {
@@ -1236,6 +1289,7 @@
                     });
                 }
             }
+
             return isValid && !!val;
         },
 
@@ -1251,6 +1305,7 @@
             var re, z = '0|',
                 p = '[1-9]\\d*',
                 key = params ? params[0] : '*';
+
             switch (key) {
                 case '+':
                     re = p;
@@ -1268,6 +1323,7 @@
                     re = z + '-?' + p;
             }
             re = '^(?:' + re + ')$';
+
             return new RegExp(re).test(element.value) || this.messages.integer[key];
         },
 
@@ -1293,11 +1349,11 @@
                 type = params[0];
                 key = params[1];
             }
+
             selector2 = key.charAt(0) === '#' ? key : ':input[name="' + key + '"]';
             elem2 = this.$el.find(selector2)[0];
             // If the compared field is not exist
             if (!elem2) return;
-
             field2 = this.getField(elem2);
             a = element.value;
             b = elem2.value;
@@ -1367,12 +1423,14 @@
          **/
         checked: function(element, params, field) {
             if (!checkable(element)) return true;
+
             var elem, count;
 
             count = this.$el.find('input[name="' + element.name + '"]').filter(function() {
                 if (!elem && checkable(this)) elem = this;
                 return !this.disabled && this.checked && $(this).is(':visible');
             }).length;
+
             if (!params) {
                 return !!count || getDataMsg(elem, field, 'checked') || this.messages.required;
             } else {
@@ -1390,7 +1448,11 @@
         length: function(element, params) {
             var value = element.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
-            if (params && params[0].charAt(0) === '~') params[0] = '0' + params[0];
+
+            if ( params && params[0].charAt(0) === '~' ) {
+                params[0] = '0' + params[0];
+            }
+
             return this.getRangeMsg(len, params, 'length', (params[1] ? '_2' : ''));
         },
 
@@ -1417,6 +1479,7 @@
                 data = {};
 
             if (!params) return true;
+
             arr = rAjaxType.exec(params[0]);
             url = arr[2];
             type = (arr[1] || 'POST').toUpperCase();
@@ -1454,8 +1517,7 @@
          *  filter(regexp)  filter the "regexp" matched characters
          */
         filter: function(element, params) {
-            var reg = params ? (new RegExp("[" + params[0] + "]", "g")) : rUnsafe;
-            element.value = element.value.replace(reg, '');
+            element.value = element.value.replace( params ? (new RegExp("[" + params[0] + "]", "g")) : rUnsafe, '' );
             return true;
         }
     });
