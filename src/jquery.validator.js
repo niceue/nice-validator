@@ -49,9 +49,7 @@
             }
         },
         debug = window.console || {
-            log: noop,
-            info: noop,
-            warn: noop
+            log: noop
         },
 
         defaults = {
@@ -376,6 +374,9 @@
             
             me._reset();
             me.submiting = true;
+            if (opt.debug) {
+                debug.log("\n%c########## " + e.type + " form ##########", "color:blue");
+            }
 
             isFormValid = me._multiValidate(
                 me.$el.find(INPUT_SELECTOR),
@@ -452,7 +453,7 @@
                 must,
                 el = e.target,
                 etype = e.type,
-                timer = 100;
+                timer = 150;
 
             if (!isClick && etype !== 'paste') {
                 // must be verified, if it is a manual trigger
@@ -495,6 +496,7 @@
             if (timer) {
                 if (field.timeout) clearTimeout(field.timeout);
                 field.timeout = setTimeout(function() {
+                    if (me.submiting) return;
                     me._validate(el, field, must);
                 }, timer);
             } else {
@@ -587,21 +589,26 @@
             var me = this,
                 opt = me.options,
                 el = e.target,
-                isValid = field.isValid = !!ret.isValid,
+                isValid,
                 callback = isValid ? 'valid' : 'invalid';
 
-            field.old.ret = ret;
-            me.elements[field.key] = el;
-
-            if (me.checkOnly) return;
-
+            isValid = ret.isValid = field.isValid = !!ret.isValid;
             ret.key = field.key;
             ret.rule = field.rid;
             if (isValid) {
                 ret.type = 'ok';
-            } else if (me.submiting) {
-                me.errors[field.key] = ret.msg;
+            } else {
+                if (me.submiting) {
+                    me.errors[field.key] = ret.msg;
+                }
+                // so, form is invalid
+                me.isValid = false;
             }
+            field.old.ret = ret;
+            field.old.value = el.value;
+            me.elements[field.key] = el;
+
+            if (me.checkOnly) return;
 
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
@@ -615,7 +622,7 @@
                 if ( (!ret.showOk && ret.msg) || (ret.showOk && opt.showOk !== false ) ) {
                     me.showMsg(el, ret, field);
                 } else {
-                    attr(el, DATA_INPUT_STATUS) !== "tip" && me.hideMsg(el, ret);
+                    me.hideMsg(el, ret, field);
                 }
             }
         },
@@ -681,23 +688,16 @@
                 msgOpt.showOk = showOk;
                 $(el).trigger('valid.rule', [method, msgOpt.msg]);
             } else {
-                // so, form is invalid
-                me.isValid = false;
                 $(el).trigger('invalid.rule', [method, msgOpt.msg]);
             }
 
             // output the debug message
             if (opt.debug) {
-                debug[isValid ? 'info' : 'warn'](field.vid + ': ' + method + ' -> ' + (msgOpt.msg || true));
+                debug.log('   %c' + field.vid + ': ' + method + ' => ' + (msgOpt.msg || true), isValid ? "color:green":"color:red");
             }
 
-            // need to re-verify when the value is changed
-            if (isValid && field.old.value !== undefined && field.old.value !== el.value) {
-                field.vid = 0;
-                me._checkRule(el, field);
-            }
             // the current rule has passed, continue to validate
-            else if (isValid && field.vid < field.rules.length - 1) {
+            if (isValid && field.vid < field.rules.length - 1) {
                 field.vid++;
                 me._checkRule(el, field);
             }
@@ -794,7 +794,6 @@
                 groupFn = field.group,
                 old,
                 ret,
-                isCurrentTip = attr(el, DATA_INPUT_STATUS) === 'tip',
                 isValid = field.isValid = true;
 
             old = field.old = field.old || {};
@@ -811,14 +810,13 @@
                     isValid = false;
                 } else {
                     ret = undefined;
-                    me.hideMsg(el, msgOpt);
+                    me.hideMsg(el, msgOpt, field);
                 }
             }
             // if the field is not required and it has a blank value
             if (isValid && !field.required && !field.must && el.value === '') {
-                if (isCurrentTip) return;
+                if ( attr(el, DATA_INPUT_STATUS) === 'tip' ) return;
                 else me._focus({target: el});
-                old.value = '';
                 if (!checkable(el)) {
                     $el.trigger('validated.field', [field, {isValid: true}]);
                     return;
@@ -826,17 +824,14 @@
             }
             // If the value is not changed, just return the old result
             else if (!must && old && old.ret !== undefined && old.value === el.value) {
-                if (!old.ret.isValid) me.isValid = false;
-                if (isCurrentTip) return;
                 if (el.value !== '') {
-                    msgOpt = old.ret;
-                    $el.trigger('validated.field', [field, msgOpt]);
+                    $el.trigger('validated.field', [field, old.ret]);
                     return;
                 }
             }
 
-            old.value = el.value;
-            if (opt.debug) debug.log(field.key);
+            //old.value = el.value;
+            if (opt.debug) debug.log('%c'+field.key, 'background:#eee');
 
             // if the results are out (old validation results, or grouping validation results)
             if (ret !== undefined) {
@@ -1017,9 +1012,13 @@
 
         /* @interface: hideMsg
          */
-        hideMsg: function(el, opt) {
+        hideMsg: function(el, opt, /*INTERNAL*/ field) {
             el = $(el).get(0);
             opt = this._getMsgOpt(opt);
+            if ($(el).is(":verifiable")) {
+                field = field || this.getField(el);
+                if (field.msgWrapper) opt.wrapper = field.msgWrapper;
+            }
 
             var $msgbox = this._getMsgDOM(el, opt);
             if (!$msgbox.length) return;
