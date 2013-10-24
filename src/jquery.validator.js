@@ -589,10 +589,9 @@
             var me = this,
                 opt = me.options,
                 el = e.target,
-                isValid,
+                isValid = ret.isValid = field.isValid = !!ret.isValid,
                 callback = isValid ? 'valid' : 'invalid';
 
-            isValid = ret.isValid = field.isValid = !!ret.isValid;
             ret.key = field.key;
             ret.rule = field.rid;
             if (isValid) {
@@ -992,9 +991,11 @@
                 // mark message status
                 attr(el, DATA_INPUT_STATUS, opt.type);
                 field = field || this.getField(el);
-                if (field.msgStyle) opt.style = field.msgStyle;
-                if (field.msgClass) opt.cls = field.msgClass;
-                if (field.msgWrapper) opt.wrapper = field.msgWrapper;
+                if (field) {
+                    if (field.msgStyle) opt.style = field.msgStyle;
+                    if (field.msgClass) opt.cls = field.msgClass;
+                    if (field.msgWrapper) opt.wrapper = field.msgWrapper;
+                }
             }
             
             var $msgbox = this._getMsgDOM(el, opt),
@@ -1017,7 +1018,7 @@
             opt = this._getMsgOpt(opt);
             if ($(el).is(":verifiable")) {
                 field = field || this.getField(el);
-                if (field.msgWrapper) opt.wrapper = field.msgWrapper;
+                if (field && field.msgWrapper) opt.wrapper = field.msgWrapper;
             }
 
             var $msgbox = this._getMsgDOM(el, opt);
