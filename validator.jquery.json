@@ -1,0 +1,23 @@
+{
+    "name": "validator",
+    "title": "nice Validator",
+    "description": "Simple, smart and pleasant verification solution.",
+    "version": "0.6.1",
+    "keywords": ["form", "validate", "validation", "validator"],
+    "author": {
+        "name": "Jony Zhang",
+        "url": "http://niceue.com",
+        "email": "zj86@live.cn"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://niceue.com/licenses/MIT-LICENSE.txt"
+        }
+    ],
+    "bugs": "https://github.com/niceue/validator/issues",
+    "demo": "http://niceue.com/validator/demo",
+    "dependencies": {
+        "jquery": ">=1.7.0"
+    }
+}
