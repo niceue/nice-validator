@@ -3,23 +3,26 @@
     "title": "nice Validator",
     "description": "Simple, smart and pleasant verification solution.",
     "version": "0.6.1",
-    "keywords": ["validator"],
+    "keywords": ["form", "validate", "validation", "validator"],
     "homepage": "http://niceue.com/validator/",
     "author": "Jony Zhang <zj86@live.cn>",
     "repository": {
         "type": "git",
         "url": "https://github.com/niceue/validator.git"
     },
+    "bugs": "https://github.com/niceue/validator/issues",
     "licenses": [
         {
             "type": "MIT",
-            "url": "https://github.com/niceue/validator/blob/master/LICENSE.txt"
+            "url": "http://niceue.com/licenses/MIT-LICENSE.txt"
         }
     ],
     "engine": [
         "node >=0.8.0"
     ],
-    "dependencies": {},
+    "dependencies": {
+        "jquery": ">=1.7.0"
+    },
     "devDependencies": {
         "uglify-js": ">= 2.3.0",
         "stylus": ">= 0.32.0"
