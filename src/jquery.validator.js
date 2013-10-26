@@ -1157,15 +1157,19 @@
 
     // Get instance by an element
     function getInstance(el) {
+        var wrap;
+
         if (!el || !el.tagName) return;
-
-        var wrap = el;
-
         switch (el.tagName) {
             case 'INPUT':
             case 'SELECT':
             case 'TEXTAREA':
+            case 'BUTTON':
+            case 'FIELDSET':
                 wrap = el.form || $(el).closest('.n-' + NS);
+                break;
+            case 'FORM':
+                wrap = el;
                 break;
             default:
                 wrap = $(el).closest('.n-' + NS);
@@ -1174,7 +1178,7 @@
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
-    function initByElement(el) {
+    function initByInput(el) {
         var me = getInstance(el);
 
         if (me) {
@@ -1228,20 +1232,20 @@
     // Global events
     $(document)
     .on('focusin', ':input['+DATA_RULE+']', function() {
-        initByElement(this);
+        initByInput(this);
     })
 
     .on('click', 'input,button', function(){
         if (!this.form) return;
 
-        if (this.type === 'submit' && attr(this, NOVALIDATE) !== null) {
+        if (this.type === 'submit' && attr(this, 'formnovalidate') !== null) {
             attr(this.form, 'novalidateonce', true);
         }
         else if (this.name && checkable(this)) {
             var elem0 = this.form.elements[this.name][0];
 
             if (attr(elem0, DATA_RULE)) {
-                initByElement(elem0);
+                initByInput(elem0);
                 $(elem0).trigger('validate');
             }
         }
