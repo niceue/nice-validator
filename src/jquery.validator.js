@@ -304,7 +304,7 @@
 
                 // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
                 // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
-                attr(form, NOVALIDATE, true);
+                attr(form, NOVALIDATE, NOVALIDATE);
             }
         },
 
@@ -1238,15 +1238,15 @@
     .on('click', 'input,button', function(){
         if (!this.form) return;
 
-        if (this.type === 'submit' && attr(this, 'formnovalidate') !== null) {
+        if (this.type === 'submit' && attr(this, 'formnovalidate') !== null || attr(this, NOVALIDATE) !== null) {
             attr(this.form, 'novalidateonce', true);
         }
         else if (this.name && checkable(this)) {
-            var elem0 = this.form.elements[this.name][0];
-
-            if (attr(elem0, DATA_RULE)) {
-                initByInput(elem0);
-                $(elem0).trigger('validate');
+            var elem = this.form.elements[this.name];
+            if (elem.length) elem = elem[0];
+            if (attr(elem, DATA_RULE)) {
+                initByInput(elem);
+                $(elem).trigger('validate');
             }
         }
     })
@@ -1261,7 +1261,7 @@
             if (!$.isEmptyObject(me.fields)) {
                 e.type==='submit' && me._submit(e);
             } else {
-                attr(this, NOVALIDATE, true);
+                attr(this, NOVALIDATE, NOVALIDATE);
                 $form.removeData(NS);
             }
         }
