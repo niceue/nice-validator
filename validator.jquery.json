@@ -2,7 +2,7 @@
     "name": "validator",
     "title": "nice Validator",
     "description": "Simple, smart and pleasant verification solution.",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "keywords": ["form", "validate", "validation", "validator"],
     "author": {
         "name": "Jony Zhang",
