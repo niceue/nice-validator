@@ -304,6 +304,7 @@
 
                 // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
                 // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
+                me.NOVALIDATE = attr(form, NOVALIDATE);
                 attr(form, NOVALIDATE, NOVALIDATE);
             }
         },
@@ -1101,6 +1102,7 @@
         destroy: function() {
             this._reset(true);
             this.$el.off('.'+NS).removeData(NS);
+            attr(this.$el[0], NOVALIDATE, this.NOVALIDATE);
         }
     };
 
