@@ -1178,12 +1178,13 @@
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
-    function initByInput(el) {
+    function initByInput(el, eventType) {
+        if (!el.form || attr(el.form, NOVALIDATE) !== null) return;
         var me = getInstance(el);
 
         if (me) {
-            if (attr(el, DATA_RULE)) me._parse(el);
-            $(el).trigger('focusin');
+            me._parse(el);
+            $(el).trigger(eventType);
         } else {
             attr(el, DATA_RULE, null);
         }
@@ -1232,7 +1233,7 @@
     // Global events
     $(document)
     .on('focusin', ':input['+DATA_RULE+']', function() {
-        initByInput(this);
+        initByInput(this, 'focusin');
     })
 
     .on('click', 'input,button', function(){
@@ -1245,8 +1246,7 @@
             var elem = this.form.elements[this.name];
             if (elem.length) elem = elem[0];
             if (attr(elem, DATA_RULE)) {
-                initByInput(elem);
-                $(elem).trigger('validate');
+                initByInput(elem, 'validate');
             }
         }
     })
