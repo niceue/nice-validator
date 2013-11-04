@@ -1,9 +1,8 @@
 /* theme: yellow */
 .n-yellow {
-    .msg-box {
-        position:absolute;
-    }
     .msg-wrap {
+        position: absolute;
+        z-index: 1;
         padding: 4px 6px;
         font-size: 12px;
         border: 1px solid transparent;
@@ -12,6 +11,16 @@
 
         .n-icon {
             background-image: url(images/validator_simple.png);
+        }
+    }
+    .n-top {
+        .msg-wrap {
+            bottom: 100%;
+        }
+    }
+    .n-bottom {
+        .msg-wrap {
+            top: 100%;
         }
     }
     .n-tip, .n-ok, .n-loading {

@@ -1,11 +1,20 @@
 /* theme: simple */
 .n-simple {
-    .msg-box {
-        position:absolute;
-    }
     .msg-wrap {
+        position: absolute;
+        z-index: 1;
         .n-icon {
             background-image: url(images/validator_simple.png);
+        }
+    }
+    .n-top {
+        .msg-wrap {
+            bottom: 100%;
+        }
+    }
+    .n-bottom {
+        .msg-wrap {
+            top: 100%;
         }
     }
     .n-left, .n-right {

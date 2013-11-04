@@ -40,6 +40,10 @@ inline-block() {
         @extend .n-inline-block
     }
 }
+.msg-box {
+    position:relative;
+    *zoom:1;
+}
 .msg-wrap {
     position: relative;
     white-space: nowrap;
@@ -47,9 +51,6 @@ inline-block() {
 .msg-wrap,.n-icon,.n-msg {
     @extend .n-inline-block
     vertical-align:top;
-}
-.msg-box {
-    *zoom:1;
 }
 
 .n-arrow {
@@ -65,8 +66,8 @@ inline-block() {
         font-weight: 400;
         font-style: normal; 
         font-size: 12px;
+        font-family: serif;
         line-height: 14px; _line-height: 15px;
-        font-family: sans-serif !important;
     }
     i {text-shadow:none;}
 }
@@ -76,25 +77,23 @@ inline-block() {
     background-repeat:no-repeat;
 }
 .n-msg {
-    line-height:16px;
+    display: inline-block;
+    line-height:15px;
     margin-left: 2px;
-    margin-top: -1px;
-    margin-top: s("0\9");
-    *padding-top: 2px;
-    _padding-top: 0;
+    *margin-top: -1px;
+    _margin-top: 0;
     font-size: 12px;
-    font-family: tahoma;
+    font-family: simsun;
 }
 
-
+// valid input
+.n-valid {}
 // invalid input
 .n-invald {}
-// invalid tooltip
+// tooltip
 .n-error {color:#CC3333;}
-// valid tooltip
 .n-ok {color:#390;}
-.n-tip,.n-loading {color:#808080;}
-
+.n-tip, .n-loading {color:#808080;}
 
 // icons
 .n-error .n-icon {background-position:0 0;}
@@ -104,22 +103,23 @@ inline-block() {
 
 
 /** arrow and position **/
-.n-top .n-arrow,
-.n-bottom .n-arrow {height: 6px; width: 12px; left:8px;}
-.n-left .n-arrow,
-.n-right .n-arrow {width: 6px; height: 12px; top: 6px; }
-
 .n-top, .n-right, .n-bottom, .n-left {
-    display: inline;
-    font-size:0;
-    font-size: 0;
+    display: inline-block;
     line-height: 0;
     vertical-align:top;
     outline: 0;
 }
+.n-top, .n-bottom {
+    .n-arrow {height: 6px; width: 12px; left:8px;}
+}
+ 
+.n-left, .n-right {
+    .n-arrow {width: 6px; height: 12px; top: 6px; }
+}
+
 /** top **/
 .n-top {
-    bottom: 100%;
+    vertical-align: top;
     .msg-wrap { margin-bottom:6px; }
     .n-arrow {
         bottom: -6px;
@@ -130,8 +130,6 @@ inline-block() {
 /** bottom **/
 .n-bottom {
     vertical-align: bottom;
-    top: 100%;
-    _top: auto;
     .msg-wrap { margin-top: 6px; }
     .n-arrow {
         top: -6px;
@@ -141,7 +139,6 @@ inline-block() {
 }
 /** left **/
 .n-left {
-    font-size: 12px;
     .msg-wrap {right: 100%; margin-right:6px; }
     .n-arrow {
         right:-6px;
@@ -151,7 +148,6 @@ inline-block() {
 }
 /** right **/
 .n-right {
-    font-size: 12px;
     .msg-wrap { margin-left:6px; }
     .n-arrow {
         left:-6px;
