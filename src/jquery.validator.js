@@ -1,4 +1,4 @@
-/*! nice Validator 0.6.2
+/*! nice Validator 0.6.3
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -434,7 +434,7 @@
                 msg;
 
             if (e.type !== 'showtip') {
-                if ( this.submiting ) return;
+                if ( e.isTrigger || this.submiting ) return;
                 if ( el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip') ) return;
             }
             msg = attr(el, DATA_TIP);
