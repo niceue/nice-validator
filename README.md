@@ -1,4 +1,5 @@
 ## nice Validator
+[![Build Status](https://travis-ci.org/niceue/validator.png)](https://travis-ci.org/niceue/validator)  
 Simple, smart and pleasant verification solution.
 
 ### Documention
