@@ -1,6 +1,6 @@
 {
-    "name": "validator",
-    "title": "nice Validator",
+    "name": "niceValidator",
+    "title": "niceValidator",
     "description": "Simple, smart and pleasant verification solution.",
     "version": "0.6.3",
     "keywords": ["form", "validate", "validation", "validator"],
