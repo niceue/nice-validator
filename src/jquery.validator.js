@@ -1,8 +1,8 @@
-/*! nice Validator 0.6.3
+/*! nice Validator 0.6.4
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
-/*jshint browser:true, evil:true*/
+/*jshint evil:true, expr:true */
 (function($, undefined) {
     "use strict";
 
