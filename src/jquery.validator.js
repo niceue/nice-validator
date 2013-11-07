@@ -49,7 +49,8 @@
             }
         },
         debug = window.console || {
-            log: noop
+            log: noop,
+            info: noop
         },
 
         defaults = {
@@ -228,6 +229,14 @@
                 fields = me.fields,
                 form = me.$el[0];
 
+            // Processing field information
+            if (isObject(opt.fields)) {
+                $.each(opt.fields, function(k, v) {
+                    if (v) fields[k] = isString(v) ? {
+                        rule: v
+                    } : v;
+                });
+            }
             // Initialization group verification
             if (isArray(opt.groups)) {
                 $.map(opt.groups, function(obj) {
@@ -243,15 +252,7 @@
                     });
                 });
             }
-
-            // Processing field information
-            if (isObject(opt.fields)) {
-                $.each(opt.fields, function(k, v) {
-                    if (v) fields[k] = isString(v) ? {
-                        rule: v
-                    } : v;
-                });
-            }
+            // Parsing DOM rules
             me.$el.find(INPUT_SELECTOR).each(function() {
                 me._parse(this);
             });
@@ -302,9 +303,10 @@
                 }
                 me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
+                // cache the novalidate attribute value
+                me.NOVALIDATE = attr(form, NOVALIDATE);
                 // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
                 // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
-                me.NOVALIDATE = attr(form, NOVALIDATE);
                 attr(form, NOVALIDATE, NOVALIDATE);
             }
         },
@@ -376,7 +378,7 @@
             me._reset();
             me.submiting = true;
             if (opt.debug) {
-                debug.log("\n%c########## " + e.type + " form ##########", "color:blue");
+                debug.log("\n" + e.type + " form");
             }
 
             isFormValid = me._multiValidate(
@@ -497,7 +499,6 @@
             if (timer) {
                 if (field.timeout) clearTimeout(field.timeout);
                 field.timeout = setTimeout(function() {
-                    if (me.submiting) return;
                     me._validate(el, field, must);
                 }, timer);
             } else {
@@ -641,7 +642,11 @@
             field = field || me.getField(el);
             method = field.rid;
 
-            if (ret === true || ret === undefined) {
+            // use null to break validation from a field
+            if (ret === null) {
+                $(el).trigger('validated.field', [field, {isValid: true}]);
+            }
+            else if (ret === true || ret === undefined) {
                 isValid = true;
             }
             // ret may be: false, strings, objects
@@ -672,6 +677,11 @@
                 msgOpt.msg = (isValid ? msg : (msg || me.messages[method] || defaults.defaultMsg)).replace('{0}', field.display || '');
             }
 
+            // output the debug message
+            if (opt.debug) {
+                debug.log('   ' + field.vid + ': ' + method + ' => ' + (msgOpt.msg || true));
+            }
+
             // message analysis, and throw rule level event
             if (isValid) {
                 msgOpt.isValid = true;
@@ -689,11 +699,6 @@
                 $(el).trigger('valid.rule', [method, msgOpt.msg]);
             } else {
                 $(el).trigger('invalid.rule', [method, msgOpt.msg]);
-            }
-
-            // output the debug message
-            if (opt.debug) {
-                debug.log('   %c' + field.vid + ': ' + method + ' => ' + (msgOpt.msg || true), isValid ? "color:green":"color:red");
             }
 
             // the current rule has passed, continue to validate
@@ -771,10 +776,6 @@
                 // whether the field valid is unknown
                 field.isValid = undefined;
             }
-            // use null to break validation from a field
-            else if (ret === null) {
-                $(el).trigger('validated.field', [field, {isValid: true}]);
-            }
             // other result
             else {
                 $(el).trigger('validated.rule', [field, ret]);
@@ -801,39 +802,38 @@
 
             // group validation
             if (groupFn) {
-                $.extend(msgOpt, groupFn);
                 ret = groupFn.call(me);
-                if (ret !== true) {
+                if (ret === true || ret === undefined) {
+                    ret = undefined;
+                } else {
                     if (isString(ret)) ret = {error: ret};
                     field.vid = 0;
                     field.rid = 'group';
                     isValid = false;
-                } else {
-                    ret = undefined;
-                    me.hideMsg(el, msgOpt, field);
+                    me.hideMsg(el, {}, field);
+                    $.extend(msgOpt, groupFn);
                 }
             }
             // if the field is not required and it has a blank value
-            if (isValid && !field.required && !field.must && el.value === '') {
-                if ( attr(el, DATA_INPUT_STATUS) === 'tip' ) return;
-                else me._focus({target: el});
+            if (isValid && !field.required && !field.must && !el.value) {
+                if ( attr(el, DATA_INPUT_STATUS) === 'tip' ) {
+                    return;
+                }
                 if (!checkable(el)) {
                     $el.trigger('validated.field', [field, {isValid: true}]);
                     return;
                 }
             }
             // If the value is not changed, just return the old result
-            else if (!must && old && old.ret !== undefined && old.value === el.value) {
-                if (el.value !== '') {
-                    $el.trigger('validated.field', [field, old.ret]);
-                    return;
-                }
+            else if (!must && old && old.ret !== undefined && el.value && old.value === el.value) {
+                $el.trigger('validated.field', [field, old.ret]);
+                return;
             }
 
             //old.value = el.value;
-            if (opt.debug) debug.log('%c'+field.key, 'background:#eee');
+            if (opt.debug) debug.info(field.key);
 
-            // if the results are out (old validation results, or grouping validation results)
+            // if the results are out
             if (ret !== undefined) {
                 $el.trigger('validated.rule', [field, ret, msgOpt]);
             } else if (field.rule) {
@@ -879,7 +879,7 @@
                 ret = me.rules[method].call(me, el, params);
             }
 
-            return ret === true || ret === undefined || false;
+            return ret === true || ret === undefined || ret === null || false;
         },
 
         // Get a range of validation messages
@@ -1343,11 +1343,12 @@
             match[gte, count]  The value must be greater than or equal to the value of the count field
          **/
         match: function(element, params, field) {
+            if (!params) return;
+
             var a, b,
                 key, msg, type = 'eq',
                 selector2, elem2, field2;
 
-            if (!params) return;
             if (params.length === 1) {
                 key = params[0];
             } else {
@@ -1427,7 +1428,7 @@
             checked[3]     3 items
          **/
         checked: function(element, params, field) {
-            if (!checkable(element)) return true;
+            if (!checkable(element)) return;
 
             var elem, count;
 
@@ -1476,18 +1477,14 @@
             By GET:             remote(get:path/to/server.php, name1, name2, ...);
          */
         remote: function(element, params) {
+            if (!params) return;
+
             var me = this,
-                arr,
+                arr = rAjaxType.exec(params[0]),
+                url = arr[2],
+                type = (arr[1] || 'POST').toUpperCase(),
                 search,
-                url,
-                type,
                 data = {};
-
-            if (!params) return true;
-
-            arr = rAjaxType.exec(params[0]);
-            url = arr[2];
-            type = (arr[1] || 'POST').toUpperCase();
 
             data[element.name] = element.value;
             // There are extra fields
@@ -1523,7 +1520,6 @@
          */
         filter: function(element, params) {
             element.value = element.value.replace( params ? (new RegExp("[" + params[0] + "]", "g")) : rUnsafe, '' );
-            return true;
         }
     });
 
