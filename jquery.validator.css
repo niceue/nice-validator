@@ -11,7 +11,7 @@
 .n-arrow i{text-shadow:none}
 .n-icon{width:16px;height:16px;overflow:hidden;background-repeat:no-repeat}
 .n-msg{display:inline-block;line-height:15px;margin-left:2px;*margin-top:-1px;_margin-top:0;font-size:12px;font-family:simsun}
-.n-valid,.n-invald,.n-error{color:#c33}
+.n-error{color:#c33}
 .n-ok{color:#390}
 .n-tip,.n-loading{color:#808080}
 .n-error .n-icon{background-position:0 0}
