@@ -28,7 +28,7 @@
     },
     "devDependencies": {
         "uglify-js": ">= 2.3.0",
-        "stylus": ">= 0.32.0",
+        "stylus": ">= 0.40.3",
         "jshint": ">=2.3.0"
     }
 }
