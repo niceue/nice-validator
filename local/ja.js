@@ -62,7 +62,7 @@
             }
         }
     });
-    
+
     /* Themes
      */
     var TPL_ARROW = '<span class="n-arrow"><b>◆</b><i>◆</i></span>';
