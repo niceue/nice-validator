@@ -181,7 +181,7 @@
         ret = me._multiValidate($inputs, function(isValid){
             isFunction(callback) && callback.call(null, isValid);
             me.checkOnly = false;
-        }, true);
+        });
 
         // If you pass a callback, we maintain the jQuery object chain
         return isFunction(callback) ? this : ret;
@@ -312,7 +312,7 @@
         },
 
         // Verify a zone
-        _multiValidate: function($inputs, doneCallbacks, must){
+        _multiValidate: function($inputs, doneCallbacks){
             var me = this,
                 opt = me.options;
 
@@ -325,7 +325,7 @@
                 var field = me.getField(el);
                 if (!field) return;
 
-                me._validate(el, field, must);
+                me._validate(el, field);
                 if (!me.isValid && opt.stopOnError) {
                     // stop the verification
                     return false;
@@ -541,6 +541,7 @@
             if (!key) return;
 
             field = me.fields[key] || {};
+            field.old = {};
             field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
 
@@ -605,8 +606,8 @@
                 // so, form is invalid
                 me.isValid = false;
             }
-            field.old.ret = ret;
             field.old.value = el.value;
+            field.old.id = el.id;
             me.elements[field.key] = el;
 
             if (me.checkOnly) return;
@@ -717,6 +718,7 @@
         _checkRule: function(el, field) {
             var me = this,
                 ret,
+                old,
                 key = field.key,
                 rule = field.rules[field.vid],
                 method = rule.method,
@@ -724,11 +726,19 @@
 
             // request has been sent, wait it
             if (me.submiting && me.deferred[key]) return;
+            old = field.old;
             field.rid = method;
 
-            // get validation result of the current rule
-            ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
-            
+            if ( !field.must && old.ret !== undefined &&
+                 old.rule === rule && old.id === el.id &&
+                 el.value && old.value === el.value
+            ) {
+                ret = old.ret;
+            } else {
+                // get validation result of the current rule
+                ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
+            }
+
             // asynchronous validation
             if (isObject(ret) && isFunction(ret.then)) {
                 var dataFilter = function(data) {
@@ -767,6 +777,8 @@
                             if (data === undefined) data = dataFilter(msg.data);
                             msg = data || true;
                         }
+                        old.rule = rule;
+                        old.ret = msg;
                         $(el).trigger('validated.rule', [field, msg]);
                     },
                     function(jqXHR, textStatus){
@@ -783,7 +795,7 @@
         },
 
         // Processing the validation
-        _validate: function(el, field, must) {
+        _validate: function(el, field) {
             // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
             if ( !field.rules ) this._parse(el);
@@ -793,12 +805,10 @@
                 $el = $(el),
                 msgOpt = {},
                 groupFn = field.group,
-                old,
                 ret,
                 isValid = field.isValid = true;
 
-            old = field.old = field.old || {};
-            must = must || field.must;
+            if (opt.debug) debug.info(field.key);
 
             // group validation
             if (groupFn) {
@@ -824,14 +834,6 @@
                     return;
                 }
             }
-            // If the value is not changed, just return the old result
-            else if (!must && old && old.ret !== undefined && el.value && old.value === el.value) {
-                $el.trigger('validated.field', [field, old.ret]);
-                return;
-            }
-
-            //old.value = el.value;
-            if (opt.debug) debug.info(field.key);
 
             // if the results are out
             if (ret !== undefined) {
