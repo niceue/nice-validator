@@ -52,6 +52,7 @@
             log: noop,
             info: noop
         },
+        novalidateonce,
 
         defaults = {
             debug: 0,
@@ -352,8 +353,8 @@
                 form = e.target,
                 isFormValid;
 
-            if (attr(form, 'novalidateonce')) {
-                attr(form, 'novalidateonce', null);
+            if (novalidateonce) {
+                novalidateonce = false;
                 return;
             }
             // We found the "only" mark, and make the native event continues.
@@ -407,6 +408,7 @@
                     me.$el.trigger(ret + '.form', [form, errors]);
 
                     if (isValid && !me.isAjaxSubmit) {
+                        me.submiting = true;
                         // trigger the native submit event
                         $(form).trigger('submit', ['only']);
                     }
@@ -1243,8 +1245,8 @@
     .on('click', 'input,button', function(){
         if (!this.form) return;
 
-        if (this.type === 'submit' && attr(this, 'formnovalidate') !== null || attr(this, NOVALIDATE) !== null) {
-            attr(this.form, 'novalidateonce', true);
+        if (this.type === 'submit' && attr(this, NOVALIDATE) !== null) {
+            novalidateonce = true;
         }
         else if (this.name && checkable(this)) {
             var elem = this.form.elements[this.name];
