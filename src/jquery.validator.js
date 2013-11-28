@@ -350,8 +350,7 @@
         _submit: function(e, mark) {
             var me = this,
                 opt = me.options,
-                form = e.target,
-                isFormValid;
+                form = e.target;
 
             if (novalidateonce) {
                 novalidateonce = false;
@@ -363,16 +362,16 @@
                 return;
             }
 
+            e.preventDefault();
+
             // Prevent duplicate submission
             if (me.submiting) {
                 isFunction(me.submiting) && me.submiting.call(me);
-                e.preventDefault();
                 return;
             }
 
             // trigger the beforeSubmit callback.
             if ( isFunction(opt.beforeSubmit) && opt.beforeSubmit.call(me, form) === false ) {
-                me.isAjaxSubmit && e.preventDefault();
                 return;
             }
             
@@ -382,7 +381,7 @@
                 debug.log("\n" + e.type + " form");
             }
 
-            isFormValid = me._multiValidate(
+            me._multiValidate(
                 me.$el.find(INPUT_SELECTOR),
                 function(isValid){
                     var FOCUS_EVENT = 'focus.field',
@@ -408,15 +407,11 @@
                     me.$el.trigger(ret + '.form', [form, errors]);
 
                     if (isValid && !me.isAjaxSubmit) {
-                        me.submiting = true;
-                        // trigger the native submit event
-                        $(form).trigger('submit', ['only']);
+                        novalidateonce = true;
+                        form.submit();
                     }
                 }
             );
-
-            // isFormValid == false || isFormValid === undefined || isAjaxSubmit
-            if (!isFormValid || me.isAjaxSubmit) e.preventDefault();
         },
 
         _reset: function(e) {
@@ -424,7 +419,7 @@
 
             me.errors = {};
             if (e) {
-                me.$el.find(":verifiable").each( function(i, el){
+                me.$el.find(INPUT_SELECTOR).each( function(i, el){
                     me.hideMsg(el);
                     attr(el, DATA_INPUT_STATUS, null);
                     attr(el, ARIA_INVALID, null);
@@ -518,7 +513,7 @@
             var me = this;
 
             if (me.$el[0] !== e.target) return;
-            me.$el.find(":verifiable["+ DATA_TIP +"]").each(function(){
+            me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]").each(function(){
                 me.showMsg(this, {
                     msg: attr(this, DATA_TIP),
                     type: 'tip'
@@ -992,7 +987,7 @@
             if (!opt.msg && !opt.showOk) return;
             el = $(el).get(0);
 
-            if ($(el).is(":verifiable")) {
+            if ($(el).is(INPUT_SELECTOR)) {
                 // mark message status
                 attr(el, DATA_INPUT_STATUS, opt.type);
                 field = field || this.getField(el);
@@ -1021,7 +1016,7 @@
         hideMsg: function(el, opt, /*INTERNAL*/ field) {
             el = $(el).get(0);
             opt = this._getMsgOpt(opt);
-            if ($(el).is(":verifiable")) {
+            if ($(el).is(INPUT_SELECTOR)) {
                 field = field || this.getField(el);
                 if (field && field.msgWrapper) opt.wrapper = field.msgWrapper;
             }
@@ -1245,8 +1240,10 @@
     .on('click', 'input,button', function(){
         if (!this.form) return;
 
-        if (this.type === 'submit' && attr(this, NOVALIDATE) !== null) {
-            novalidateonce = true;
+        if (this.type === 'submit') {
+            if (attr(this, NOVALIDATE) !== null) {
+                novalidateonce = true;
+            }
         }
         else if (this.name && checkable(this)) {
             var elem = this.form.elements[this.name];
@@ -1268,7 +1265,7 @@
                 e.type==='submit' && me._submit(e);
             } else {
                 attr(this, NOVALIDATE, NOVALIDATE);
-                $form.removeData(NS);
+                $form.off('.'+NS).removeData(NS);
             }
         }
     });
