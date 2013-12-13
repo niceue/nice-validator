@@ -1,4 +1,4 @@
-/*! nice Validator 0.6.6
+/*! nice Validator 0.6.7
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
