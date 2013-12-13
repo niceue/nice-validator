@@ -14,6 +14,7 @@
         CLS_INPUT_VALID = 'n-valid',
         CLS_INPUT_INVALID = 'n-invalid',
         CLS_MSG_BOX = 'msg-box',
+        ARIA_REQUIRED = 'aria-required',
         ARIA_INVALID = 'aria-invalid',
         DATA_RULE = 'data-rule',
         DATA_TARGET = 'data-target',
@@ -421,8 +422,6 @@
             if (e) {
                 me.$el.find(INPUT_SELECTOR).each( function(i, el){
                     me.hideMsg(el);
-                    attr(el, DATA_INPUT_STATUS, null);
-                    attr(el, ARIA_INVALID, null);
                     $(el).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
                 });
             }
@@ -545,7 +544,7 @@
             field.key = key;
             field.required = field.rule.indexOf('required') !== -1;
             field.must = field.must || !!field.rule.match(/match|checked/);
-            if (field.required) attr(el, 'aria-required', true);
+            if (field.required) attr(el, ARIA_REQUIRED, true);
             if ('timely' in field && !field.timely || !me.options.timely) {
                 attr(el, 'notimely', true);
             }
@@ -612,8 +611,8 @@
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             $(el).attr( ARIA_INVALID, !isValid )
-                 .addClass( isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID )
                  .removeClass( isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID )
+                 .addClass( !ret.skip ? isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID : "" )
                  .trigger( callback + '.field', [ret, me] );
 
             // show or hide the message
@@ -642,7 +641,8 @@
 
             // use null to break validation from a field
             if (ret === null) {
-                $(el).trigger('validated.field', [field, {isValid: true}]);
+                $(el).trigger('validated.field', [field, {isValid: true, skip: true}]);
+                return;
             }
             else if (ret === true || ret === undefined) {
                 isValid = true;
@@ -1017,6 +1017,8 @@
             el = $(el).get(0);
             opt = this._getMsgOpt(opt);
             if ($(el).is(INPUT_SELECTOR)) {
+                attr(el, DATA_INPUT_STATUS, null);
+                attr(el, ARIA_INVALID, null);
                 field = field || this.getField(el);
                 if (field && field.msgWrapper) opt.wrapper = field.msgWrapper;
             }
@@ -1285,7 +1287,10 @@
             if (params) {
                 if (params.length === 1) {
                     if (!val && !this.test(element, params[0]) ) {
+                        attr(element, ARIA_REQUIRED, null);
                         return null;
+                    } else {
+                        attr(element, ARIA_REQUIRED, true);
                     }
                 } else if (params[0] === 'not') {
                     $.map(params.slice(1), function(v) {
