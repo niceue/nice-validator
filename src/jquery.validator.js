@@ -161,6 +161,7 @@
                     if (options.charAt(0) === '_') return;
                     cache[options].apply(cache, Array.prototype.slice.call(args, 1));
                 } else if (options) {
+                    cache._reset(true);
                     cache._init(this, options);
                 }
             } else {
@@ -314,7 +315,7 @@
                 $.each(fields, function(k, v) {
                     var el = me.elements[k];
                     if (!v && el) {
-                        me._resetElement(el);
+                        me._resetElement(el, true);
                     }
                     me.fields[k] = isString(v) ? {
                         rule: v
@@ -326,12 +327,6 @@
             me.$el.find(INPUT_SELECTOR).each(function() {
                 me._parse(this);
             });
-        },
-
-        _resetElement: function(el) {
-            attr(el, ARIA_REQUIRED, null);
-            $(el).removeClass(CLS_INPUT_VALID + ' ' + CLS_INPUT_INVALID);
-            this.hideMsg(el);
         },
 
         // Verify a zone
@@ -442,9 +437,16 @@
             me.errors = {};
             if (e) {
                 me.$el.find(INPUT_SELECTOR).each( function(i, el){
-                    me.hideMsg(el);
-                    $(el).removeClass(CLS_INPUT_VALID + " " + CLS_INPUT_INVALID);
+                    me._resetElement(el);
                 });
+            }
+        },
+
+        _resetElement: function(el, all) {
+            $(el).removeClass(CLS_INPUT_VALID + ' ' + CLS_INPUT_INVALID);
+            this.hideMsg(el);
+            if (all) {
+                attr(el, ARIA_REQUIRED, null);
             }
         },
 
