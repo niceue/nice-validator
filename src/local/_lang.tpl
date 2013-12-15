@@ -13,7 +13,7 @@
         
         // Custom rules
         rules: {
-            digits: [/^\d*$/, "<%=digits%>"]
+            digits: [/^\d+$/, "<%=digits%>"]
             <% 
             if (rules) {
                 for(var i in rules) {

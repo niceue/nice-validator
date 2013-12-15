@@ -13,7 +13,7 @@
         
         // Custom rules
         rules: {
-            digits: [/^\d*$/, "請輸入數字"]
+            digits: [/^\d+$/, "請輸入數字"]
             
         }
     });

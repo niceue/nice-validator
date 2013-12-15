@@ -13,7 +13,7 @@
         
         // Custom rules
         rules: {
-            digits: [/^\d*$/, "Please enter only digits."]
+            digits: [/^\d+$/, "Please enter only digits."]
             
         }
     });
