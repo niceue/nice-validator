@@ -1,4 +1,4 @@
-/*! nice Validator 0.6.7
+/*! nice Validator 0.6.8
  * (c) 2012-2013 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -155,11 +155,13 @@
         !that.is('form') && (that = this.find('form'));
         !that.length && (that = this);
         that.each(function() {
-            if (isString(options)) {
-                if (options.charAt(0) === '_') return;
-                var cache = $(this).data(NS);
-                if (cache) {
+            var cache = $(this).data(NS);
+            if (cache) {
+                if (isString(options)) {
+                    if (options.charAt(0) === '_') return;
                     cache[options].apply(cache, Array.prototype.slice.call(args, 1));
+                } else if (options) {
+                    cache._init(this, options);
                 }
             } else {
                 new Validator(this, options);
@@ -197,48 +199,44 @@
                 name === 'select' || name === 'textarea') && elem.disabled === false && attr(elem, NOVALIDATE) === null;
     };
 
-    // Constructor for validator
+
+    // Constructor for Validator
     function Validator(element, options) {
-        var me = this, themeOpt, dataOpt;
+        var me = this;
 
         if (!me instanceof Validator) return new Validator(element, options);
-        
-        if (isFunction(options)) {
-            options = {
-                valid: options
-            };
-        }
-        options = options || {};
-        dataOpt = attr(element, 'data-'+NS+'-option');
-        dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
-        themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
 
-        me.options = $.extend({}, defaults, themeOpt, dataOpt, options);
         me.$el = $(element);
-        me.rules = new Rules(me.options.rules, true);
-        me.messages = new Messages(me.options.messages, true);
-        me.elements = {};
-        me.fields = {};
-        me.deferred = {};
-        me.errors = {};
-        me._init();
+        me._init(element, options);
     }
 
     Validator.prototype = {
-        _init: function() {
+        _init: function(element, options) {
             var me = this,
-                opt = me.options,
-                fields = me.fields,
-                form = me.$el[0];
+                opt, themeOpt, dataOpt;
 
-            // Processing field information
-            if (isObject(opt.fields)) {
-                $.each(opt.fields, function(k, v) {
-                    if (v) fields[k] = isString(v) ? {
-                        rule: v
-                    } : v;
-                });
+            // Initialization options
+            if (isFunction(options)) {
+                options = {
+                    valid: options
+                };
             }
+            options = options || {};
+            dataOpt = attr(element, 'data-'+ NS +'-option');
+            dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
+            themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
+            opt = me.options = $.extend({}, defaults, themeOpt, dataOpt, this.options, options);
+
+            me.rules = new Rules(opt.rules, true);
+            me.messages = new Messages(opt.messages, true);
+            me.elements = me.elements || {};
+            me.deferred = {};
+            me.errors = {};
+
+            // Initialization fields
+            me.fields = {};
+            me._initFields(opt.fields);
+
             // Initialization group verification
             if (isArray(opt.groups)) {
                 $.map(opt.groups, function(obj) {
@@ -249,17 +247,13 @@
                         };
                     $.extend(fn, obj);
                     $.map(obj.fields.split(' '), function(k) {
-                        fields[k] = fields[k] || {};
-                        fields[k].group = fn;
+                        me.fields[k] = me.fields[k] || {};
+                        me.fields[k].group = fn;
                     });
                 });
             }
-            // Parsing DOM rules
-            me.$el.find(INPUT_SELECTOR).each(function() {
-                me._parse(this);
-            });
 
-            // Message parameters
+            // Initialization message parameters
             me.msgOpt = {
                 type: 'error',
                 pos: getPos(opt.msgClass),
@@ -272,26 +266,26 @@
                 hide: opt.msgHide
             };
 
-            // Guess whether ajax submit
-            if (opt.valid || attr(form, 'action') === null) {
+            // Guess whether it use ajax submit
+            me.isAjaxSubmit = false;
+            if (opt.valid || attr(element, 'action') === null) {
                 me.isAjaxSubmit = true;
             } else {
-                // if there is "valid.form" event
-                var events = $[ $._data ? '_data' : 'data' ](form, "events");
+                // if there is a "valid.form" event
+                var events = $[ $._data ? '_data' : 'data' ](element, "events");
                 if (events && events.valid &&
                     $.map(events.valid, function(e){
                         return e.namespace.indexOf('form') !== -1 ? 1 : null;
                     }).length
                 ) {
                     me.isAjaxSubmit = true;
-                } else {
-                    me.isAjaxSubmit = false;
                 }
             }
 
-            // Processing events and cache
+            // Initialization events and make a cache
             if (!me.$el.data(NS)) {
-                me.$el.on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
+                me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass)
+                      .on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
                       .on('reset.'+NS, proxy(me, '_reset'))
                       .on('showtip.'+NS, proxy(me, '_showTip'))
                       .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
@@ -303,14 +297,41 @@
                     me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                           .on('change.'+NS, 'select', proxy(me, '_click'));
                 }
-                me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass);
 
                 // cache the novalidate attribute value
-                me.NOVALIDATE = attr(form, NOVALIDATE);
+                me.NOVALIDATE = attr(element, NOVALIDATE);
                 // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
                 // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
-                attr(form, NOVALIDATE, NOVALIDATE);
+                attr(element, NOVALIDATE, NOVALIDATE);
             }
+        },
+
+        _initFields: function(fields) {
+            var me = this;
+
+            // Processing field information
+            if (isObject(fields)) {
+                $.each(fields, function(k, v) {
+                    var el = me.elements[k];
+                    if (!v && el) {
+                        me._resetElement(el);
+                    }
+                    me.fields[k] = isString(v) ? {
+                        rule: v
+                    } : v;
+                });
+            }
+
+            // Parsing DOM rules
+            me.$el.find(INPUT_SELECTOR).each(function() {
+                me._parse(this);
+            });
+        },
+
+        _resetElement: function(el) {
+            attr(el, ARIA_REQUIRED, null);
+            $(el).removeClass(CLS_INPUT_VALID + ' ' + CLS_INPUT_INVALID);
+            this.hideMsg(el);
         },
 
         // Verify a zone
@@ -391,7 +412,7 @@
 
                     if (!isValid) {
                         // navigate to the error element
-                        var $input = me.$el.find(':input.' + CLS_INPUT_INVALID + ':first');
+                        var $input = me.$el.find(':input[' + ARIA_INVALID + '="true"]:first');
                         $input.trigger(FOCUS_EVENT);
                         // IE6 has to trigger once again to get the focus
                         isIE6 && $input.trigger(FOCUS_EVENT);
@@ -537,19 +558,29 @@
             if (!key) return;
 
             field = me.fields[key] || {};
+            field.key = key;
             field.old = {};
-            field.rule = field.rule || dataRule || '';
+            if (me.fields[key] !== null) {
+                field.rule = field.rule || dataRule || '';
+            }
             if (!field.rule) return;
 
-            field.key = key;
-            field.required = field.rule.indexOf('required') !== -1;
-            field.must = field.must || !!field.rule.match(/match|checked/);
-            if (field.required) attr(el, ARIA_REQUIRED, true);
+            if (field.rule.match(/match|checked/)) {
+                field.must = true;
+            }
+            if (field.rule.indexOf('required') !== -1) {
+                field.required = true;
+                attr(el, ARIA_REQUIRED, true);
+            }
             if ('timely' in field && !field.timely || !me.options.timely) {
                 attr(el, 'notimely', true);
             }
-            if (isString(field.target)) attr(el, DATA_TARGET, field.target);
-            if (isString(field.tip)) attr(el, DATA_TIP, field.tip);
+            if (isString(field.target)) {
+                attr(el, DATA_TARGET, field.target);
+            }
+            if (isString(field.tip)) {
+                attr(el, DATA_TIP, field.tip);
+            }
 
             me.fields[key] = me._parseRule(field);
         },
@@ -610,7 +641,7 @@
 
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
-            $(el).attr( ARIA_INVALID, !isValid )
+            $(el).attr( ARIA_INVALID, isValid ? null : true )
                  .removeClass( isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID )
                  .addClass( !ret.skip ? isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID : "" )
                  .trigger( callback + '.field', [ret, me] );
@@ -1062,33 +1093,18 @@
         /* @interface: setField
          */
         setField: function(key, obj) {
-            var me = this,
-                fields = {};
+            var fields = {};
 
+            // update this field
             if (isString(key)) {
-                // remove this field
-                if (obj === null) {
-                    $.map(key.split(' '), function(k) {
-                        if (k && me.fields[k]) me.fields[k] = null;
-                    });
-                    return;
-                }
-                // update this field
-                else if (obj) {
-                    fields[key] = obj;
-                }
+                fields[key] = obj;
             }
             // update fields
             else if (isObject(key)) {
                 fields = key;
             }
 
-            if (!me.options.fields) {
-                me.options.fields = fields;
-            } else {
-                $.extend(me.options.fields, fields);
-            }
-            me._init();
+            this._initFields(fields);
         },
 
         /* @interface: holdSubmit
