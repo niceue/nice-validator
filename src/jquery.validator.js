@@ -394,6 +394,7 @@
             
             me._reset();
             me.submiting = true;
+            me.autoSubmit = e.type === 'submit';
             if (opt.debug) {
                 debug.log("\n" + e.type + " form");
             }
@@ -423,7 +424,7 @@
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + '.form', [form, errors]);
 
-                    if (isValid && !me.isAjaxSubmit) {
+                    if (isValid && !me.isAjaxSubmit && me.autoSubmit) {
                         novalidateonce = true;
                         form.submit();
                     }
@@ -1274,7 +1275,7 @@
         }
     })
 
-    .on('submit', 'form', function(e) {
+    .on('submit validate', 'form', function(e) {
         if (attr(this, NOVALIDATE) !== null) return;
 
         var $form = $(this), me;
@@ -1282,7 +1283,7 @@
         if (!$form.data(NS)) {
             me = $form[NS]().data(NS);
             if (!$.isEmptyObject(me.fields)) {
-                e.type==='submit' && me._submit(e);
+                me._submit(e);
             } else {
                 attr(this, NOVALIDATE, NOVALIDATE);
                 $form.off('.'+NS).removeData(NS);
