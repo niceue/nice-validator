@@ -1127,6 +1127,12 @@
             this.submiting = hold;
         },
 
+        /* @interface: cleanUp
+         */
+        cleanUp: function() {
+            this._reset(true);
+        },
+
         /* @interface: destroy
          */
         destroy: function() {
