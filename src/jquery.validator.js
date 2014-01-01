@@ -59,8 +59,10 @@
             debug: 0,
             timely: 1,
             theme: 'default',
-            stopOnError: false,
             ignore: '',
+            //stopOnError: false,
+            //focusCleanup: false,
+            focusInvalid: true,
             //beforeSubmit: null,
             //dataFilter: null,
             //valid: null,
@@ -404,14 +406,16 @@
                 function(isValid){
                     var FOCUS_EVENT = 'focus.field',
                         ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid',
+                        $input,
                         errors;
 
                     if (!isValid) {
-                        // navigate to the error element
-                        var $input = me.$el.find(':input[' + ARIA_INVALID + '="true"]:first');
-                        $input.trigger(FOCUS_EVENT);
-                        // IE6 has to trigger once again to get the focus
-                        isIE6 && $input.trigger(FOCUS_EVENT);
+                        if (opt.focusInvalid) {
+                            // navigate to the error element
+                            $input = me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger(FOCUS_EVENT);
+                            // IE6 has to trigger once again to get the focus
+                            isIE6 && $input.trigger(FOCUS_EVENT);
+                        }
                         errors = $.map(me.errors, function(err){
                             return err;
                         });
@@ -457,8 +461,14 @@
 
             if (e.type !== 'showtip') {
                 if ( e.isTrigger || this.submiting ) return;
-                if ( el.value !== '' && (attr(el, ARIA_INVALID) === 'false' || attr(el, DATA_INPUT_STATUS) === 'tip') ) return;
+                if ( el.value !== '' && attr(el, DATA_INPUT_STATUS) === 'tip' ) return;
+
+                if ( this.options.focusCleanup && attr(el, DATA_INPUT_STATUS) === 'error' ) {
+                    $(el).removeClass(CLS_INPUT_INVALID);
+                    this.hideMsg(el);
+                }
             }
+
             msg = attr(el, DATA_TIP);
             if (!msg) return;
 
