@@ -2,7 +2,7 @@
     "name": "jquery.validator",
     "title": "nice Validator",
     "description": "Simple, smart and pleasant verification solution.",
-    "version": "0.6.8",
+    "version": "0.7.0",
     "keywords": ["form", "validate", "validation", "validator"],
     "homepage": "http://niceue.com/validator/",
     "author": "Jony Zhang <zj86@live.cn>",
@@ -18,7 +18,7 @@
         }
     ],
     "engine": [
-        "node >=0.8.0"
+        "node >=0.10.0"
     ],
     "scripts": {
         "test": "jshint src/jquery.validator.js"
@@ -27,8 +27,8 @@
         "jquery": ">=1.7.0"
     },
     "devDependencies": {
-        "uglify-js": ">= 2.3.0",
-        "stylus": ">= 0.40.3",
+        "uglify-js": ">= 2.4.8",
+        "stylus": ">= 0.41.3",
         "jshint": ">=2.3.0"
     }
 }
