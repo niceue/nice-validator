@@ -23,7 +23,8 @@
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
-        rRule = /(\w+)(?:\[(.*)\]$|\((.*)\)$)?/,
+        rRules = /(!?)\s?(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||&)?/g,
+        rRule = /(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
         rPos = /^.*(top|right|bottom|left).*$/,
@@ -235,23 +236,19 @@
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
+            me.fields = {};
 
             // Initialization fields
-            me.fields = {};
             me._initFields(opt.fields);
 
             // Initialization group verification
             if (isArray(opt.groups)) {
                 $.map(opt.groups, function(obj) {
                     if (!isString(obj.fields) || !isFunction(obj.callback)) return null;
-                    var $elememts = me.$el.find(keys2selector(obj.fields)),
-                        fn = function() {
-                            return obj.callback.call(me, $elememts);
-                        };
-                    $.extend(fn, obj);
+                    obj.$elems = me.$el.find(keys2selector(obj.fields));
                     $.map(obj.fields.split(' '), function(k) {
                         me.fields[k] = me.fields[k] || {};
-                        me.fields[k].group = fn;
+                        me.fields[k].group = obj;
                     });
                 });
             }
@@ -456,23 +453,24 @@
         },
 
         _focus: function(e) {
-            var el = e.target,
+            var me = this,
+                el = e.target,
                 msg;
 
             if (e.type !== 'showtip') {
-                if ( e.isTrigger || this.submiting ) return;
+                if ( e.isTrigger || me.submiting ) return;
                 if ( el.value !== '' && attr(el, DATA_INPUT_STATUS) === 'tip' ) return;
 
-                if ( this.options.focusCleanup && attr(el, DATA_INPUT_STATUS) === 'error' ) {
+                if ( me.options.focusCleanup && attr(el, DATA_INPUT_STATUS) === 'error' ) {
                     $(el).removeClass(CLS_INPUT_INVALID);
-                    this.hideMsg(el);
+                    me.hideMsg(el);
                 }
             }
 
             msg = attr(el, DATA_TIP);
             if (!msg) return;
 
-            this.showMsg(el, {
+            me.showMsg(el, {
                 msg: msg,
                 type: 'tip'
             });
@@ -600,29 +598,26 @@
 
         // Parsing field rules
         _parseRule: function(field) {
-            var arr = rDisplay.exec(field.rule),
-                rules;
+            var arr = rDisplay.exec(field.rule);
 
             if (!arr) return;
-
-            field.display = arr[1];
-            field.rules = [];
-            rules = (arr[2] || '').split(';');
-
-            $.map(rules, function(rule) {
-                var parts = rRule.exec(rule);
-
-                if (!parts) return null;
-                if (parts[3]) parts[2] = parts[3];
-
-                field.rules.push({
-                    method: parts[1],
-                    params: parts[2] ? $.trim(parts[2]).split(', ') : undefined
-                });
-            });
-
             field.vid = 0;
-            field.rid = field.rules[0].method;
+            field.display = arr[1];
+            
+            if (arr[2]) {
+                field.rules = [];
+                arr[2].replace(rRules, function(){
+                    var args = arguments;
+                    args[3] = args[3] || args[4];
+                    field.rules.push({
+                        not: args[1] === "!",
+                        method: args[2],
+                        params: args[3] ? args[3].split(', ') : undefined,
+                        or: args[5] === "|"
+                    });
+                });
+                //field.rid = field.rules[0].method;
+            }
 
             return field;
         },
@@ -675,7 +670,9 @@
                 opt = me.options,
                 el = e.target,
                 msg = '',
+                rule,
                 method,
+                pass,
                 isValid = false,
                 showOk = false;
 
@@ -719,32 +716,52 @@
                 msgOpt.msg = (isValid ? msg : (msg || me.messages[method] || defaults.defaultMsg)).replace('{0}', field.display || '');
             }
 
+            if (field.rules) {
+
+                rule = field.rules[field.vid];
+                if (rule.not) {
+                    isValid = method === "required" || !isValid;
+                }
+
+                if (rule.or) {
+                    if (isValid) {
+                        while (field.rules[field.vid++].or) {
+                            if (field.vid === field.rules.length) break;
+                        }
+                    } else {
+                        pass = true;
+                    }
+                }
+            }
+
             // output the debug message
             if (opt.debug) {
                 debug.log('   ' + field.vid + ': ' + method + ' => ' + (msgOpt.msg || true));
             }
 
             // message analysis, and throw rule level event
-            if (isValid) {
-                msgOpt.isValid = true;
-                if (!showOk) {
-                    var okmsg = field.ok || attr(el, 'data-ok');
-                    if (okmsg) {
-                        showOk = true;
-                        msgOpt.msg = okmsg;
-                    } else if (isString(opt.showOk)) {
-                        showOk = true;
-                        msgOpt.msg = opt.showOk;
+            if (!pass) {
+                if (isValid) {
+                    msgOpt.isValid = true;
+                    if (!showOk) {
+                        var okmsg = field.ok || attr(el, 'data-ok');
+                        if (okmsg) {
+                            showOk = true;
+                            msgOpt.msg = okmsg;
+                        } else if (isString(opt.showOk)) {
+                            showOk = true;
+                            msgOpt.msg = opt.showOk;
+                        }
                     }
+                    msgOpt.showOk = showOk;
+                    $(el).trigger('valid.rule', [method, msgOpt.msg]);
+                } else {
+                    $(el).trigger('invalid.rule', [method, msgOpt.msg]);
                 }
-                msgOpt.showOk = showOk;
-                $(el).trigger('valid.rule', [method, msgOpt.msg]);
-            } else {
-                $(el).trigger('invalid.rule', [method, msgOpt.msg]);
             }
 
             // the current rule has passed, continue to validate
-            if (isValid && field.vid < field.rules.length - 1) {
+            if (pass || isValid && field.vid < field.rules.length - 1) {
                 field.vid++;
                 me._checkRule(el, field);
             }
@@ -772,12 +789,14 @@
 
             if ( !field.must && old.ret !== undefined &&
                  old.rule === rule && old.id === el.id &&
-                 el.value && old.value === el.value
-            ) {
+                 el.value && old.value === el.value )
+            {
                 ret = old.ret;
-            } else {
+            }
+            else {
+                var fn = getDataRule(el, method) || me.rules[method];
                 // get validation result of the current rule
-                ret = (getDataRule(el, method) || me.rules[method] || function() {return true;}).call(me, el, params, field);
+                ret = fn ? fn.call(me, el, params, field) : getDataMsg(el, field, method) || me.messages[method];
             }
 
             // asynchronous validation
@@ -845,24 +864,25 @@
                 opt = me.options,
                 $el = $(el),
                 msgOpt = {},
-                groupFn = field.group,
+                group = field.group,
                 ret,
                 isValid = field.isValid = true;
 
             if (opt.debug) debug.info(field.key);
 
             // group validation
-            if (groupFn) {
-                ret = groupFn.call(me);
-                if (ret === true || ret === undefined) {
+            if (group) {
+                ret = group.callback.call(me, group.$elems);
+                if (ret === true) {
                     ret = undefined;
-                } else {
+                }
+                if (ret !== undefined) {
                     if (isString(ret)) ret = {error: ret};
                     field.vid = 0;
                     field.rid = 'group';
                     isValid = false;
                     me.hideMsg(el, {}, field);
-                    $.extend(msgOpt, groupFn);
+                    $.extend(msgOpt, group);
                 }
             }
             // if the field is not required and it has a blank value
@@ -914,12 +934,13 @@
                 method,
                 params;
 
-            if (!parts) return true;
-            if (parts[3]) parts[2] = parts[3];
-            method = parts[1];
-            params = parts[2] ? $.trim(parts[2]).split(', ') : undefined;
-            if (method in me.rules) {
-                ret = me.rules[method].call(me, el, params);
+            if (parts) {
+                method = parts[1];
+                if (method in me.rules) {
+                    params = parts[2] || parts[3];
+                    params = params ? params.split(', ') : undefined;
+                    ret = me.rules[method].call(me, el, params);
+                }
             }
 
             return ret === true || ret === undefined || ret === null || false;
@@ -1036,9 +1057,9 @@
                 attr(el, DATA_INPUT_STATUS, opt.type);
                 field = field || this.getField(el);
                 if (field) {
-                    if (field.msgStyle) opt.style = field.msgStyle;
-                    if (field.msgClass) opt.cls = field.msgClass;
-                    if (field.msgWrapper) opt.wrapper = field.msgWrapper;
+                    opt.style = field.msgStyle || opt.style;
+                    opt.cls = field.msgClass || opt.cls;
+                    opt.wrapper = field.msgWrapper || opt.wrapper;
                 }
             }
             
@@ -1064,7 +1085,9 @@
                 attr(el, DATA_INPUT_STATUS, null);
                 attr(el, ARIA_INVALID, null);
                 field = field || this.getField(el);
-                if (field && field.msgWrapper) opt.wrapper = field.msgWrapper;
+                if (field) {
+                    opt.wrapper = field.msgWrapper || opt.wrapper;
+                }
             }
 
             var $msgbox = this._getMsgDOM(el, opt);
@@ -1130,13 +1153,13 @@
         /* @interface: cleanUp
          */
         cleanUp: function() {
-            this._reset(true);
+            this._reset(1);
         },
 
         /* @interface: destroy
          */
         destroy: function() {
-            this._reset(true);
+            this._reset(1);
             this.$el.off('.'+NS).removeData(NS);
             attr(this.$el[0], NOVALIDATE, this.NOVALIDATE);
         }
