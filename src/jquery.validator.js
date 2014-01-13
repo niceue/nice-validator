@@ -873,16 +873,17 @@
             // group validation
             if (group) {
                 ret = group.callback.call(me, group.$elems);
-                if (ret === true) {
-                    ret = undefined;
-                }
                 if (ret !== undefined) {
-                    if (isString(ret)) ret = {error: ret};
-                    field.vid = 0;
-                    field.rid = 'group';
-                    isValid = false;
-                    me.hideMsg(el, {}, field);
-                    $.extend(msgOpt, group);
+                    me.hideMsg(group.target, {}, field);
+                    if (ret === true) ret = undefined;
+                    else {
+                        if (isString(ret)) ret = {error: ret};
+                        field.vid = 0;
+                        field.rid = 'group';
+                        isValid = false;
+                        me.hideMsg(el, {}, field);
+                        $.extend(msgOpt, group);
+                    }
                 }
             }
             // if the field is not required and it has a blank value
