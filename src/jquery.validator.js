@@ -333,8 +333,8 @@
             var me = this,
                 opt = me.options;
 
-            me.isValid = true;
-            me.deferred = {};
+            me._multiValid = true;
+            //me.deferred = {};
 
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
@@ -343,7 +343,7 @@
                 if (!field) return;
 
                 me._validate(el, field);
-                if (!me.isValid && opt.stopOnError) {
+                if (!me._multiValid && opt.stopOnError) {
                     // stop the verification
                     return false;
                 }
@@ -354,12 +354,12 @@
                 null,
                 $.map(me.deferred, function(v){return v;})
             ).done(function(){
-                doneCallbacks.call(me, me.isValid);
+                doneCallbacks.call(me, me._multiValid);
             });
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect whether a form valid through "doneCallbacks".
-            return !$.isEmptyObject(me.deferred) ? undefined : me.isValid;
+            return !$.isEmptyObject(me.deferred) ? undefined : me._multiValid;
         },
 
         // Verify the whole form
@@ -392,6 +392,7 @@
             }
             
             me._reset();
+            me.isValid = undefined;
             me.submiting = true;
             me.autoSubmit = e.type === 'submit';
             if (opt.debug) {
@@ -638,12 +639,12 @@
                 if (me.submiting) {
                     me.errors[field.key] = ret.msg;
                 }
-                // so, form is invalid
-                me.isValid = false;
+                me._multiValid = false;
             }
             field.old.value = el.value;
             field.old.id = el.id;
             me.elements[field.key] = el;
+            me.$el[0].isValid = me.isValid = isValid ? me.isFormValid() : isValid;
 
             if (me.checkOnly) return;
 
@@ -653,6 +654,7 @@
                  .removeClass( isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID )
                  .addClass( !ret.skip ? isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID : "" )
                  .trigger( callback + '.field', [ret, me] );
+            me.$el.triggerHandler('validation', [ret, me]);
 
             // show or hide the message
             if (field.msgMaker || opt.msgMaker) {
@@ -1142,6 +1144,18 @@
             }
 
             this._initFields(fields);
+        },
+
+        /* @interface: isFormValid
+         */
+        isFormValid: function() {
+            var fields = this.fields;
+            for (var k in fields) {
+                if (!fields[k].isValid) {
+                    return fields[k].isValid;
+                }
+            }
+            return true;
         },
 
         /* @interface: holdSubmit
