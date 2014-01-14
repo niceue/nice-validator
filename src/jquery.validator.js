@@ -11,8 +11,6 @@
         CLS_MSG_ERROR = 'n-error',
         CLS_MSG_TIP = 'n-tip',
         CLS_MSG_LOADING = 'n-loading',
-        CLS_INPUT_VALID = 'n-valid',
-        CLS_INPUT_INVALID = 'n-invalid',
         CLS_MSG_BOX = 'msg-box',
         ARIA_REQUIRED = 'aria-required',
         ARIA_INVALID = 'aria-invalid',
@@ -68,6 +66,9 @@
             //dataFilter: null,
             //valid: null,
             //invalid: null,
+
+            validClass: 'n-valid',
+            invalidClass: 'n-invalid',
 
             msgWrapper: 'span',
             msgMaker: function(opt) {
@@ -292,14 +293,14 @@
                       .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
                       .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
                       .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
-                      .on('click.'+NS, 'input:radio,input:checkbox', proxy(me, '_click'));
+                      .on('click.'+NS, ':radio,:checkbox', proxy(me, '_click'));
                 if (opt.timely >= 2) {
                     me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
                           .on('change.'+NS, 'select', proxy(me, '_click'));
                 }
 
                 // cache the novalidate attribute value
-                me.NOVALIDATE = attr(element, NOVALIDATE);
+                me._novalidate = attr(element, NOVALIDATE);
                 // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
                 // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
@@ -462,9 +463,7 @@
                 return;
             }
 
-            if (opt.debug) {
-                debug.log("\n" + e.type + " form");
-            }
+            opt.debug && debug.log("\n" + e.type + " form");
             
             var autoSubmit = e.type === 'submit';
             me._reset();
@@ -479,11 +478,8 @@
 
                     if (!isValid) {
                         if (opt.focusInvalid) {
-                            var FOCUS_EVENT = 'focus.field';
-                            // IE6 has to trigger once again to get the focus
-                            if (isIE6) FOCUS_EVENT += ' ' + FOCUS_EVENT;
                             // navigate to the error element
-                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger(FOCUS_EVENT);
+                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger('focus.field');
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
@@ -517,7 +513,8 @@
         },
 
         _resetElement: function(el, all) {
-            $(el).removeClass(CLS_INPUT_VALID + ' ' + CLS_INPUT_INVALID);
+            var opt = this.options;
+            $(el).removeClass(opt.validClass + ' ' + opt.invalidClass);
             this.hideMsg(el);
             if (all) {
                 attr(el, ARIA_REQUIRED, null);
@@ -526,6 +523,7 @@
 
         _focus: function(e) {
             var me = this,
+                opt = me.options,
                 el = e.target,
                 msg;
 
@@ -533,8 +531,8 @@
                 if ( e.isTrigger || me.submiting ) return;
                 if ( el.value !== '' && attr(el, DATA_INPUT_STATUS) === 'tip' ) return;
 
-                if ( me.options.focusCleanup && attr(el, DATA_INPUT_STATUS) === 'error' ) {
-                    $(el).removeClass(CLS_INPUT_INVALID);
+                if ( opt.focusCleanup && attr(el, DATA_INPUT_STATUS) === 'error' ) {
+                    $(el).removeClass(opt.invalidClass);
                     me.hideMsg(el);
                 }
             }
@@ -652,8 +650,8 @@
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             $(el).attr( ARIA_INVALID, isValid ? null : true )
-                 .removeClass( isValid ? CLS_INPUT_INVALID : CLS_INPUT_VALID )
-                 .addClass( !ret.skip ? isValid ? CLS_INPUT_VALID : CLS_INPUT_INVALID : "" )
+                 .removeClass( isValid ? opt.invalidClass : opt.validClass )
+                 .addClass( !ret.skip ? isValid ? opt.validClass : opt.invalidClass : "" )
                  .trigger( callback + '.field', [ret, me] );
             me.$el.triggerHandler('validation', [ret, me]);
 
@@ -847,7 +845,9 @@
                     function(jqXHR, textStatus){
                         $(el).trigger('validated.rule', [field, textStatus]);
                     }
-                );
+                ).always(function(){
+                    delete me.deferred[key];
+                });
                 // whether the field valid is unknown
                 field.isValid = undefined;
             }
@@ -906,25 +906,6 @@
             } else if (field.rule) {
                 me._checkRule(el, field);
             }
-        },
-
-        _getMsgOpt: function(obj) {
-            return $.extend({}, this.msgOpt, isString(obj) ? {msg: obj} : obj);
-        },
-
-        // Get field information
-        getField: function(el) {
-            var me = this,
-                key;
-
-            if (el.id && '#' + el.id in me.fields || !el.name) {
-                key = '#' + el.id;
-            } else {
-                key = el.name;
-            }
-            if (attr(el, DATA_RULE)) me._parse(el);
-
-            return me.fields[key];
         },
 
         /* Detecting whether the value of an element that matches a rule
@@ -1006,6 +987,10 @@
             }
 
             return tpl;
+        },
+
+        _getMsgOpt: function(obj) {
+            return $.extend({}, this.msgOpt, isString(obj) ? {msg: obj} : obj);
         },
 
         _getMsgDOM: function(el, opt) {
@@ -1130,6 +1115,21 @@
             });
         },
 
+        // Get field information
+        getField: function(el) {
+            var me = this,
+                key;
+
+            if (el.id && '#' + el.id in me.fields || !el.name) {
+                key = '#' + el.id;
+            } else {
+                key = el.name;
+            }
+            if (attr(el, DATA_RULE)) me._parse(el);
+
+            return me.fields[key];
+        },
+
         /* @interface: setField
          */
         setField: function(key, obj) {
@@ -1162,8 +1162,7 @@
         /* @interface: holdSubmit
          */
         holdSubmit: function(hold) {
-            if (hold === undefined) hold = true;
-            this.submiting = hold;
+            this.submiting = hold === undefined || hold;
         },
 
         /* @interface: cleanUp
@@ -1177,7 +1176,7 @@
         destroy: function() {
             this._reset(1);
             this.$el.off('.'+NS).removeData(NS);
-            attr(this.$el[0], NOVALIDATE, this.NOVALIDATE);
+            attr(this.$el[0], NOVALIDATE, this._novalidate);
         }
     };
 
@@ -1517,10 +1516,10 @@
                 return !this.disabled && this.checked && $(this).is(':visible');
             }).length;
 
-            if (!params) {
-                return !!count || getDataMsg(elem, field, 'checked') || this.messages.required;
-            } else {
+            if (params) {
                 return this.getRangeMsg(count, params, 'checked');
+            } else {
+                return !!count || getDataMsg(elem, field, 'checked') || this.messages.required;
             }
         },
 
@@ -1532,10 +1531,12 @@
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
         length: function(element, params) {
+            if (!params) return;
+
             var value = element.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
 
-            if ( params && params[0].charAt(0) === '~' ) {
+            if ( params[0].charAt(0) === '~' ) {
                 params[0] = '0' + params[0];
             }
 
@@ -1599,7 +1600,7 @@
          *  filter(regexp)  filter the "regexp" matched characters
          */
         filter: function(element, params) {
-            element.value = element.value.replace( params ? (new RegExp("[" + params[0] + "]", "g")) : rUnsafe, '' );
+            element.value = element.value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
         }
     });
 
