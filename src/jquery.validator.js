@@ -199,8 +199,8 @@
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
 
-        return (name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] || name === 'select' || name === 'textarea')
-               && elem.disabled === false && attr(elem, NOVALIDATE) === null;
+        return (name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] || name === 'select' || name === 'textarea') &&
+               elem.disabled === false && attr(elem, NOVALIDATE) === null;
     };
 
 
@@ -481,7 +481,7 @@
                         if (opt.focusInvalid) {
                             var FOCUS_EVENT = 'focus.field';
                             // IE6 has to trigger once again to get the focus
-                            isIE6 && FOCUS_EVENT += ' ' + FOCUS_EVENT;
+                            if (isIE6) FOCUS_EVENT += ' ' + FOCUS_EVENT;
                             // navigate to the error element
                             me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger(FOCUS_EVENT);
                         }
