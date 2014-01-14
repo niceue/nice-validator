@@ -529,11 +529,13 @@
 
             if (e.type !== 'showtip') {
                 if ( e.isTrigger || me.submiting ) return;
-                if ( el.value !== '' && attr(el, DATA_INPUT_STATUS) === 'tip' ) return;
-
-                if ( opt.focusCleanup && attr(el, DATA_INPUT_STATUS) === 'error' ) {
-                    $(el).removeClass(opt.invalidClass);
-                    me.hideMsg(el);
+                if ( attr(el, DATA_INPUT_STATUS) === 'error' ) {
+                    if (opt.focusCleanup) {
+                        $(el).removeClass(opt.invalidClass);
+                        me.hideMsg(el);
+                    }
+                } else {
+                    if (el.value !== '') return;
                 }
             }
 
