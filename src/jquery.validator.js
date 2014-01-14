@@ -195,12 +195,12 @@
         return isFunction(callback) ? this : ret;
     };
 
-    // A faster selector than ":input:not(:submit,:button,:reset,:disabled,[novalidate])"
+    // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[novalidate])"
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
 
-        return (name === 'input' && elem.type !== 'submit' && elem.type !== 'button' && elem.type !== 'reset' ||
-                name === 'select' || name === 'textarea') && elem.disabled === false && attr(elem, NOVALIDATE) === null;
+        return (name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] || name === 'select' || name === 'textarea')
+               && elem.disabled === false && attr(elem, NOVALIDATE) === null;
     };
 
 
@@ -312,13 +312,16 @@
             // Processing field information
             if (isObject(fields)) {
                 $.each(fields, function(k, v) {
-                    var el = me.elements[k];
-                    if (!v && el) {
-                        me._resetElement(el, true);
+                    // delete the field from settings
+                    if (v === null) {
+                        var el = me.elements[k];
+                        if (el) me._resetElement(el, true);
+                        delete me.fields[k];
+                    } else {
+                        me.fields[k] = isString(v) ? {
+                            rule: v
+                        } : v;
                     }
-                    me.fields[k] = isString(v) ? {
-                        rule: v
-                    } : v;
                 });
             }
 
@@ -328,14 +331,82 @@
             });
         },
 
+        // Parsing a field
+        _parse: function(el) {
+            var me = this,
+                field,
+                key = el.name,
+                dataRule = attr(el, DATA_RULE);
+
+            dataRule && attr(el, DATA_RULE, null);
+
+            // if the field has passed the key as id mode, or it doesn't has a name
+            if (el.id && ('#' + el.id in me.fields) || !el.name) {
+                key = '#' + el.id;
+            }
+            // doesn't verify a field that has neither id nor name
+            if (!key) return;
+
+            field = me.fields[key] || {};
+            field.key = key;
+            field.old = {};
+            field.rule = field.rule || dataRule || '';
+            if (!field.rule) return;
+
+            if (field.rule.match(/match|checked/)) {
+                field.must = true;
+            }
+            if (field.rule.indexOf('required') !== -1) {
+                field.required = true;
+                attr(el, ARIA_REQUIRED, true);
+            }
+            if ('timely' in field && !field.timely || !me.options.timely) {
+                attr(el, 'notimely', true);
+            }
+            if (isString(field.target)) {
+                attr(el, DATA_TARGET, field.target);
+            }
+            if (isString(field.tip)) {
+                attr(el, DATA_TIP, field.tip);
+            }
+
+            me.fields[key] = me._parseRule(field);
+        },
+
+        // Parsing field rules
+        _parseRule: function(field) {
+            var arr = rDisplay.exec(field.rule);
+
+            if (!arr) return;
+            // current rule index
+            field._v = 0;
+            field.display = arr[1];
+            
+            if (arr[2]) {
+                field.rules = [];
+                arr[2].replace(rRules, function(){
+                    var args = arguments;
+                    args[3] = args[3] || args[4];
+                    field.rules.push({
+                        not: args[1] === "!",
+                        method: args[2],
+                        params: args[3] ? args[3].split(', ') : undefined,
+                        or: args[5] === "|"
+                    });
+                });
+                // current rule name
+                // field._r = field.rules[0].method;
+            }
+
+            return field;
+        },
+
         // Verify a zone
         _multiValidate: function($inputs, doneCallbacks){
             var me = this,
                 opt = me.options;
 
             me._multiValid = true;
-            //me.deferred = {};
-
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             $inputs.each(function(i, el) {
@@ -390,29 +461,29 @@
             if ( isFunction(opt.beforeSubmit) && opt.beforeSubmit.call(me, form) === false ) {
                 return;
             }
-            
-            me._reset();
-            me.isValid = undefined;
-            me.submiting = true;
-            me.autoSubmit = e.type === 'submit';
+
             if (opt.debug) {
                 debug.log("\n" + e.type + " form");
             }
+            
+            var autoSubmit = e.type === 'submit';
+            me._reset();
+            me.submiting = true;
+            me.isValid = undefined;
 
             me._multiValidate(
                 me.$el.find(INPUT_SELECTOR),
                 function(isValid){
-                    var FOCUS_EVENT = 'focus.field',
-                        ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid',
-                        $input,
+                    var ret = (isValid || opt.debug === 2) ? 'valid' : 'invalid',
                         errors;
 
                     if (!isValid) {
                         if (opt.focusInvalid) {
-                            // navigate to the error element
-                            $input = me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger(FOCUS_EVENT);
+                            var FOCUS_EVENT = 'focus.field';
                             // IE6 has to trigger once again to get the focus
-                            isIE6 && $input.trigger(FOCUS_EVENT);
+                            isIE6 && FOCUS_EVENT += ' ' + FOCUS_EVENT;
+                            // navigate to the error element
+                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger(FOCUS_EVENT);
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
@@ -426,7 +497,7 @@
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + '.form', [form, errors]);
 
-                    if (isValid && !me.isAjaxSubmit && me.autoSubmit) {
+                    if (isValid && !me.isAjaxSubmit && autoSubmit) {
                         novalidateonce = true;
                         form.submit();
                     }
@@ -526,8 +597,8 @@
             if (!field) return;
 
             if (timer) {
-                if (field.timeout) clearTimeout(field.timeout);
-                field.timeout = setTimeout(function() {
+                if (field._t) clearTimeout(field._t);
+                field._t = setTimeout(function() {
                     me._validate(el, field, must);
                 }, timer);
             } else {
@@ -553,76 +624,6 @@
             });
         },
 
-        // Parsing a field
-        _parse: function(el) {
-            var me = this,
-                field,
-                key = el.name,
-                dataRule = attr(el, DATA_RULE);
-
-            dataRule && attr(el, DATA_RULE, null);
-
-            // if the field has passed the key as id mode, or it doesn't has a name
-            if (el.id && ('#' + el.id in me.fields) || !el.name) {
-                key = '#' + el.id;
-            }
-            // doesn't verify a field that has neither id nor name
-            if (!key) return;
-
-            field = me.fields[key] || {};
-            field.key = key;
-            field.old = {};
-            if (me.fields[key] !== null) {
-                field.rule = field.rule || dataRule || '';
-            }
-            if (!field.rule) return;
-
-            if (field.rule.match(/match|checked/)) {
-                field.must = true;
-            }
-            if (field.rule.indexOf('required') !== -1) {
-                field.required = true;
-                attr(el, ARIA_REQUIRED, true);
-            }
-            if ('timely' in field && !field.timely || !me.options.timely) {
-                attr(el, 'notimely', true);
-            }
-            if (isString(field.target)) {
-                attr(el, DATA_TARGET, field.target);
-            }
-            if (isString(field.tip)) {
-                attr(el, DATA_TIP, field.tip);
-            }
-
-            me.fields[key] = me._parseRule(field);
-        },
-
-        // Parsing field rules
-        _parseRule: function(field) {
-            var arr = rDisplay.exec(field.rule);
-
-            if (!arr) return;
-            field.vid = 0;
-            field.display = arr[1];
-            
-            if (arr[2]) {
-                field.rules = [];
-                arr[2].replace(rRules, function(){
-                    var args = arguments;
-                    args[3] = args[3] || args[4];
-                    field.rules.push({
-                        not: args[1] === "!",
-                        method: args[2],
-                        params: args[3] ? args[3].split(', ') : undefined,
-                        or: args[5] === "|"
-                    });
-                });
-                //field.rid = field.rules[0].method;
-            }
-
-            return field;
-        },
-
         // Validated a field
         _validatedField: function(e, field, ret) {
             var me = this,
@@ -632,7 +633,7 @@
                 callback = isValid ? 'valid' : 'invalid';
 
             ret.key = field.key;
-            ret.rule = field.rid;
+            ret.rule = field._r;
             if (isValid) {
                 ret.type = 'ok';
             } else {
@@ -680,7 +681,7 @@
 
             msgOpt = msgOpt || {};
             field = field || me.getField(el);
-            method = field.rid;
+            method = field._r;
 
             // use null to break validation from a field
             if (ret === null) {
@@ -720,15 +721,15 @@
 
             if (field.rules) {
 
-                rule = field.rules[field.vid];
+                rule = field.rules[field._v];
                 if (rule.not) {
                     isValid = method === "required" || !isValid;
                 }
 
                 if (rule.or) {
                     if (isValid) {
-                        while (field.rules[field.vid++].or) {
-                            if (field.vid === field.rules.length) break;
+                        while (field.rules[field._v++].or) {
+                            if (field._v === field.rules.length) break;
                         }
                     } else {
                         pass = true;
@@ -738,7 +739,7 @@
 
             // output the debug message
             if (opt.debug) {
-                debug.log('   ' + field.vid + ': ' + method + ' => ' + (msgOpt.msg || true));
+                debug.log('   ' + field._v + ': ' + method + ' => ' + (msgOpt.msg || true));
             }
 
             // message analysis, and throw rule level event
@@ -763,13 +764,13 @@
             }
 
             // the current rule has passed, continue to validate
-            if (pass || isValid && field.vid < field.rules.length - 1) {
-                field.vid++;
+            if (pass || isValid && field._v < field.rules.length - 1) {
+                field._v++;
                 me._checkRule(el, field);
             }
             // field was invalid, or all fields was valid
             else {
-                field.vid = 0;
+                field._v = 0;
                 $(el).trigger('validated.field', [field, msgOpt]);
             }
         },
@@ -780,14 +781,14 @@
                 ret,
                 old,
                 key = field.key,
-                rule = field.rules[field.vid],
+                rule = field.rules[field._v],
                 method = rule.method,
                 params = rule.params;
 
             // request has been sent, wait it
             if (me.submiting && me.deferred[key]) return;
             old = field.old;
-            field.rid = method;
+            field._r = method;
 
             if ( !field.must && old.ret !== undefined &&
                  old.rule === rule && old.id === el.id &&
@@ -880,8 +881,8 @@
                     if (ret === true) ret = undefined;
                     else {
                         if (isString(ret)) ret = {error: ret};
-                        field.vid = 0;
-                        field.rid = 'group';
+                        field._v = 0;
+                        field._r = 'group';
                         isValid = false;
                         me.hideMsg(el, {}, field);
                         $.extend(msgOpt, group);
