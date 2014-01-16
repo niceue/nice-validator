@@ -7,7 +7,7 @@ exports.lang = {
     digits: "Please enter only digits.",
 
     required: "This field is required.",
-    remote: "{0} is already in use.",
+    remote: "Please try another name.",
 
     integer_nzp: "Please enter an integer.",
     integer_p: "Please enter a positive integer.",

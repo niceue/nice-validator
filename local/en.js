@@ -23,7 +23,7 @@
     $.validator.config({
         messages: {
             required: "This field is required.",
-            remote: "{0} is already in use.",
+            remote: "Please try another name.",
             integer: {
                 '*': "Please enter an integer.",
                 '+': "Please enter a positive integer.",
