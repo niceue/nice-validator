@@ -7,6 +7,11 @@
     "use strict";
 
     var NS = 'validator',
+        CLS_NS = '.' + NS,
+        CLS_NS_RULE = '.rule',
+        CLS_NS_FIELD = '.field',
+        CLS_NS_FORM = '.form',
+        CLS_WRAPPER = 'nice-' + NS,
         CLS_MSG_OK = 'n-ok',
         CLS_MSG_ERROR = 'n-error',
         CLS_MSG_TIP = 'n-tip',
@@ -285,18 +290,18 @@
 
             // Initialization events and make a cache
             if (!me.$el.data(NS)) {
-                me.$el.data(NS, me).addClass('n-' + NS + ' ' + opt.formClass)
-                      .on('submit.'+NS + ' validate.'+NS, proxy(me, '_submit'))
-                      .on('reset.'+NS, proxy(me, '_reset'))
-                      .on('showtip.'+NS, proxy(me, '_showTip'))
-                      .on('validated.field.'+NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
-                      .on('validated.rule.'+NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
-                      .on('focusin.'+NS + ' click.'+NS + ' showtip.'+NS, INPUT_SELECTOR, proxy(me, '_focus'))
-                      .on('focusout.'+NS + ' validate.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
-                      .on('click.'+NS, ':radio,:checkbox', proxy(me, '_click'));
+                me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
+                      .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
+                      .on('reset'+ CLS_NS, proxy(me, '_reset'))
+                      .on('showtip'+ CLS_NS, proxy(me, '_showTip'))
+                      .on('validated'+ CLS_NS_FIELD + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
+                      .on('validated'+ CLS_NS_RULE + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
+                      .on('focusin'+ CLS_NS +' click'+ CLS_NS +' showtip'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
+                      .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
+                      .on('click'+CLS_NS, ':radio,:checkbox', proxy(me, '_click'));
                 if (opt.timely >= 2) {
-                    me.$el.on('keyup.'+NS + ' paste.'+NS, INPUT_SELECTOR, proxy(me, '_blur'))
-                          .on('change.'+NS, 'select', proxy(me, '_click'));
+                    me.$el.on('keyup'+ CLS_NS +' paste'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
+                          .on('change'+ CLS_NS, 'select', proxy(me, '_click'));
                 }
 
                 // cache the novalidate attribute value
@@ -479,7 +484,7 @@
                     if (!isValid) {
                         if (opt.focusInvalid) {
                             // navigate to the error element
-                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger('focus.field');
+                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger('focus'+CLS_NS_FIELD);
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
@@ -491,7 +496,7 @@
 
                     // trigger callback and event
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
-                    me.$el.trigger(ret + '.form', [form, errors]);
+                    me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
 
                     if (isValid && !me.isAjaxSubmit && autoSubmit) {
                         novalidateonce = true;
@@ -521,7 +526,7 @@
             }
         },
 
-        _focus: function(e) {
+        _focusin: function(e) {
             var me = this,
                 opt = me.options,
                 el = e.target,
@@ -549,7 +554,7 @@
         },
 
         // Handle focusout/validate/keyup/click/paste events
-        _blur: function(e, isClick) {
+        _focusout: function(e, isClick) {
             var me = this,
                 opt = me.options,
                 field,
@@ -609,7 +614,7 @@
         },
 
         _click: function(e) {
-            this._blur(e, true);
+            this._focusout(e, true);
         },
 
         _showTip: function(e){
@@ -654,7 +659,7 @@
             $(el).attr( ARIA_INVALID, isValid ? null : true )
                  .removeClass( isValid ? opt.invalidClass : opt.validClass )
                  .addClass( !ret.skip ? isValid ? opt.validClass : opt.invalidClass : "" )
-                 .trigger( callback + '.field', [ret, me] );
+                 .trigger( callback + CLS_NS_FIELD, [ret, me] );
             me.$el.triggerHandler('validation', [ret, me]);
 
             // show or hide the message
@@ -685,7 +690,7 @@
 
             // use null to break validation from a field
             if (ret === null) {
-                $(el).trigger('validated.field', [field, {isValid: true, skip: true}]);
+                $(el).trigger('validated'+CLS_NS_FIELD, [field, {isValid: true, skip: true}]);
                 return;
             }
             else if (ret === true || ret === undefined) {
@@ -757,9 +762,9 @@
                         }
                     }
                     msgOpt.showOk = showOk;
-                    $(el).trigger('valid.rule', [method, msgOpt.msg]);
+                    $(el).trigger('valid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 } else {
-                    $(el).trigger('invalid.rule', [method, msgOpt.msg]);
+                    $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
 
@@ -771,7 +776,7 @@
             // field was invalid, or all fields was valid
             else {
                 field._v = 0;
-                $(el).trigger('validated.field', [field, msgOpt]);
+                $(el).trigger('validated'+CLS_NS_FIELD, [field, msgOpt]);
             }
         },
 
@@ -842,10 +847,10 @@
                         }
                         old.rule = rule;
                         old.ret = msg;
-                        $(el).trigger('validated.rule', [field, msg]);
+                        $(el).trigger('validated'+CLS_NS_RULE, [field, msg]);
                     },
                     function(jqXHR, textStatus){
-                        $(el).trigger('validated.rule', [field, textStatus]);
+                        $(el).trigger('validated'+CLS_NS_RULE, [field, textStatus]);
                     }
                 ).always(function(){
                     delete me.deferred[key];
@@ -855,7 +860,7 @@
             }
             // other result
             else {
-                $(el).trigger('validated.rule', [field, ret]);
+                $(el).trigger('validated'+CLS_NS_RULE, [field, ret]);
             }
         },
 
@@ -897,14 +902,14 @@
                     return;
                 }
                 if (!checkable(el)) {
-                    $el.trigger('validated.field', [field, {isValid: true}]);
+                    $el.trigger('validated'+CLS_NS_FIELD, [field, {isValid: true}]);
                     return;
                 }
             }
 
             // if the results are out
             if (ret !== undefined) {
-                $el.trigger('validated.rule', [field, ret, msgOpt]);
+                $el.trigger('validated'+CLS_NS_RULE, [field, ret, msgOpt]);
             } else if (field.rule) {
                 me._checkRule(el, field);
             }
@@ -1177,7 +1182,7 @@
          */
         destroy: function() {
             this._reset(1);
-            this.$el.off('.'+NS).removeData(NS);
+            this.$el.off(CLS_NS).removeData(NS);
             attr(this.$el[0], NOVALIDATE, this._novalidate);
         }
     };
@@ -1244,25 +1249,27 @@
             case 'TEXTAREA':
             case 'BUTTON':
             case 'FIELDSET':
-                wrap = el.form || $(el).closest('.n-' + NS);
+                wrap = el.form || $(el).closest('.' + CLS_WRAPPER);
                 break;
             case 'FORM':
                 wrap = el;
                 break;
             default:
-                wrap = $(el).closest('.n-' + NS);
+                wrap = $(el).closest('.' + CLS_WRAPPER);
         }
 
         return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
     }
 
-    function initByInput(el, eventType) {
+    function initByInput(e) {
+        
+        var el = e.currentTarget, me;
         if (!el.form || attr(el.form, NOVALIDATE) !== null) return;
-        var me = getInstance(el);
 
+        me = getInstance(el);
         if (me) {
             me._parse(el);
-            $(el).trigger(eventType);
+            me['_'+e.type](e);
         } else {
             attr(el, DATA_RULE, null);
         }
@@ -1310,23 +1317,24 @@
 
     // Global events
     $(document)
-    .on('focusin', ':input['+DATA_RULE+']', function() {
-        initByInput(this, 'focusin');
+    .on('focusin', ':input['+DATA_RULE+']', function(e) {
+        initByInput(e);
     })
 
-    .on('click', 'input,button', function(){
-        if (!this.form) return;
+    .on('click', 'input,button', function(e){
+        var input = this;
+        if (!input.form) return;
 
-        if (this.type === 'submit') {
-            if (attr(this, NOVALIDATE) !== null) {
+        if (input.type === 'submit') {
+            if (attr(input, NOVALIDATE) !== null) {
                 novalidateonce = true;
             }
         }
-        else if (this.name && checkable(this)) {
-            var elem = this.form.elements[this.name];
+        else if (input.name && checkable(input)) {
+            var elem = input.form.elements[input.name];
             if (elem.length) elem = elem[0];
             if (attr(elem, DATA_RULE)) {
-                initByInput(elem, 'validate');
+                initByInput(e);
             }
         }
     })
@@ -1342,7 +1350,7 @@
                 me._submit(e);
             } else {
                 attr(this, NOVALIDATE, NOVALIDATE);
-                $form.off('.'+NS).removeData(NS);
+                $form.off(CLS_NS).removeData(NS);
             }
         }
     });
@@ -1446,7 +1454,7 @@
             b = elem2.value;
 
             if (!field.init_match) {
-                this.$el.on('valid.field.'+NS, selector2, function(){
+                this.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
                     $(element).trigger('validate');
                 });
                 field.init_match = field2.init_match = 1;
