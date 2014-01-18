@@ -20,8 +20,10 @@
         ARIA_REQUIRED = 'aria-required',
         ARIA_INVALID = 'aria-invalid',
         DATA_RULE = 'data-rule',
-        DATA_TARGET = 'data-target',
+        DATA_MSG = 'data-msg',
         DATA_TIP = 'data-tip',
+        DATA_OK = 'data-ok',
+        DATA_TARGET = 'data-target',
         DATA_INPUT_STATUS = 'data-inputstatus',
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
@@ -67,7 +69,7 @@
             //stopOnError: false,
             //focusCleanup: false,
             focusInvalid: true,
-            //beforeSubmit: null,
+            beforeSubmit: noop,
             //dataFilter: null,
             //valid: null,
             //invalid: null,
@@ -86,7 +88,7 @@
                     }[opt.type];
 
                 html = '<span class="msg-wrap '+ cls +'" role="alert">';
-                html += (opt.arrow || '') + (opt.icon || '') + '<span class="n-msg">' + opt.msg + '</span>';
+                html += opt.arrow + opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
                 html += '</span>';
                 return html;
             },
@@ -114,12 +116,16 @@
         timely        {Boolean}     true      Whether to enable timely verification
         theme         {String}     'default'  Using which theme
         stopOnError   {Boolean}     false     Whether to stop validate when found an error input
+        focusCleanup  {Boolean}     false     Whether to clean up the field message when focus the field
+        focusInvalid  {Boolean}     true      Whether to focus the field that is invalid
         ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
         
         beforeSubmit  {Function}              Do something before submitting the form
         dataFilter    {Function}              Conversion ajax results
         valid         {Function}              Triggered when the form is valid
         invalid       {Function}              Triggered when the form is invalid
+        validClass    {String}                Add the class name to a valid field
+        invalidClass  {String}                Add the class name to a invalid field
 
         msgShow       {Function}    null      When show a message, will trigger this callback
         msgHide       {Function}    null      When hide a message, will trigger this callback
@@ -181,25 +187,29 @@
         return this;
     };
 
+
     // Validate a field, or an area
     $.fn.isValid = function(callback, checkOnly) {
         var me = getInstance(this[0]),
-            $inputs,
+            hasCallback = isFunction(callback),
             ret;
 
         if (!me) return true;
         // By default only verify without prompt message
-        if (checkOnly === undefined) checkOnly = true;
-        me.checkOnly = checkOnly;
-        $inputs = this.is(':input') ? this : this.find(INPUT_SELECTOR);
-        ret = me._multiValidate($inputs, function(isValid){
-            isFunction(callback) && callback.call(null, isValid);
-            me.checkOnly = false;
-        });
+        me.checkOnly = checkOnly === undefined || checkOnly;
+
+        ret = me._multiValidate(
+            this.is(':input') ? this : this.find(INPUT_SELECTOR),
+            function(isValid){
+                hasCallback && callback.call(null, isValid);
+                me.checkOnly = false;
+            }
+        );
 
         // If you pass a callback, we maintain the jQuery object chain
-        return isFunction(callback) ? this : ret;
+        return hasCallback ? this : ret;
     };
+
 
     // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[novalidate])"
     $.expr[":"].verifiable = function(elem) {
@@ -235,7 +245,7 @@
             dataOpt = attr(element, 'data-'+ NS +'-option');
             dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
             themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
-            opt = me.options = $.extend({}, defaults, themeOpt, dataOpt, this.options, options);
+            opt = me.options = $.extend({}, defaults, themeOpt, dataOpt, me.options, options);
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
@@ -386,8 +396,9 @@
             if (!arr) return;
             // current rule index
             field._v = 0;
-            field.display = arr[1];
-            
+            if (arr[1]) {
+                field.display = arr[1];
+            }
             if (arr[2]) {
                 field.rules = [];
                 arr[2].replace(rRules, function(){
@@ -417,12 +428,12 @@
 
             $inputs.each(function(i, el) {
                 var field = me.getField(el);
-                if (!field) return;
-
-                me._validate(el, field);
-                if (!me._multiValid && opt.stopOnError) {
-                    // stop the verification
-                    return false;
+                if (field) {
+                    me._validate(el, field);
+                    if (!me._multiValid && opt.stopOnError) {
+                        // stop the verification
+                        return false;
+                    }
                 }
             });
 
@@ -443,34 +454,26 @@
         _submit: function(e, mark) {
             var me = this,
                 opt = me.options,
-                form = e.target;
-
-            if (novalidateonce) {
-                novalidateonce = false;
-                return;
-            }
-            // We found the "only" mark, and make the native event continues.
-            // Receive the "validate" event only from the form.
-            if (mark === 'only' || e.type === 'validate' && me.$el[0] !== form) {
-                return;
-            }
-
-            e.preventDefault();
-
-            // Prevent duplicate submission
-            if (me.submiting) {
-                isFunction(me.submiting) && me.submiting.call(me);
-                return;
-            }
-
-            // trigger the beforeSubmit callback.
-            if ( isFunction(opt.beforeSubmit) && opt.beforeSubmit.call(me, form) === false ) {
-                return;
-            }
-
-            opt.debug && debug.log("\n" + e.type + " form");
+                form = e.target,
+                autoSubmit = e.type === 'submit';
             
-            var autoSubmit = e.type === 'submit';
+            e.preventDefault();
+            if (
+                novalidateonce && (novalidateonce = false) ||
+                // Prevent duplicate submission
+                me.submiting ||
+                // We found the "only" mark, and make the native event continues.
+                mark === 'only' ||
+                // Receive the "validate" event only from the form.
+                e.type === 'validate' && me.$el[0] !== form ||
+                // trigger the beforeSubmit callback.
+                opt.beforeSubmit.call(me, form) === false
+            ) {
+                return;
+            }
+
+            opt.debug && debug.log("\n" + e.type);
+            
             me._reset();
             me.submiting = true;
             me.isValid = undefined;
@@ -484,7 +487,7 @@
                     if (!isValid) {
                         if (opt.focusInvalid) {
                             // navigate to the error element
-                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').trigger('focus'+CLS_NS_FIELD);
+                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').focus();
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
@@ -533,7 +536,7 @@
                 msg;
 
             if (e.type !== 'showtip') {
-                if ( e.isTrigger || me.submiting ) return;
+                if ( me.submiting ) return;
                 if ( attr(el, DATA_INPUT_STATUS) === 'error' ) {
                     if (opt.focusCleanup) {
                         $(el).removeClass(opt.invalidClass);
@@ -548,8 +551,8 @@
             if (!msg) return;
 
             me.showMsg(el, {
-                msg: msg,
-                type: 'tip'
+                type: 'tip',
+                msg: msg
             });
         },
 
@@ -664,112 +667,98 @@
 
             // show or hide the message
             if (field.msgMaker || opt.msgMaker) {
-                if ( (!ret.showOk && ret.msg) || (ret.showOk && opt.showOk !== false ) ) {
-                    me.showMsg(el, ret, field);
-                } else {
-                    me.hideMsg(el, ret, field);
-                }
+                me[ ret.showOk || ret.msg ? 'showMsg' : 'hideMsg' ](el, ret, field);
             }
         },
 
         // Validated a rule
         _validatedRule: function(e, field, ret, msgOpt) {
+            field = field || me.getField(el);
+            msgOpt = msgOpt || {};
+
             var me = this,
                 opt = me.options,
                 el = e.target,
-                msg = '',
+                msg,
                 rule,
-                method,
-                pass,
-                isValid = false,
-                showOk = false;
-
-            msgOpt = msgOpt || {};
-            field = field || me.getField(el);
-            method = field._r;
+                method = field._r,
+                transfer,
+                isValid = false;
 
             // use null to break validation from a field
             if (ret === null) {
                 $(el).trigger('validated'+CLS_NS_FIELD, [field, {isValid: true, skip: true}]);
                 return;
             }
-            else if (ret === true || ret === undefined) {
+            else if (ret === true || ret === undefined || ret === '') {
                 isValid = true;
             }
-            // ret may be: false, strings, objects
-            else {
-                /* rule message priority:
-                    1. custom message;
-                    2. rule returned message;
-                    3. built-in rules message;
-                    4. the default message
-                */
-                // get message from element or field
-                msg = getDataMsg(el, field, method);
-                if (!msg) {
-                    // get message from result
-                    if (isString(ret)) {
-                        msg = ret;
-                        ret = {error: msg};
-                    } else if (isObject(ret)) {
-                        if (ret.error) {
-                            msg = ret.error;
-                        } else {
-                            isValid = true;
-                            if (ret.ok && isString(ret.ok)) showOk = true;
-                            msg = ret.ok;
-                        }
-                    }
+            else if (isString(ret)) {
+                msg = ret;
+            } else if (isObject(ret)) {
+                if (ret.error) {
+                    msg = ret.error;
+                } else {
+                    msg = ret.ok;
+                    isValid = true;
                 }
-                msgOpt.msg = (isValid ? msg : (msg || me.messages[method] || defaults.defaultMsg)).replace('{0}', field.display || '');
             }
 
             if (field.rules) {
-
                 rule = field.rules[field._v];
                 if (rule.not) {
                     isValid = method === "required" || !isValid;
                 }
-
                 if (rule.or) {
                     if (isValid) {
-                        while (field.rules[field._v++].or) {
-                            if (field._v === field.rules.length) break;
+                        while ( field._v < field.rules.length && field.rules[field._v].or ) {
+                            field._v++;
                         }
                     } else {
-                        pass = true;
+                        transfer = true;
                     }
+                }
+            }
+
+            // message analysis, and throw rule level event
+            if (!transfer) {
+                if (isValid) {
+                    msgOpt.isValid = isValid;
+                    if (opt.showOk !== false) {
+                        if (!isString(msg)) {
+                            if (isString(field.ok)) {
+                                msg = field.ok;
+                            } else if (isString(attr(el, DATA_OK))) {
+                                msg = attr(el, DATA_OK);
+                            } else if (isString(opt.showOk)) {
+                                msg = opt.showOk;
+                            }
+                        }
+                        if (isString(msg)) {
+                            msgOpt.showOk = isValid;
+                            msgOpt.msg = msg;
+                        }
+                    }
+                    $(el).trigger('valid'+CLS_NS_RULE, [method, msgOpt.msg]);
+                } else {
+                    /* rule message priority:
+                        1. custom message;
+                        2. rule returned message;
+                        3. built-in rules message;
+                        4. the default message
+                    */
+                    msgOpt.msg = (msg || getDataMsg(el, field, method) || me.messages[method] || defaults.defaultMsg).replace('{0}', field.display || '');
+                    $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
 
             // output the debug message
             if (opt.debug) {
-                debug.log('   ' + field._v + ': ' + method + ' => ' + (msgOpt.msg || true));
-            }
-
-            // message analysis, and throw rule level event
-            if (!pass) {
-                if (isValid) {
-                    msgOpt.isValid = true;
-                    if (!showOk) {
-                        var okmsg = field.ok || attr(el, 'data-ok');
-                        if (okmsg) {
-                            showOk = true;
-                            msgOpt.msg = okmsg;
-                        } else if (isString(opt.showOk)) {
-                            showOk = true;
-                            msgOpt.msg = opt.showOk;
-                        }
-                    }
-                    msgOpt.showOk = showOk;
-                    $(el).trigger('valid'+CLS_NS_RULE, [method, msgOpt.msg]);
-                } else {
-                    $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
-                }
+                debug.log('   ' + field._v + ': ' + method + ' => ' + (isValid || msgOpt.msg || isValid));
             }
 
             // the current rule has passed, continue to validate
-            if (pass || isValid && field._v < field.rules.length - 1) {
+            if (transfer || isValid && field._v < field.rules.length - 1) {
                 field._v++;
                 me._checkRule(el, field);
             }
@@ -799,20 +788,16 @@
                  old.rule === rule && old.id === el.id &&
                  el.value && old.value === el.value )
             {
+                // get result from cache
                 ret = old.ret;
             }
             else {
-                var fn = getDataRule(el, method) || me.rules[method];
-                // get validation result of the current rule
-                ret = fn ? fn.call(me, el, params, field) : getDataMsg(el, field, method) || me.messages[method];
+                // get result from current rule
+                ret = (getDataRule(el, method) || me.rules[method] || noop).call(me, el, params, field);
             }
 
             // asynchronous validation
             if (isObject(ret) && isFunction(ret.then)) {
-                var dataFilter = function(data) {
-                        if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
-                    };
-
                 me.deferred[key] = ret;
                 
                 // show loading message
@@ -824,30 +809,30 @@
                 // waiting to parse the response data
                 ret.then(
                     function(d, textStatus, jqXHR) {
-                        var msg = jqXHR.responseText,
-                            data,
-                            filter = field.dataFilter || me.options.dataFilter;
+                        var data = jqXHR.responseText,
+                            result,
+                            dataFilter = field.dataFilter || me.options.dataFilter;
 
                         // detect if it is json format
                         if (this.dataType === 'json') {
-                            msg = d;
-                        } else if (msg.charAt(0) === '{') {
-                            msg = $.parseJSON(msg) || {};
+                            data = d;
+                        } else if (data.charAt(0) === '{') {
+                            data = $.parseJSON(data) || {};
+                        }
+
+                        if (!isFunction(dataFilter)) {
+                            dataFilter = function(data) {
+                                if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
+                            };
                         }
 
                         // filter data
-                        if (isFunction(filter)) {
-                            msg = filter(msg);
-                        } else if (msg === '') {
-                            msg = true;
-                        } else {
-                            data = dataFilter(msg);
-                            if (data === undefined) data = dataFilter(msg.data);
-                            msg = data || true;
-                        }
+                        result = dataFilter(data);
+                        if (result === undefined) result = dataFilter(data.data);
+
                         old.rule = rule;
-                        old.ret = msg;
-                        $(el).trigger('validated'+CLS_NS_RULE, [field, msg]);
+                        old.ret = result;
+                        $(el).trigger('validated'+CLS_NS_RULE, [field, result]);
                     },
                     function(jqXHR, textStatus){
                         $(el).trigger('validated'+CLS_NS_RULE, [field, textStatus]);
@@ -860,7 +845,7 @@
             }
             // other result
             else {
-                $(el).trigger('validated'+CLS_NS_RULE, [field, ret]);
+                $(el).trigger('validated'+ CLS_NS_RULE, [field, ret]);
             }
         },
 
@@ -868,7 +853,6 @@
         _validate: function(el, field) {
             // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
-            if ( !field.rules ) this._parse(el);
 
             var me = this,
                 opt = me.options,
@@ -878,6 +862,7 @@
                 ret,
                 isValid = field.isValid = true;
 
+            if ( !field.rules ) me._parse(el);
             if (opt.debug) debug.info(field.key);
 
             // group validation
@@ -935,7 +920,7 @@
                 }
             }
 
-            return ret === true || ret === undefined || ret === null || false;
+            return ret === true || ret === undefined || ret === null;
         },
 
         // Get a range of validation messages
@@ -1008,10 +993,10 @@
                 if (tgt) {
                     tgt = this.$el.find(tgt);
                     if (tgt.length) {
-                        if (!tgt.is(':input')) {
-                            $msgbox = tgt;
-                        } else {
+                        if (tgt.is(':input')) {
                             el = tgt.get(0);
+                        } else {
+                            $msgbox = tgt;
                         }
                     }
                 }
@@ -1044,14 +1029,15 @@
         /* @interface: showMsg
          */
         showMsg: function(el, opt, /*INTERNAL*/ field) {
-            opt = this._getMsgOpt(opt);
+            var me = this;
+            opt = me._getMsgOpt(opt);
             if (!opt.msg && !opt.showOk) return;
             el = $(el).get(0);
 
             if ($(el).is(INPUT_SELECTOR)) {
                 // mark message status
                 attr(el, DATA_INPUT_STATUS, opt.type);
-                field = field || this.getField(el);
+                field = field || me.getField(el);
                 if (field) {
                     opt.style = field.msgStyle || opt.style;
                     opt.cls = field.msgClass || opt.cls;
@@ -1059,38 +1045,39 @@
                 }
             }
             
-            var $msgbox = this._getMsgDOM(el, opt),
+            var $msgbox = me._getMsgDOM(el, opt),
                 cls = $msgbox[0].className;
                 
             !rPos.test(cls) && $msgbox.addClass(opt.cls);
             if ( isIE6 && opt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
-            $msgbox.html( ( (field || {}).msgMaker || this.options.msgMaker ).call(this, opt) );
+            $msgbox.html( ( (field || {}).msgMaker || me.options.msgMaker ).call(me, opt) );
             $msgbox[0].style.display = '';
 
-            isFunction(opt.show) && opt.show.call(this, $msgbox, opt.type);
+            isFunction(opt.show) && opt.show.call(me, $msgbox, opt.type);
         },
 
         /* @interface: hideMsg
          */
         hideMsg: function(el, opt, /*INTERNAL*/ field) {
+            var me = this;
             el = $(el).get(0);
-            opt = this._getMsgOpt(opt);
+            opt = me._getMsgOpt(opt);
             if ($(el).is(INPUT_SELECTOR)) {
                 attr(el, DATA_INPUT_STATUS, null);
                 attr(el, ARIA_INVALID, null);
-                field = field || this.getField(el);
+                field = field || me.getField(el);
                 if (field) {
                     opt.wrapper = field.msgWrapper || opt.wrapper;
                 }
             }
 
-            var $msgbox = this._getMsgDOM(el, opt);
+            var $msgbox = me._getMsgDOM(el, opt);
             if (!$msgbox.length) return;
 
             if ( isFunction(opt.hide) ) {
-                opt.hide.call(this, $msgbox, opt.type);
+                opt.hide.call(me, $msgbox, opt.type);
             } else {
                 $msgbox[0].style.display = 'none';
             }
@@ -1290,7 +1277,7 @@
 
         if (isObject(msg) && item) msg = msg[item];
         if (!isString(msg)) {
-            msg = attr(el, 'data-msg-' + item) || attr(el, 'data-msg') || '';
+            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || '';
         }
 
         return msg;
@@ -1434,7 +1421,8 @@
         match: function(element, params, field) {
             if (!params) return;
 
-            var a, b,
+            var me = this,
+                a, b,
                 key, msg, type = 'eq',
                 selector2, elem2, field2;
 
@@ -1446,18 +1434,18 @@
             }
 
             selector2 = key.charAt(0) === '#' ? key : ':input[name="' + key + '"]';
-            elem2 = this.$el.find(selector2)[0];
+            elem2 = me.$el.find(selector2)[0];
             // If the compared field is not exist
             if (!elem2) return;
-            field2 = this.getField(elem2);
+            field2 = me.getField(elem2);
             a = element.value;
             b = elem2.value;
 
-            if (!field.init_match) {
-                this.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
+            if (!field._match) {
+                me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
                     $(element).trigger('validate');
                 });
-                field.init_match = field2.init_match = 1;
+                field._match = field2._match = 1;
             }
 
             // If both fields are blank
@@ -1480,7 +1468,7 @@
                 return true;
             }
 
-            msg = this.messages.match[type].replace('{1}', field2.display || key);
+            msg = me.messages.match[type].replace('{1}', field2.display || key);
             
             switch (type) {
                 case 'lt':
@@ -1519,17 +1507,19 @@
         checked: function(element, params, field) {
             if (!checkable(element)) return;
 
-            var elem, count;
+            var me = this,
+                elem, count;
 
-            count = this.$el.find('input[name="' + element.name + '"]').filter(function() {
-                if (!elem && checkable(this)) elem = this;
-                return !this.disabled && this.checked && $(this).is(':visible');
+            count = me.$el.find('input[name="' + element.name + '"]').filter(function() {
+                var el = this;
+                if (!elem && checkable(el)) elem = el;
+                return !el.disabled && el.checked && $(el).is(':visible');
             }).length;
 
             if (params) {
-                return this.getRangeMsg(count, params, 'checked');
+                return me.getRangeMsg(count, params, 'checked');
             } else {
-                return !!count || getDataMsg(elem, field, 'checked') || this.messages.required;
+                return !!count || getDataMsg(elem, field, 'checked') || me.messages.required;
             }
         },
 
@@ -1599,7 +1589,6 @@
                 url: url,
                 type: type,
                 data: data,
-                async: true,
                 cache: false
             });
         },
