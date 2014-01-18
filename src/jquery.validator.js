@@ -451,7 +451,7 @@
         },
 
         // Verify the whole form
-        _submit: function(e, mark) {
+        _submit: function(e) {
             var me = this,
                 opt = me.options,
                 form = e.target,
@@ -462,8 +462,6 @@
                 novalidateonce && (novalidateonce = false) ||
                 // Prevent duplicate submission
                 me.submiting ||
-                // We found the "only" mark, and make the native event continues.
-                mark === 'only' ||
                 // Receive the "validate" event only from the form.
                 e.type === 'validate' && me.$el[0] !== form ||
                 // trigger the beforeSubmit callback.
