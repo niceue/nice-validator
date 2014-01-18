@@ -12,7 +12,7 @@ var SRC  = '',
     pkg = JSON.parse(fs.readFileSync(OUT + 'package.json')),
     NS = pkg.name,
     COPYRIGHT = '/*! '+ pkg.title +' '+ pkg.version +'\n'
-              + ' * (c) 2012-2014 '+ pkg.author +', MIT Licensed\n'
+              + ' * (c) 2012-'+ new Date().getFullYear() +' '+ pkg.author +', '+ pkg.licenses[0].type +' Licensed\n'
               + ' * '+ pkg.homepage +'\n'
               + ' */';
     
