@@ -748,7 +748,7 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msgOpt.msg = (getDataMsg(el, field, me.messages[method]) || msg || defaults.defaultMsg).replace('{0}', field.display || '');
+                    msgOpt.msg = (getDataMsg(el, field, msg, me.messages[method]) || defaults.defaultMsg).replace('{0}', field.display || '');
                     $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
@@ -872,7 +872,6 @@
                     me.hideMsg(group.target, {}, field);
                     if (ret === true) ret = undefined;
                     else {
-                        if (isString(ret)) ret = {error: ret};
                         field._v = 0;
                         field._r = 'group';
                         isValid = false;
@@ -1272,13 +1271,13 @@
     }
 
     // Get custom messages on the node
-    function getDataMsg(el, field, m) {
+    function getDataMsg(el, field, ret, m) {
         var msg = field.msg,
             item = field._r;
 
         if (isObject(msg)) msg = msg[item];
         if (!isString(msg)) {
-            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || ( m ? isString(m) ? m : m[item] : '');
+            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || ret || ( m ? isString(m) ? m : m[item] : '');
         }
 
         return msg;
