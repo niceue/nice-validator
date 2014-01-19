@@ -706,6 +706,7 @@
             if (field.rules) {
                 rule = field.rules[field._v];
                 if (rule.not) {
+                    msg = undefined;
                     isValid = method === "required" || !isValid;
                 }
                 if (rule.or) {
@@ -741,12 +742,13 @@
                     $(el).trigger('valid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 } else {
                     /* rule message priority:
-                        1. custom message;
-                        2. rule returned message;
-                        3. built-in rules message;
-                        4. the default message
+                        1. custom field message;
+                        2. custom DOM message
+                        3. global defined message;
+                        4. rule returned message;
+                        5. default message;
                     */
-                    msgOpt.msg = (msg || getDataMsg(el, field, method) || me.messages[method] || defaults.defaultMsg).replace('{0}', field.display || '');
+                    msgOpt.msg = (getDataMsg(el, field, me.messages[method]) || msg || defaults.defaultMsg).replace('{0}', field.display || '');
                     $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
@@ -1270,12 +1272,13 @@
     }
 
     // Get custom messages on the node
-    function getDataMsg(el, field, item) {
-        var msg = field.msg;
+    function getDataMsg(el, field, m) {
+        var msg = field.msg,
+            item = field._r;
 
-        if (isObject(msg) && item) msg = msg[item];
+        if (isObject(msg)) msg = msg[item];
         if (!isString(msg)) {
-            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || '';
+            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || ( m ? isString(m) ? m : m[item] : '');
         }
 
         return msg;
@@ -1502,7 +1505,7 @@
             checked[~3]    less than 3 items
             checked[3]     3 items
          **/
-        checked: function(element, params, field) {
+        checked: function(element, params) {
             if (!checkable(element)) return;
 
             var me = this,
@@ -1517,7 +1520,7 @@
             if (params) {
                 return me.getRangeMsg(count, params, 'checked');
             } else {
-                return !!count || getDataMsg(elem, field, 'checked') || me.messages.required;
+                return !!count || me.messages.required;
             }
         },
 
