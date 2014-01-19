@@ -693,7 +693,8 @@
             }
             else if (isString(ret)) {
                 msg = ret;
-            } else if (isObject(ret)) {
+            }
+            else if (isObject(ret)) {
                 if (ret.error) {
                     msg = ret.error;
                 } else {
@@ -853,7 +854,6 @@
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
 
             var me = this,
-                opt = me.options,
                 $el = $(el),
                 msgOpt = {},
                 group = field.group,
@@ -861,7 +861,7 @@
                 isValid = field.isValid = true;
 
             if ( !field.rules ) me._parse(el);
-            if (opt.debug) debug.info(field.key);
+            if (me.options.debug) debug.info(field.key);
 
             // group validation
             if (group) {
