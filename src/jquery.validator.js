@@ -216,7 +216,7 @@
         var name = elem.nodeName.toLowerCase();
 
         return (name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] || name === 'select' || name === 'textarea') &&
-               elem.disabled === false && attr(elem, NOVALIDATE) === null;
+               elem.disabled === false;
     };
 
 
