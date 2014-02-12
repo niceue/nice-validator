@@ -462,15 +462,17 @@
                 novalidateonce ||
                 // Receive the "validate" event only from the form.
                 e.type === 'validate' && me.$el[0] !== form
+               
             ) {
                 novalidateonce = false;
                 return;
             }
 
+
             if (
                 // Prevent duplicate submission
                 me.submiting ||
-                // trigger the beforeSubmit callback.
+                 // trigger the beforeSubmit callback.
                 opt.beforeSubmit.call(me, form) === false
             ) {
                 e.preventDefault();
@@ -516,6 +518,8 @@
                     }
                 }
             );
+            // isFormValid == false || isFormValid === undefined || isAjaxSubmit
+            if (!me.isValid || me.isAjaxSubmit) e.preventDefault();
         },
 
         _reset: function(e) {
