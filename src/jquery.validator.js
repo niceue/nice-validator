@@ -456,17 +456,23 @@
                 opt = me.options,
                 form = e.target,
                 autoSubmit = e.type === 'submit';
-            
-            e.preventDefault();
+
             if (
-                novalidateonce && (novalidateonce = false) ||
+                novalidateonce ||
+                // Receive the "validate" event only from the form.
+                e.type === 'validate' && me.$el[0] !== form
+            ) {
+                novalidateonce = false;
+                return;
+            }
+
+            if (
                 // Prevent duplicate submission
                 me.submiting ||
-                // Receive the "validate" event only from the form.
-                e.type === 'validate' && me.$el[0] !== form ||
                 // trigger the beforeSubmit callback.
                 opt.beforeSubmit.call(me, form) === false
             ) {
+                e.preventDefault();
                 return;
             }
 
@@ -501,10 +507,12 @@
 
                     if (isValid && !me.isAjaxSubmit && autoSubmit) {
                         novalidateonce = true;
-                        form.submit();
+                        $(form).submit();
                     }
                 }
             );
+            // isFormValid == false || isFormValid === undefined || isAjaxSubmit
+            if (!me.isValid || me.isAjaxSubmit) e.preventDefault();
         },
 
         _reset: function(e) {
