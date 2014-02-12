@@ -59,6 +59,7 @@
             log: noop,
             info: noop
         },
+        submitButton,
         novalidateonce,
 
         defaults = {
@@ -507,12 +508,14 @@
 
                     if (isValid && !me.isAjaxSubmit && autoSubmit) {
                         novalidateonce = true;
-                        $(form).submit();
+                        if (submitButton) {
+                            submitButton.click();
+                        } else {
+                            form.submit();
+                        }
                     }
                 }
             );
-            // isFormValid == false || isFormValid === undefined || isAjaxSubmit
-            if (!me.isValid || me.isAjaxSubmit) e.preventDefault();
         },
 
         _reset: function(e) {
@@ -1317,16 +1320,17 @@
     })
 
     .on('click', 'input,button', function(e){
-        var input = this;
+        var input = this, name = input.name;
         if (!input.form) return;
 
         if (input.type === 'submit') {
+            submitButton = input;
             if (attr(input, NOVALIDATE) !== null) {
                 novalidateonce = true;
             }
         }
-        else if (input.name && checkable(input)) {
-            var elem = input.form.elements[input.name];
+        else if (name && checkable(input)) {
+            var elem = input.form.elements[name];
             if (elem.length) elem = elem[0];
             if (attr(elem, DATA_RULE)) {
                 initByInput(e);
