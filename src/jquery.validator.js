@@ -1587,7 +1587,8 @@
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    data[ $.trim(name) ] = me.$el.find(':input[name="' + name + '"]').val();
+                    name = $.trim(name);
+                    data[ name ] = me.$el.find( name.charAt(0) === '#' ? name : ':input[name="' + name + '"]').val();
                 });
             }
             data = $.param(data);
