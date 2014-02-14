@@ -1520,7 +1520,7 @@
             checked[~3]    less than 3 items
             checked[3]     3 items
          **/
-        checked: function(element, params) {
+        checked: function(element, params, field) {
             if (!checkable(element)) return;
 
             var me = this,
@@ -1535,7 +1535,7 @@
             if (params) {
                 return me.getRangeMsg(count, params, 'checked');
             } else {
-                return !!count || me.messages.required;
+                return !!count || getDataMsg(elem, field, '') || me.messages.required;
             }
         },
 
