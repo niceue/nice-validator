@@ -1587,8 +1587,10 @@
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    name = $.trim(name);
-                    data[ name ] = me.$el.find(':input[name="' + name + '"]').val();
+                    var arr = name.split(':'), selector;
+                    name = $.trim(arr[0]);
+                    selector = $.trim(arr[1] || '') || name;
+                    data[ name ] = me.$el.find( selector.charAt(0)==='#' ? selector : ':input[name="' + selector + '"]').val();
                 });
             }
             data = $.param(data);
