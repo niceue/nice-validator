@@ -308,8 +308,10 @@
                       .on('validated'+ CLS_NS_FIELD + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
                       .on('validated'+ CLS_NS_RULE + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
                       .on('focusin'+ CLS_NS +' click'+ CLS_NS +' showtip'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
-                      .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
-                      .on('click'+CLS_NS, ':radio,:checkbox', proxy(me, '_click'));
+                      .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
+                if (opt.timely) {
+                    me.$el.on('click'+CLS_NS, ':radio,:checkbox', proxy(me, '_click'));
+                }
                 if (opt.timely >= 2) {
                     me.$el.on('keyup'+ CLS_NS +' paste'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
                           .on('change'+ CLS_NS, 'select', proxy(me, '_click'));
