@@ -14,3 +14,4 @@ Thumbs.db
 *.bak
 /src/libs
 /src/test.html
+src/index.html
