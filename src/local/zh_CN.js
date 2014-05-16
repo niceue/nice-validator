@@ -57,8 +57,8 @@ exports.lang = {
 
     length_eq: "请输入{1}个字符",
     length_rg: "请输入{1}到{2}个字符",
-    length_gt: "请输入大于{1}个字符",
-    length_lt: "请输入小于{1}个字符",
+    length_gt: "请至少输入{1}个字符",
+    length_lt: "请最多输入{1}个字符",
     length_eq_2: "",
     length_lt_2: "",
     length_gt_2: "",
