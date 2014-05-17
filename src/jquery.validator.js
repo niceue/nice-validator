@@ -392,13 +392,17 @@
 
         // Parsing field rules
         _parseRule: function(field) {
-            var arr = rDisplay.exec(field.rule);
+            var arr = rDisplay.exec(field.rule),
+                opt = this.options;
 
             if (!arr) return;
             // current rule index
             field._i = 0;
             if (arr[1]) {
                 field.display = arr[1];
+            }
+            if (!field.display && opt.display) {
+                field.display = opt.display;
             }
             if (arr[2]) {
                 field.rules = [];
@@ -760,7 +764,7 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msgOpt.msg = (getDataMsg(el, field, msg, me.messages[method]) || defaults.defaultMsg).replace('{0}', field.display || '');
+                    msgOpt.msg = (getDataMsg(el, field, msg, me.messages[method]) || defaults.defaultMsg).replace('{0}', me._getDisplay(el, field.display || ''));
                     $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
@@ -990,6 +994,10 @@
             }
 
             return tpl;
+        },
+
+        _getDisplay: function(el, str) {
+            return !isString(str) ? isFunction(str) ? str.call(this, el) : '' : str;
         },
 
         _getMsgOpt: function(obj) {
@@ -1481,7 +1489,7 @@
                 return true;
             }
 
-            msg = me.messages.match[type].replace('{1}', field2.display || key);
+            msg = me.messages.match[type].replace('{1}', me._getDisplay(element, field2.display || key));
             
             switch (type) {
                 case 'lt':
