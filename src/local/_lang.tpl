@@ -1,6 +1,6 @@
 /*********************************
  * Themes, rules, and i18n support
- * Locale: <%=local_string%>
+ * Locale: <#=local_string#>
  *********************************/
 (function ($) {
     /* Global configuration
@@ -8,13 +8,13 @@
     $.validator.config({
         //stopOnError: false,
         //theme: 'yellow_right',
-        defaultMsg: "<%=defaultMsg%>",
-        loadingMsg: "<%=loadingMsg%>",
+        defaultMsg: "<#=defaultMsg#>",
+        loadingMsg: "<#=loadingMsg#>",
         
         // Custom rules
         rules: {
-            digits: [/^\d+$/, "<%=digits%>"]
-            <% 
+            digits: [/^\d+$/, "<#=digits#>"]
+            <# 
             if (rules) {
                 for(var i in rules) {
                     if ( typeof rules[i] === 'object' ) {
@@ -22,8 +22,8 @@
                     } else {
                         echo( ',' + i + ': ' + rules[i].toString().replace(/\n\s{4}/g,'\n            ') );
                     }
-            %>
-            <% }} %>
+            #>
+            <# }} #>
         }
     });
 
@@ -31,43 +31,43 @@
      */
     $.validator.config({
         messages: {
-            required: "<%=required%>",
-            remote: "<%=remote%>",
+            required: "<#=required#>",
+            remote: "<#=remote#>",
             integer: {
-                '*': "<%=integer_nzp%>",
-                '+': "<%=integer_p%>",
-                '+0': "<%=integer_pz%>",
-                '-': "<%=integer_n%>",
-                '-0': "<%=integer_nz%>"
+                '*': "<#=integer_nzp#>",
+                '+': "<#=integer_p#>",
+                '+0': "<#=integer_pz#>",
+                '-': "<#=integer_n#>",
+                '-0': "<#=integer_nz#>"
             },
             match: {
-                eq: "<%=match_eq%>",
-                neq: "<%=match_neq%>",
-                lt: "<%=match_lt%>",
-                gt: "<%=match_gt%>",
-                lte: "<%=match_lte%>",
-                gte: "<%=match_gte%>"
+                eq: "<#=match_eq#>",
+                neq: "<#=match_neq#>",
+                lt: "<#=match_lt#>",
+                gt: "<#=match_gt#>",
+                lte: "<#=match_lte#>",
+                gte: "<#=match_gte#>"
             },
             range: {
-                rg: "<%=range_rg%>",
-                gt: "<%=range_gt%>",
-                lt: "<%=range_lt%>"
+                rg: "<#=range_rg#>",
+                gt: "<#=range_gt#>",
+                lt: "<#=range_lt#>"
             },
             checked: {
-                eq: "<%=checked_eq%>",
-                rg: "<%=checked_rg%>",
-                gt: "<%=checked_gt%>",
-                lt: "<%=checked_lt%>"
+                eq: "<#=checked_eq#>",
+                rg: "<#=checked_rg#>",
+                gt: "<#=checked_gt#>",
+                lt: "<#=checked_lt#>"
             },
             length: {
-                eq: "<%=length_eq%>",
-                rg: "<%=length_rg%>",
-                gt: "<%=length_gt%>",
-                lt: "<%=length_lt%>",
-                eq_2: "<%=length_eq_2%>",
-                rg_2: "<%=length_rg_2%>",
-                gt_2: "<%=length_gt_2%>",
-                lt_2: "<%=length_lt_2%>"
+                eq: "<#=length_eq#>",
+                rg: "<#=length_rg#>",
+                gt: "<#=length_gt#>",
+                lt: "<#=length_lt#>",
+                eq_2: "<#=length_eq_2#>",
+                rg_2: "<#=length_rg_2#>",
+                gt_2: "<#=length_gt_2#>",
+                lt_2: "<#=length_lt_2#>"
             }
         }
     });

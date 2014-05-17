@@ -5,8 +5,8 @@ var fs = require("fs");
 function Compiler(html) {
     html = html || '';
     if (/\.(?=tpl|html)$/.test(html)) html = fs.readFileSync(html);
-    var begin = '<%',
-        end = '%>',
+    var begin = '<#',
+        end = '#>',
         ecp = function(str){
             return str.replace(/('|\\)/g, '\\$1').replace(/\r\n/g, '\\r\\n').replace(/\n/g, '\\n');
         },

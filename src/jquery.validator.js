@@ -398,7 +398,7 @@
 
             if (!arr) return;
             // current rule index
-            field._v = 0;
+            field._i = 0;
             if (arr[1]) {
                 field.display = arr[1];
             }
@@ -414,8 +414,6 @@
                         or: args[5] === "|"
                     });
                 });
-                // current rule name
-                // field._r = field.rules[0].method;
             }
 
             return field;
@@ -721,15 +719,15 @@
             }
 
             if (field.rules) {
-                rule = field.rules[field._v];
+                rule = field.rules[field._i];
                 if (rule.not) {
                     msg = undefined;
                     isValid = method === "required" || !isValid;
                 }
                 if (rule.or) {
                     if (isValid) {
-                        while ( field._v < field.rules.length && field.rules[field._v].or ) {
-                            field._v++;
+                        while ( field._i < field.rules.length && field.rules[field._i].or ) {
+                            field._i++;
                         }
                     } else {
                         transfer = true;
@@ -772,17 +770,17 @@
 
             // output the debug message
             if (opt.debug) {
-                debug.log('   ' + field._v + ': ' + method + ' => ' + (isValid || msgOpt.msg || isValid));
+                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msgOpt.msg || isValid));
             }
 
             // the current rule has passed, continue to validate
-            if (transfer || isValid && field._v < field.rules.length - 1) {
-                field._v++;
+            if (transfer || isValid && field._i < field.rules.length - 1) {
+                field._i++;
                 me._checkRule(el, field);
             }
             // field was invalid, or all fields was valid
             else {
-                field._v = 0;
+                field._i = 0;
                 $(el).trigger('validated'+CLS_NS_FIELD, [field, msgOpt]);
             }
         },
@@ -793,7 +791,7 @@
                 ret,
                 old,
                 key = field.key,
-                rule = field.rules[field._v],
+                rule = field.rules[field._i],
                 method = rule.method,
                 params = rule.params;
 
@@ -889,7 +887,7 @@
                     me.hideMsg(group.target, {}, field);
                     if (ret === true) ret = undefined;
                     else {
-                        field._v = 0;
+                        field._i = 0;
                         field._r = 'group';
                         isValid = false;
                         me.hideMsg(el, {}, field);
