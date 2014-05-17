@@ -196,8 +196,7 @@
             ret;
 
         if (!me) return true;
-        // By default only verify without prompt message
-        me.checkOnly = checkOnly === undefined || checkOnly;
+        me.checkOnly = !!checkOnly;
 
         ret = me._multiValidate(
             this.is(':input') ? this : this.find(INPUT_SELECTOR),
