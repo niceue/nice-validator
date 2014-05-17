@@ -190,13 +190,13 @@
 
 
     // Validate a field, or an area
-    $.fn.isValid = function(callback, checkOnly) {
+    $.fn.isValid = function(callback, hideMsg) {
         var me = getInstance(this[0]),
             hasCallback = isFunction(callback),
             ret;
 
         if (!me) return true;
-        me.checkOnly = !!checkOnly;
+        me.checkOnly = !hideMsg;
 
         ret = me._multiValidate(
             this.is(':input') ? this : this.find(INPUT_SELECTOR),
@@ -665,8 +665,6 @@
             me.elements[field.key] = el;
             me.$el[0].isValid = me.isValid = isValid ? me.isFormValid() : isValid;
 
-            if (me.checkOnly) return;
-
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             $(el).attr( ARIA_INVALID, isValid ? null : true )
@@ -674,6 +672,8 @@
                  .addClass( !ret.skip ? isValid ? opt.validClass : opt.invalidClass : "" )
                  .trigger( callback + CLS_NS_FIELD, [ret, me] );
             me.$el.triggerHandler('validation', [ret, me]);
+
+            if (me.checkOnly) return;
 
             // show or hide the message
             if (field.msgMaker || opt.msgMaker) {
