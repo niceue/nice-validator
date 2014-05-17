@@ -308,18 +308,17 @@
                       .on('validated'+ CLS_NS_RULE + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
                       .on('focusin'+ CLS_NS +' click'+ CLS_NS +' showtip'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
-                if (opt.timely) {
-                    me.$el.on('click'+CLS_NS, ':radio,:checkbox', proxy(me, '_click'));
-                }
+
                 if (opt.timely >= 2) {
                     me.$el.on('keyup'+ CLS_NS +' paste'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
-                          .on('change'+ CLS_NS, 'select', proxy(me, '_click'));
+                          .on('click'+ CLS_NS, ':radio,:checkbox', proxy(me, '_click'))
+                          .on('change'+ CLS_NS, 'select,input[type="file"]', proxy(me, '_click'));
                 }
 
                 // cache the novalidate attribute value
                 me._novalidate = attr(element, NOVALIDATE);
-                // Initialization is complete, stop off default HTML5 form validation, and as a basis has been initialized
-                // jQuery's "attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
+                // Initialization is complete, stop off default HTML5 form validation
+                // If use "jQuery.attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
             }
         },
@@ -509,7 +508,8 @@
 
                     if (isValid && !me.isAjaxSubmit && autoSubmit) {
                         novalidateonce = true;
-                        if (submitButton) {
+                        // For asp.NET controls
+                        if (submitButton && submitButton.name) {
                             submitButton.click();
                         } else {
                             form.submit();
@@ -576,13 +576,13 @@
                 must,
                 el = e.target,
                 etype = e.type,
-                timer = 150;
+                timer = 0;
 
             if (!isClick && etype !== 'paste') {
                 // must be verified, if it is a manual trigger
                 if (etype === 'validate') {
                     must = true;
-                    timer = 0;
+                    //timer = 0;
                 }
                 // or doesn't require real-time verification, exit
                 else if ( attr(el, 'notimely') ) return;
@@ -622,10 +622,8 @@
                     me._validate(el, field, must);
                 }, timer);
             } else {
-                // use synchronous verification for "validate" event
                 me._validate(el, field, must);
             }
-            
         },
 
         _click: function(e) {
