@@ -666,7 +666,7 @@
             }
             field.old.value = el.value;
             field.old.id = el.id;
-            me.elements[field.key] = el;
+            me.elements[field.key] = ret.element = el;
             me.$el[0].isValid = me.isValid = isValid ? me.isFormValid() : isValid;
 
             // trigger callback and event
