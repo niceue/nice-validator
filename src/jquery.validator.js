@@ -1541,14 +1541,8 @@
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
         length: function(element, params) {
-            if (!params) return;
-
             var value = element.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
-
-            if ( params[0].charAt(0) === '~' ) {
-                params[0] = '0' + params[0];
-            }
 
             return this.getRangeMsg(len, params, 'length', (params[1] ? '_2' : ''));
         },
