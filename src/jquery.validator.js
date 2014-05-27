@@ -284,7 +284,7 @@
 
             // Guess whether it use ajax submit
             me.isAjaxSubmit = false;
-            if (opt.valid || attr(element, 'action') === null) {
+            if (opt.valid || !$.trim(attr(element, 'action'))) {
                 me.isAjaxSubmit = true;
             } else {
                 // if there is a "valid.form" event
