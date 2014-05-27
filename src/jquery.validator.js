@@ -1,4 +1,4 @@
-/*! nice Validator 0.7.1
+/*! nice Validator 0.7.2
  * (c) 2012-2014 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -460,24 +460,16 @@
                 form = e.target,
                 autoSubmit = e.type === 'submit';
 
+            e.preventDefault();
             if (
-                novalidateonce ||
-                // Receive the "validate" event only from the form.
-                e.type === 'validate' && me.$el[0] !== form
-               
-            ) {
-                novalidateonce = false;
-                return;
-            }
-
-
-            if (
+                novalidateonce && !!~(novalidateonce = false) ||
                 // Prevent duplicate submission
                 me.submiting ||
-                 // trigger the beforeSubmit callback.
+                // Receive the "validate" event only from the form.
+                e.type === 'validate' && me.$el[0] !== form ||
+                // trigger the beforeSubmit callback.
                 opt.beforeSubmit.call(me, form) === false
             ) {
-                e.preventDefault();
                 return;
             }
 
@@ -514,15 +506,12 @@
                         novalidateonce = true;
                         // For asp.NET controls
                         if (submitButton && submitButton.name) {
-                            submitButton.click();
-                        } else {
-                            form.submit();
+                            me.$el.append('<input type="hidden" name="'+ submitButton.name +'" value="'+ $(submitButton).val() +'">');
                         }
+                        form.submit();
                     }
                 }
             );
-            // isFormValid == false || isFormValid === undefined || isAjaxSubmit
-            if (!me.isValid || me.isAjaxSubmit) e.preventDefault();
         },
 
         _reset: function(e) {
