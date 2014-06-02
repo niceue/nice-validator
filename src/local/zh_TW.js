@@ -13,7 +13,7 @@ exports.lang = {
     integer_p: "請輸入正整數",
     integer_pz: "請輸入正整數或0",
     integer_n: "請輸入負整數",
-    integer_nz: "請輸入負整數或0", 
+    integer_nz: "請輸入負整數或0",
 
     match_eq: "{0}與{1}不一致",
     match_neq: "{0}與{1}不能相同",
@@ -23,20 +23,20 @@ exports.lang = {
     match_gte: "{0}必須大於或等於{1}",
 
     range_rg: "請輸入{1}到{2}的數",
-    range_gt: "請輸入大於或等於{1}的數",
-    range_lt: "請輸入小於或等於{1}的數",
+    range_gte: "請輸入大於或等於{1}的數",
+    range_lte: "請輸入小於或等於{1}的數",
     
     checked_eq: "請選擇{1}項",
     checked_rg: "請選擇{1}到{2}項",
-    checked_gt: "請至少選擇{1}項",
-    checked_lt: "請最多選擇{1}項",
+    checked_gte: "請至少選擇{1}項",
+    checked_lte: "請最多選擇{1}項",
 
     length_eq: "請輸入{1}個字符",
     length_rg: "請輸入{1}到{2}個字符",
-    length_gt: "請輸入大於{1}個字符",
-    length_lt: "請輸入小於{1}個字符",
+    length_gte: "請輸入大於{1}個字符",
+    length_lte: "請輸入小於{1}個字符",
     length_eq_2: "",
-    length_lt_2: "",
-    length_gt_2: "",
-    length_lt_2: ""
+    length_rg_2: "",
+    length_gte_2: "",
+    length_lte_2: ""
 };

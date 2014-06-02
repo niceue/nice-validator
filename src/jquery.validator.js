@@ -947,11 +947,11 @@
                 } else if (a && !b) {
                     if (isNumber && value >= +a) return true;
                     args.push(a);
-                    c = 'gt';
+                    c = 'gte';
                 } else if (!a && b) {
                     if (isNumber && value <= +b) return true;
                     args.push(b);
-                    c = 'lt';
+                    c = 'lte';
                 }
             } else {
                 if (value === +a) return true;
