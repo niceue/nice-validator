@@ -2,7 +2,18 @@
  * Themes, rules, and i18n support
  * Locale: English
  *********************************/
-(function ($) {
+(function(factory) {
+    if (typeof define === 'function') {
+        define(function(require, exports, module){
+            var $ = require('jquery');
+            $._VALIDATOR_URI = module.uri;
+            require('../src/jquery.validator')($);
+            factory($);
+        });
+    } else {
+        factory(jQuery);
+    }
+}(function($) {
     /* Global configuration
      */
     $.validator.config({
@@ -122,4 +133,4 @@
             }
         }
     });
-})(jQuery);
+}));

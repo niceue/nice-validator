@@ -1,10 +1,50 @@
-/*! nice Validator 0.7.2
+/*! nice Validator 0.8.0
  * (c) 2012-2014 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
 /*jshint evil:true, expr:true */
-(function($, undefined) {
+(function(factory) {
+    if (typeof define === 'function') {
+        // Register as an anonymous module.
+        define([], function(){
+            return factory;
+        });
+    } else {
+        factory(jQuery);
+    }
+}(function($, undefined) {
     "use strict";
+
+    // Resource loader
+    (function(){;
+        var arr, node,
+            scripts = document.getElementsByTagName('script'),
+            URI = $._VALIDATOR_URI;
+
+        if (URI) {
+            node = scripts[0];
+            arr = URI.match(/(.*)\/local\/(\w{2,5})\.js/);
+        } else {
+            var i = scripts.length, re = /(.*validator.js)\?.*local=(\w+)/;
+            while (i-- && !arr) {
+                node = scripts[i];
+                arr = (node.getAttribute('src',2)||'').match(re);
+            }
+        }
+        if (arr) {
+            var dir = arr[0].split('/').slice(0, -1).join('/').replace(/\/(local|src)$/,'')+'/',
+                el = document.createElement( 'link' );
+            el.rel = 'stylesheet';
+            el.href = dir + 'jquery.validator.css';
+            node.parentNode.insertBefore(el, node);
+            if (!URI) {
+                el = document.createElement( 'script' )
+                el.async = 1;
+                el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
+                node.parentNode.insertBefore(el, node);
+            }
+        }
+    })();
 
     var NS = 'validator',
         CLS_NS = '.' + NS,
@@ -1644,4 +1684,4 @@
 
     $[NS] = Validator;
 
-})(jQuery);
+}));
