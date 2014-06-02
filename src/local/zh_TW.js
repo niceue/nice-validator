@@ -33,8 +33,8 @@ exports.lang = {
 
     length_eq: "請輸入{1}個字符",
     length_rg: "請輸入{1}到{2}個字符",
-    length_gte: "請輸入大於{1}個字符",
-    length_lte: "請輸入小於{1}個字符",
+    length_gte: "請至少輸入{1}個字符",
+    length_lte: "請至少輸入{1}個字符",
     length_eq_2: "",
     length_rg_2: "",
     length_gte_2: "",
