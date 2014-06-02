@@ -61,24 +61,24 @@
             },
             range: {
                 rg: "<#=range_rg#>",
-                gt: "<#=range_gt#>",
-                lt: "<#=range_lt#>"
+                gte: "<#=range_gte#>",
+                lte: "<#=range_lte#>"
             },
             checked: {
                 eq: "<#=checked_eq#>",
                 rg: "<#=checked_rg#>",
-                gt: "<#=checked_gt#>",
-                lt: "<#=checked_lt#>"
+                gte: "<#=checked_gte#>",
+                lte: "<#=checked_lte#>"
             },
             length: {
                 eq: "<#=length_eq#>",
                 rg: "<#=length_rg#>",
-                gt: "<#=length_gt#>",
-                lt: "<#=length_lt#>",
+                gte: "<#=length_gte#>",
+                lte: "<#=length_lte#>",
                 eq_2: "<#=length_eq_2#>",
                 rg_2: "<#=length_rg_2#>",
-                gt_2: "<#=length_gt_2#>",
-                lt_2: "<#=length_lt_2#>"
+                gte_2: "<#=length_gte_2#>",
+                lte_2: "<#=length_lte_2#>"
             }
         }
     });

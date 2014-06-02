@@ -2,7 +2,8 @@
  * (c) 2012-2014 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
-/*jshint evil:true, expr:true */
+/*jshint evil:true, expr:true, strict:false*/
+/*global define*/
 (function(factory) {
     if (typeof define === 'function') {
         // Register as an anonymous module.
@@ -16,7 +17,7 @@
     "use strict";
 
     // Resource loader
-    (function(){;
+    (function(){
         var arr, node,
             scripts = document.getElementsByTagName('script'),
             URI = $._VALIDATOR_URI;
@@ -33,12 +34,12 @@
         }
         if (arr) {
             var dir = arr[0].split('/').slice(0, -1).join('/').replace(/\/(local|src)$/,'')+'/',
-                el = document.createElement( 'link' );
+                el = document.createElement('link');
             el.rel = 'stylesheet';
             el.href = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
             if (!URI) {
-                el = document.createElement( 'script' )
+                el = document.createElement('script');
                 el.async = 1;
                 el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
                 node.parentNode.insertBefore(el, node);
@@ -987,11 +988,11 @@
                 } else if (a && !b) {
                     if (isNumber && value >= +a) return true;
                     args.push(a);
-                    c = 'gt';
+                    c = 'gte';
                 } else if (!a && b) {
                     if (isNumber && value <= +b) return true;
                     args.push(b);
-                    c = 'lt';
+                    c = 'lte';
                 }
             } else {
                 if (value === +a) return true;

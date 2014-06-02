@@ -52,24 +52,24 @@
             },
             range: {
                 rg: "Please enter a number between {1} and {2}.",
-                gt: "Please enter a number greater than or equal to {1}.",
-                lt: "Please enter a number less than or equal to {1}."
+                gte: "Please enter a number greater than or equal to {1}.",
+                lte: "Please enter a number less than or equal to {1}."
             },
             checked: {
                 eq: "Please check {1} items.",
                 rg: "Please check between {1} and {2} items.",
-                gt: "Please check at least {1} items.",
-                lt: "Please check no more than {1} items."
+                gte: "Please check at least {1} items.",
+                lte: "Please check no more than {1} items."
             },
             length: {
                 eq: "Please enter {1} characters.",
                 rg: "Please enter a value between {1} and {2} characters long.",
-                gt: "Please enter at least {1} characters.",
-                lt: "Please enter no more than {1} characters.",
+                gte: "Please enter at least {1} characters.",
+                lte: "Please enter no more than {1} characters.",
                 eq_2: "",
                 rg_2: "",
-                gt_2: "",
-                lt_2: ""
+                gte_2: "",
+                lte_2: ""
             }
         }
     });
