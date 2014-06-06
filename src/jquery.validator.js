@@ -237,7 +237,7 @@
             ret;
 
         if (!me) return true;
-        me.checkOnly = !hideMsg;
+        me.checkOnly = !!hideMsg;
 
         ret = me._multiValidate(
             this.is(':input') ? this : this.find(INPUT_SELECTOR),
@@ -1078,7 +1078,8 @@
         /* @interface: showMsg
          */
         showMsg: function(el, opt, /*INTERNAL*/ field) {
-            var me = this;
+            var me = this,
+                msgMaker;
             opt = me._getMsgOpt(opt);
             if (!opt.msg && !opt.showOk) return;
             el = $(el).get(0);
@@ -1093,6 +1094,7 @@
                     opt.wrapper = field.msgWrapper || opt.wrapper;
                 }
             }
+            if (!(msgMaker = (field || {}).msgMaker || me.options.msgMaker)) return;
             
             var $msgbox = me._getMsgDOM(el, opt),
                 cls = $msgbox[0].className;
@@ -1101,8 +1103,7 @@
             if ( isIE6 && opt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
-            $msgbox.html( ( (field || {}).msgMaker || me.options.msgMaker ).call(me, opt) );
-            $msgbox[0].style.display = '';
+            $msgbox.html( msgMaker.call(me, opt) )[0].style.display = '';
 
             isFunction(opt.show) && opt.show.call(me, $msgbox, opt.type);
         },
