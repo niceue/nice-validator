@@ -29,7 +29,7 @@
             var i = scripts.length, re = /(.*validator.js)\?.*local=(\w+)/;
             while (i-- && !arr) {
                 node = scripts[i];
-                arr = (node.getAttribute('src',2)||'').match(re);
+                arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
             }
         }
         if (arr) {
