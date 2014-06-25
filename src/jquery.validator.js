@@ -468,6 +468,7 @@
                 opt = me.options;
 
             me._multiValid = true;
+            me._verifying = true;
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             $inputs.each(function(i, el) {
@@ -486,6 +487,7 @@
                 null,
                 $.map(me.deferred, function(v){return v;})
             ).done(function(){
+                me._verifying = false;
                 doneCallbacks.call(me, me._multiValid);
             });
 
@@ -580,6 +582,8 @@
                 opt = me.options,
                 el = e.target,
                 msg;
+
+            if (me._verifying) return;
 
             if (e.type !== 'showtip') {
                 if ( me.submiting ) return;
