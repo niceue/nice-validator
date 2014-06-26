@@ -234,14 +234,19 @@
     $.fn.isValid = function(callback, hideMsg) {
         var me = getInstance(this[0]),
             hasCallback = isFunction(callback),
-            ret;
+            ret, opt;
 
         if (!me) return true;
         me.checkOnly = !!hideMsg;
+        opt = me.options;
 
         ret = me._multiValidate(
             this.is(':input') ? this : this.find(INPUT_SELECTOR),
             function(isValid){
+                if (!isValid && opt.focusInvalid && !me.checkOnly) {
+                    // navigate to the error element
+                    me.$el.find(':input[' + ARIA_INVALID + ']:first').focus();
+                }
                 hasCallback && callback.call(null, isValid);
                 me.checkOnly = false;
             }
@@ -352,8 +357,8 @@
 
                 if (opt.timely >= 2) {
                     me.$el.on('keyup'+ CLS_NS +' paste'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
-                          .on('click'+ CLS_NS, ':radio,:checkbox', proxy(me, '_click'))
-                          .on('change'+ CLS_NS, 'select,input[type="file"]', proxy(me, '_click'));
+                          .on('click'+ CLS_NS, ':radio,:checkbox', proxy(me, '_focusout'))
+                          .on('change'+ CLS_NS, 'select,input[type="file"]', proxy(me, '_focusout'));
                 }
 
                 // cache the novalidate attribute value
@@ -467,15 +472,15 @@
             var me = this,
                 opt = me.options;
 
-            me._multiValid = true;
-            me._verifying = true;
+            me.verifying = true;
+            me.isValid = undefined;
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             $inputs.each(function(i, el) {
                 var field = me.getField(el);
                 if (field) {
                     me._validate(el, field);
-                    if (!me._multiValid && opt.stopOnError) {
+                    if (!me.isValid && opt.stopOnError) {
                         // stop the verification
                         return false;
                     }
@@ -487,13 +492,13 @@
                 null,
                 $.map(me.deferred, function(v){return v;})
             ).done(function(){
-                me._verifying = false;
-                doneCallbacks.call(me, me._multiValid);
+                doneCallbacks.call(me, me.isValid);
+                me.verifying = false;
             });
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect whether a form valid through "doneCallbacks".
-            return !$.isEmptyObject(me.deferred) ? undefined : me._multiValid;
+            return !$.isEmptyObject(me.deferred) ? undefined : me.isValid;
         },
 
         // Verify the whole form
@@ -520,7 +525,6 @@
             
             me._reset();
             me.submiting = true;
-            me.isValid = undefined;
 
             me._multiValidate(
                 me.$el.find(INPUT_SELECTOR),
@@ -583,17 +587,14 @@
                 el = e.target,
                 msg;
 
-            if (me._verifying) return;
+            if (me.verifying) return;
 
             if (e.type !== 'showtip') {
-                if ( me.submiting ) return;
                 if ( attr(el, DATA_INPUT_STATUS) === 'error' ) {
                     if (opt.focusCleanup) {
                         $(el).removeClass(opt.invalidClass);
                         me.hideMsg(el);
                     }
-                } else {
-                    if (el.value !== '') return;
                 }
             }
 
@@ -606,17 +607,18 @@
             });
         },
 
-        // Handle focusout/validate/keyup/click/paste events
-        _focusout: function(e, isClick) {
+        // Handle focusout/validate/keyup/click/change/paste events
+        _focusout: function(e) {
             var me = this,
                 opt = me.options,
                 field,
                 must,
                 el = e.target,
                 etype = e.type,
+                ignoreType = {click:1, change:1, paste:1},
                 timer = 0;
 
-            if (!isClick && etype !== 'paste') {
+            if ( !ignoreType[etype] ) {
                 // must be verified, if it is a manual trigger
                 if (etype === 'validate') {
                     must = true;
@@ -664,10 +666,6 @@
             }
         },
 
-        _click: function(e) {
-            this._focusout(e, true);
-        },
-
         _showTip: function(e){
             var me = this;
 
@@ -696,7 +694,6 @@
                 if (me.submiting) {
                     me.errors[field.key] = ret.msg;
                 }
-                me._multiValid = false;
             }
             field.old.value = el.value;
             field.old.id = el.id;
