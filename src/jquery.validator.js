@@ -473,7 +473,7 @@
                 opt = me.options;
 
             me.verifying = true;
-            me.isValid = undefined;
+            me.isValid = true;
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             $inputs.each(function(i, el) {
@@ -694,11 +694,12 @@
                 if (me.submiting) {
                     me.errors[field.key] = ret.msg;
                 }
+                me.isValid = false;
             }
             field.old.value = el.value;
             field.old.id = el.id;
             me.elements[field.key] = ret.element = el;
-            me.$el[0].isValid = me.isValid = isValid ? me.isFormValid() : isValid;
+            me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
 
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
