@@ -1036,13 +1036,13 @@
             return $.extend({}, this.msgOpt, isString(obj) ? {msg: obj} : obj);
         },
 
-        _getMsgDOM: function(el, opt) {
+        _getMsgDOM: function(el, msgOpt) {
             var $el = $(el), $msgbox, datafor, tgt;
-            
+
             if ($el.is(':input')) {
-                tgt = opt.target || attr(el, DATA_TARGET);
+                tgt = msgOpt.target || attr(el, DATA_TARGET);
                 if (tgt) {
-                    tgt = this.$el.find(tgt);
+                    tgt = isFunction(tgt) ? tgt.call(this, el) : this.$el.find(tgt);
                     if (tgt.length) {
                         if (tgt.is(':input')) {
                             el = tgt.get(0);
@@ -1053,7 +1053,7 @@
                 }
                 if (!$msgbox) {
                     datafor = !checkable(el) && el.id ? el.id : el.name;
-                    $msgbox = this.$el.find(opt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
+                    $msgbox = this.$el.find(msgOpt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
                 }
             } else {
                 $msgbox = $el;
@@ -1061,16 +1061,16 @@
 
             if (!$msgbox.length) {
                 $el = this.$el.find(tgt || el);
-                $msgbox = $('<'+ opt.wrapper + '>').attr({
-                    'class': CLS_MSG_BOX + (opt.cls ? ' ' + opt.cls : ''),
-                    'style': opt.style || '',
+                $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
+                    'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
+                    'style': msgOpt.style || '',
                     'for': datafor
                 });
                 if (checkable(el)) {
                     var $parent = $el.parent();
                     $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
                 } else {
-                    $msgbox[!opt.pos || opt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
+                    $msgbox[!msgOpt.pos || msgOpt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
                 }
             }
 
@@ -1079,57 +1079,63 @@
 
         /* @interface: showMsg
          */
-        showMsg: function(el, opt, /*INTERNAL*/ field) {
+        showMsg: function(el, msgOpt, /*INTERNAL*/ field) {
             var me = this,
+                opt = me.options,
                 msgMaker;
-            opt = me._getMsgOpt(opt);
-            if (!opt.msg && !opt.showOk) return;
+
+            msgOpt = me._getMsgOpt(msgOpt);
+            if (!msgOpt.msg && !msgOpt.showOk) return;
             el = $(el).get(0);
 
             if ($(el).is(INPUT_SELECTOR)) {
                 // mark message status
-                attr(el, DATA_INPUT_STATUS, opt.type);
+                attr(el, DATA_INPUT_STATUS, msgOpt.type);
                 field = field || me.getField(el);
                 if (field) {
-                    opt.style = field.msgStyle || opt.style;
-                    opt.cls = field.msgClass || opt.cls;
-                    opt.wrapper = field.msgWrapper || opt.wrapper;
+                    msgOpt.style = field.msgStyle || msgOpt.style;
+                    msgOpt.cls = field.msgClass || msgOpt.cls;
+                    msgOpt.wrapper = field.msgWrapper || msgOpt.wrapper;
+                    msgOpt.target = field.target || opt.target;
                 }
             }
-            if (!(msgMaker = (field || {}).msgMaker || me.options.msgMaker)) return;
+            if (!(msgMaker = (field || {}).msgMaker || opt.msgMaker)) return;
             
-            var $msgbox = me._getMsgDOM(el, opt),
+            var $msgbox = me._getMsgDOM(el, msgOpt),
                 cls = $msgbox[0].className;
                 
-            !rPos.test(cls) && $msgbox.addClass(opt.cls);
-            if ( isIE6 && opt.pos === 'bottom' ) {
+            !rPos.test(cls) && $msgbox.addClass(msgOpt.cls);
+            if ( isIE6 && msgOpt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
-            $msgbox.html( msgMaker.call(me, opt) )[0].style.display = '';
+            $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
 
-            isFunction(opt.show) && opt.show.call(me, $msgbox, opt.type);
+            isFunction(msgOpt.show) && msgOpt.show.call(me, $msgbox, msgOpt.type);
         },
 
         /* @interface: hideMsg
          */
-        hideMsg: function(el, opt, /*INTERNAL*/ field) {
-            var me = this;
+        hideMsg: function(el, msgOpt, /*INTERNAL*/ field) {
+            var me = this,
+                opt = me.options;
+
             el = $(el).get(0);
-            opt = me._getMsgOpt(opt);
+            msgOpt = me._getMsgOpt(msgOpt);
             if ($(el).is(INPUT_SELECTOR)) {
                 attr(el, DATA_INPUT_STATUS, null);
                 attr(el, ARIA_INVALID, null);
                 field = field || me.getField(el);
                 if (field) {
-                    opt.wrapper = field.msgWrapper || opt.wrapper;
+                    msgOpt.wrapper = field.msgWrapper || msgOpt.wrapper;
+                    msgOpt.target = field.target || opt.target;
                 }
             }
 
-            var $msgbox = me._getMsgDOM(el, opt);
+            var $msgbox = me._getMsgDOM(el, msgOpt);
             if (!$msgbox.length) return;
 
-            if ( isFunction(opt.hide) ) {
-                opt.hide.call(me, $msgbox, opt.type);
+            if ( isFunction(msgOpt.hide) ) {
+                msgOpt.hide.call(me, $msgbox, msgOpt.type);
             } else {
                 $msgbox[0].style.display = 'none';
             }
