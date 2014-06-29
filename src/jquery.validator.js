@@ -1079,6 +1079,14 @@
                 opt = me.options,
                 msgMaker;
 
+            if (typeof el === 'object' && !el.nodeName && !msgOpt) {
+                $.each(el, function(name, msg) {
+                    var el = me.elements[name] || me.$el.find(':input[name="' + name + '"]')[0];
+                    me.showMsg(el, msg);
+                });
+                return;
+            }
+
             msgOpt = me._getMsgOpt(msgOpt);
             if (!msgOpt.msg && !msgOpt.showOk) return;
             el = $(el).get(0);
@@ -1134,17 +1142,6 @@
             } else {
                 $msgbox[0].style.display = 'none';
             }
-        },
-
-        /* @interface: mapMsg
-         */
-        mapMsg: function(obj) {
-            var me = this;
-
-            $.each(obj, function(name, msg) {
-                var el = me.elements[name] || me.$el.find(':input[name="' + name + '"]')[0];
-                me.showMsg(el, msg);
-            });
         },
 
         /* @interface: setMsg
