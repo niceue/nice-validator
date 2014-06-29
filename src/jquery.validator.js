@@ -350,8 +350,6 @@
                       .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
                       .on('reset'+ CLS_NS, proxy(me, '_reset'))
                       .on('showtip'+ CLS_NS, proxy(me, '_showTip'))
-                      .on('validated'+ CLS_NS_FIELD + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedField'))
-                      .on('validated'+ CLS_NS_RULE + CLS_NS, INPUT_SELECTOR, proxy(me, '_validatedRule'))
                       .on('focusin'+ CLS_NS +' click'+ CLS_NS +' showtip'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
@@ -679,10 +677,9 @@
         },
 
         // Validated a field
-        _validatedField: function(e, field, ret) {
+        _validatedField: function(el, field, ret) {
             var me = this,
                 opt = me.options,
-                el = e.target,
                 isValid = ret.isValid = field.isValid = !!ret.isValid,
                 callback = isValid ? 'valid' : 'invalid';
 
@@ -718,13 +715,12 @@
         },
 
         // Validated a rule
-        _validatedRule: function(e, field, ret, msgOpt) {
+        _validatedRule: function(el, field, ret, msgOpt) {
             field = field || me.getField(el);
             msgOpt = msgOpt || {};
 
             var me = this,
                 opt = me.options,
-                el = e.target,
                 msg,
                 rule,
                 method = field._r,
@@ -733,7 +729,7 @@
 
             // use null to break validation from a field
             if (ret === null) {
-                $(el).trigger('validated'+CLS_NS_FIELD, [field, {isValid: true, skip: true}]);
+                me._validatedField(el, field, {isValid: true, skip: true});
                 return;
             }
             else if (ret === true || ret === undefined || ret === '') {
@@ -814,7 +810,7 @@
             // field was invalid, or all fields was valid
             else {
                 field._i = 0;
-                $(el).trigger('validated'+CLS_NS_FIELD, [field, msgOpt]);
+                me._validatedField(el, field, msgOpt);
             }
         },
 
@@ -881,10 +877,10 @@
 
                         old.rule = rule;
                         old.ret = result;
-                        $(el).trigger('validated'+CLS_NS_RULE, [field, result]);
+                        me._validatedRule(el, field, result);
                     },
                     function(jqXHR, textStatus){
-                        $(el).trigger('validated'+CLS_NS_RULE, [field, textStatus]);
+                        me._validatedRule(el, field, textStatus);
                     }
                 ).always(function(){
                     delete me.deferred[key];
@@ -894,7 +890,7 @@
             }
             // other result
             else {
-                $(el).trigger('validated'+ CLS_NS_RULE, [field, ret]);
+                me._validatedRule(el, field, ret);
             }
         },
 
@@ -904,7 +900,6 @@
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
 
             var me = this,
-                $el = $(el),
                 msgOpt = {},
                 group = field.group,
                 ret,
@@ -934,14 +929,14 @@
                     return;
                 }
                 if (!checkable(el)) {
-                    $el.trigger('validated'+CLS_NS_FIELD, [field, {isValid: true}]);
+                    me._validatedField(el, field, {isValid: true});
                     return;
                 }
             }
 
             // if the results are out
             if (ret !== undefined) {
-                $el.trigger('validated'+CLS_NS_RULE, [field, ret, msgOpt]);
+                me._validatedRule(el, field, ret, msgOpt);
             } else if (field.rule) {
                 me._checkRule(el, field);
             }
