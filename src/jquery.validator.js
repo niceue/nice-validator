@@ -880,7 +880,7 @@
                         me._validatedRule(el, field, result);
                     },
                     function(jqXHR, textStatus){
-                        me._validatedRule(el, field, textStatus);
+                        me._validatedRule(el, field, me.messages[textStatus] || textStatus);
                     }
                 ).always(function(){
                     delete me.deferred[key];
