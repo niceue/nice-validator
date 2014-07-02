@@ -17,10 +17,9 @@
     "use strict";
 
     // Resource loader
-    (function(){
+    (function(URI){
         var arr, node,
-            scripts = document.getElementsByTagName('script'),
-            URI = $._VALIDATOR_URI;
+            scripts = document.getElementsByTagName('script');
 
         if (URI) {
             node = scripts[0];
@@ -45,7 +44,7 @@
                 node.parentNode.insertBefore(el, node);
             }
         }
-    })();
+    })($._VALIDATOR_URI);
 
     var NS = 'validator',
         CLS_NS = '.' + NS,
@@ -861,7 +860,7 @@
                         // detect if it is json format
                         if (this.dataType === 'json') {
                             data = d;
-                        } else if (data.charAt(0) === '{') {
+                        } else if ($.trim(data).charAt(0) === '{') {
                             data = $.parseJSON(data) || {};
                         }
 
