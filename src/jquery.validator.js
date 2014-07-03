@@ -791,7 +791,7 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msgOpt.msg = (getDataMsg(el, field, msg, me.messages[method]) || defaults.defaultMsg).replace('{0}', me._getDisplay(el, field.display || ''));
+                    msgOpt.msg = (getDataMsg(el, field, msg || me.messages[method]) || defaults.defaultMsg).replace('{0}', me._getDisplay(el, field.display || ''));
                     $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
@@ -1321,13 +1321,13 @@
     }
 
     // Get custom messages on the node
-    function getDataMsg(el, field, ret, m) {
+    function getDataMsg(el, field, m) {
         var msg = field.msg,
             item = field._r;
 
         if (isObject(msg)) msg = msg[item];
         if (!isString(msg)) {
-            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || ret || ( m ? isString(m) ? m : m[item] : '');
+            msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || ( m ? isString(m) ? m : m[item] : '');
         }
 
         return msg;
