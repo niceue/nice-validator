@@ -421,7 +421,7 @@
                 attr(el, ARIA_REQUIRED, true);
             }
             if ('timely' in field && !field.timely || !me.options.timely) {
-                attr(el, 'notimely', true);
+                attr(el, 'data-timely', 0);
             }
             if (isString(field.target)) {
                 attr(el, DATA_TARGET, field.target);
@@ -612,43 +612,45 @@
                 must,
                 el = e.target,
                 etype = e.type,
-                ignoreType = {click:1, change:1, paste:1},
+                timely = attr(el, 'data-timely'),
                 timer = 0;
 
-            if ( !ignoreType[etype] ) {
-                // must be verified, if it is a manual trigger
-                if (etype === 'validate') {
-                    must = true;
-                    //timer = 0;
-                }
-                // or doesn't require real-time verification, exit
-                else if ( attr(el, 'notimely') ) return;
-                // or it isn't a "keyup" event, exit
-                else if (opt.timely >= 2 && etype !== 'keyup') return;
+            timely = timely !== null ? +timely : opt.timely;
 
-                // if the current field is ignored, exit
-                if (opt.ignore && $(el).is(opt.ignore)) return;
+            // must be verified, if it is a manual trigger
+            if (etype === 'validate') {
+                must = true;
+            }
+            else {
+                if ( timely === 0 ) return;
 
-                if (etype === 'keyup') {
-                    var key = e.keyCode,
-                        specialKey = {
-                            8: 1,  // Backspace
-                            9: 1,  // Tab
-                            16: 1, // Shift
-                            32: 1, // Space
-                            46: 1  // Delete
-                        };
+                if (etype !== 'focusout') {
+                    if ( timely < 2 ) return;
 
-                    // only gets focus, no verification
-                    if (key === 9 && !el.value) return;
+                    if (etype === 'keyup') {
+                        var key = e.keyCode,
+                            specialKey = {
+                                8: 1,  // Backspace
+                                9: 1,  // Tab
+                                16: 1, // Shift
+                                32: 1, // Space
+                                46: 1  // Delete
+                            };
 
-                    // do not validate, if triggered by these keys
-                    if (key < 48 && !specialKey[key]) return;
+                        // only gets focus, no verification
+                        if (key === 9 && !el.value) return;
 
-                    // keyboard events, reducing the frequency of verification
-                    timer = opt.timely >=100 ? opt.timely : 500;
+                        // do not validate, if triggered by these keys
+                        if (key < 48 && !specialKey[key]) return;
+
+                        // keyboard events, reducing the frequency of verification
+                        timer = timely >=100 ? timely : 500;
+                    }
                 }
             }
+
+            // if the current field is ignored, exit
+            if (opt.ignore && $(el).is(opt.ignore)) return;
 
             field = me.getField(el);
             if (!field) return;
