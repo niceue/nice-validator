@@ -78,6 +78,7 @@
 
         noop = $.noop,
         proxy = $.proxy,
+        trim = $.trim,
         isFunction = $.isFunction,
         isString = function(s) {
             return typeof s === 'string';
@@ -316,7 +317,7 @@
 
             // Guess whether it use ajax submit
             me.isAjaxSubmit = false;
-            if (opt.valid || !$.trim(attr(element, 'action'))) {
+            if (opt.valid || !trim(attr(element, 'action'))) {
                 me.isAjaxSubmit = true;
             } else {
                 // if there is a "valid.form" event
@@ -852,7 +853,7 @@
                         // detect if it is json format
                         if (this.dataType === 'json') {
                             data = d;
-                        } else if ($.trim(data).charAt(0) === '{') {
+                        } else if (trim(data).charAt(0) === '{') {
                             data = $.parseJSON(data) || {};
                         }
 
@@ -1274,7 +1275,7 @@
 
     // Get custom rules on the node
     function getDataRule(el, method) {
-        var fn = $.trim(attr(el, DATA_RULE + '-' + method));
+        var fn = trim(attr(el, DATA_RULE + '-' + method));
 
         if (!fn) return;
         fn = (new Function("return " + fn))();
@@ -1366,35 +1367,48 @@
             required(from, .contact)
          */
         required: function(element, params, field) {
-            var val = $.trim(element.value),
+            var me = this,
+                val = trim(element.value),
                 isValid = true;
 
             if (params) {
                 if (params.length === 1) {
-                    if (!val && !this.test(element, params[0]) ) {
+                    if (!val && !me.test(element, params[0]) ) {
                         attr(element, ARIA_REQUIRED, null);
                         return null;
                     } else {
                         attr(element, ARIA_REQUIRED, true);
                     }
-                } else if (params[0] === 'not') {
-                    $.map(params.slice(1), function(v) {
-                        if ( val === $.trim(v) ) {
-                            isValid = false;
-                        }
+                }
+                else if (params[0] === 'not') {
+                    $.each(params.slice(1), function() {
+                        return (isValid = val !== trim(this));
                     });
-                } else if (params[0] === 'from') {
-                    var elements = this.$el.find(params[1]);
+                }
+                else if (params[0] === 'from') {
+                    var $elements = me.$el.find(params[1]),
+                        VALIDATED_RULE = 'validated_rule',
+                        ret;
                         
-                    isValid = elements.filter(function(){
-                        return !!$.trim(this.value);
+                    isValid = $elements.filter(function(){
+                        return !!trim(this.value);
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
-                        if (!val) return null;
-                        return;
+                        if (!val) ret = null;
+                    } else {
+                        ret = getDataMsg($elements[0], field) || false;
                     }
-                    return getDataMsg(elements[0], field) || false;
+
+                    if(!$(element).data(VALIDATED_RULE)) {
+                        $elements.data(VALIDATED_RULE, true).each(function(){
+                            if (element !== this) {
+                                me._checkRule(this, me.getField(this));
+                            }
+                        }).removeData(VALIDATED_RULE);
+                    }
+
+                    return ret;
                 }
             }
 
@@ -1593,8 +1607,8 @@
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
                     var arr = name.split(':'), selector;
-                    name = $.trim(arr[0]);
-                    selector = $.trim(arr[1] || '') || name;
+                    name = trim(arr[0]);
+                    selector = trim(arr[1] || '') || name;
                     data[ name ] = me.$el.find( selector.charAt(0)==='#' ? selector : ':input[name="' + selector + '"]').val();
                 });
             }
