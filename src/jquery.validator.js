@@ -79,7 +79,6 @@
         noop = $.noop,
         proxy = $.proxy,
         isFunction = $.isFunction,
-        isArray = $.isArray,
         isString = function(s) {
             return typeof s === 'string';
         },
@@ -301,18 +300,6 @@
 
             // Initialization fields
             me._initFields(opt.fields);
-
-            // Initialization group verification
-            if (isArray(opt.groups)) {
-                $.map(opt.groups, function(obj) {
-                    if (!isString(obj.fields) || !isFunction(obj.callback)) return null;
-                    obj.$elems = me.$el.find(keys2selector(obj.fields));
-                    $.map(obj.fields.split(' '), function(k) {
-                        me.fields[k] = me.fields[k] || {};
-                        me.fields[k].group = obj;
-                    });
-                });
-            }
 
             // Initialization message parameters
             me.msgOpt = {
@@ -903,32 +890,15 @@
             // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
 
-            var me = this,
-                msgOpt = {},
-                group = field.group,
-                ret,
-                isValid = field.isValid = true;
+            var me = this;
+
+            field.isValid = true;
 
             if ( !field.rules ) me._parse(el);
             if (me.options.debug) debug.info(field.key);
 
-            // group validation
-            if (group) {
-                ret = group.callback.call(me, group.$elems);
-                if (ret !== undefined) {
-                    me.hideMsg(group.target, {}, field);
-                    if (ret === true) ret = undefined;
-                    else {
-                        field._i = 0;
-                        field._r = 'group';
-                        isValid = false;
-                        me.hideMsg(el, {}, field);
-                        $.extend(msgOpt, group);
-                    }
-                }
-            }
             // if the field is not required and it has a blank value
-            if (isValid && !field.required && !field.must && !el.value) {
+            if (!field.required && !field.must && !el.value) {
                 if ( attr(el, DATA_INPUT_STATUS) === 'tip' ) {
                     return;
                 }
@@ -938,10 +908,7 @@
                 }
             }
 
-            // if the results are out
-            if (ret !== undefined) {
-                me._validatedRule(el, field, ret, msgOpt);
-            } else if (field.rule) {
+            if (field.rule) {
                 me._checkRule(el, field);
             }
         },
@@ -1266,17 +1233,6 @@
                     return fn.test(el.value);
                 };
         }
-    }
-
-    // Convert space-separated keys to jQuery selector
-    function keys2selector(keys) {
-        var selector = '';
-
-        $.map(keys.split(' '), function(k) {
-            selector += ',' + (k.charAt(0) === '#' ? k : '[name="' + k + '"]');
-        });
-
-        return selector.substring(1);
     }
 
     // Get instance by an element
