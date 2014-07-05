@@ -733,7 +733,10 @@
                 me._validatedField(el, field, {isValid: true, skip: true});
                 return;
             }
-            else if (ret === true || ret === undefined || ret === '') {
+            else if (ret === undefined) {
+                transfer = true;
+            }
+            else if (ret === true || ret === '') {
                 isValid = true;
             }
             else if (isString(ret)) {
@@ -1402,8 +1405,11 @@
         /** required
          * @example:
             required
+            required(anotherRule)
+            required(not, -1)
+            required(from, .contact)
          */
-        required: function(element, params) {
+        required: function(element, params, field) {
             var val = $.trim(element.value),
                 isValid = true;
 
@@ -1421,6 +1427,18 @@
                             isValid = false;
                         }
                     });
+                } else if (params[0] === 'from') {
+                    var elements = this.$el.find(params[1]);
+                        
+                    isValid = elements.filter(function(){
+                        return !!$.trim(this.value);
+                    }).length >= (params[2] || 1);
+
+                    if (isValid) {
+                        if (!val) return null;
+                        return;
+                    }
+                    return getDataMsg(elements[0], field) || false;
                 }
             }
 
