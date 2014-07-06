@@ -63,6 +63,7 @@
         DATA_MSG = 'data-msg',
         DATA_TIP = 'data-tip',
         DATA_OK = 'data-ok',
+        DATA_TIMELY = 'data-timely',
         DATA_TARGET = 'data-target',
         DATA_INPUT_STATUS = 'data-inputstatus',
         NOVALIDATE = 'novalidate',
@@ -101,6 +102,7 @@
         },
         submitButton,
         novalidateonce,
+        preinitialized = {},
 
         defaults = {
             debug: 0,
@@ -272,7 +274,11 @@
         if (!me instanceof Validator) return new Validator(element, options);
 
         me.$el = $(element);
-        me._init(element, options);
+        if (me.$el.length) {
+            me._init(me.$el[0], options);
+        } else if(isString(element)) {
+            preinitialized[element] = options;
+        }
     }
 
     Validator.prototype = {
@@ -340,7 +346,7 @@
                       .on('focusin'+ CLS_NS +' click'+ CLS_NS +' showtip'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
-                if (opt.timely >= 2) {
+                if (opt.timely !== 0) {
                     me.$el.on('keyup'+ CLS_NS +' paste'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
                           .on('click'+ CLS_NS, ':radio,:checkbox', proxy(me, '_focusout'))
                           .on('change'+ CLS_NS, 'select,input[type="file"]', proxy(me, '_focusout'));
@@ -409,7 +415,7 @@
                 attr(el, ARIA_REQUIRED, true);
             }
             if ('timely' in field && !field.timely || !me.options.timely) {
-                attr(el, 'data-timely', 0);
+                attr(el, DATA_TIMELY, 0);
             }
             if (isString(field.target)) {
                 attr(el, DATA_TARGET, field.target);
@@ -593,17 +599,23 @@
         },
 
         // Handle focusout/validate/keyup/click/change/paste events
-        _focusout: function(e) {
+        _focusout: function(e, elem) {
             var me = this,
                 opt = me.options,
                 field,
                 must,
                 el = e.target,
                 etype = e.type,
-                timely = attr(el, 'data-timely'),
+                timely,
                 timer = 0;
 
-            timely = timely !== null ? +timely : opt.timely;
+            // Just for checkbox and radio
+            if (!elem && checkable(el)) {
+                elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
+            }
+
+            timely = attr(elem || el, DATA_TIMELY);
+            timely = timely !== null ? +timely : +opt.timely;
 
             // must be verified, if it is a manual trigger
             if (etype === 'validate') {
@@ -1238,7 +1250,7 @@
 
     // Get instance by an element
     function getInstance(el) {
-        var wrap;
+        var wrap, k, options;
 
         if (!el || !el.tagName) return;
         switch (el.tagName) {
@@ -1256,18 +1268,25 @@
                 wrap = $(el).closest('.' + CLS_WRAPPER);
         }
 
-        return $(wrap).data(NS) || $(wrap)[NS]().data(NS);
+        for (k in preinitialized) {
+            if ($(wrap).is(k)) {
+                options = preinitialized[k];
+                break;
+            }
+        }
+
+        return $(wrap).data(NS) || $(wrap)[NS](options).data(NS);
     }
 
-    function initByInput(e) {
-        
-        var el = e.currentTarget, me;
+    function initByInput(e, elem) {
+        var el = elem || e.currentTarget, me;
         if (!el.form || attr(el.form, NOVALIDATE) !== null) return;
 
         me = getInstance(el);
         if (me) {
             me._parse(el);
-            me['_'+e.type](e);
+            me._focusin(e);
+            if (elem) me._focusout(e, elem);
         } else {
             attr(el, DATA_RULE, null);
         }
@@ -1330,10 +1349,14 @@
                 novalidateonce = true;
             }
         }
-        else if (name && checkable(input)) {
-            var elem = input.form.elements[name];
-            if (elem.length) elem = elem[0];
-            if (attr(elem, DATA_RULE)) {
+        else if (attr(input.form, NOVALIDATE) === null) {
+            if (name && checkable(input)) {
+                var elem = input.form.elements[name];
+                if (elem.length) elem = elem[0];
+                if (attr(elem, DATA_RULE)) {
+                    initByInput(e, elem);
+                }
+            } else {
                 initByInput(e);
             }
         }
@@ -1345,7 +1368,7 @@
         var $form = $(this), me;
 
         if (!$form.data(NS)) {
-            me = $form[NS]().data(NS);
+            me = getInstance(this);
             if (!$.isEmptyObject(me.fields)) {
                 me._submit(e);
             } else {
