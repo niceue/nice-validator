@@ -1345,7 +1345,8 @@
 
         if (input.type === 'submit') {
             submitButton = input;
-            if (attr(input, NOVALIDATE) !== null) {
+            var attrNode = input.getAttributeNode('formnovalidate');
+            if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
                 novalidateonce = true;
             }
         }
