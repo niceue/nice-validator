@@ -1215,7 +1215,7 @@
 
         if (!isObject(obj)) return;
 
-        for (var k in obj) {
+        for (var k in obj) if (checkRuleName(k)) {
             that[k] = getRule(obj[k]);
         }
     }
@@ -1332,6 +1332,10 @@
         return Date.parse(str.replace(/\.|\-/g, '/'));
     }
 
+    function checkRuleName(name) {
+        return /^[\w\d]+$/.test(name);
+    }
+
 
     // Global events
     $(document)
@@ -1397,11 +1401,13 @@
 
             if (params) {
                 if (params.length === 1) {
-                    if (!val && !me.test(element, params[0]) ) {
-                        attr(element, ARIA_REQUIRED, null);
-                        return null;
-                    } else {
-                        attr(element, ARIA_REQUIRED, true);
+                    if (checkRuleName(params[0])) {
+                        if (!val && !me.test(element, params[0]) ) {
+                            attr(element, ARIA_REQUIRED, null);
+                            return null;
+                        } else {
+                            attr(element, ARIA_REQUIRED, true);
+                        }
                     }
                 }
                 else if (params[0] === 'not') {
