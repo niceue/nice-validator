@@ -330,7 +330,7 @@
                 var events = $[ $._data ? '_data' : 'data' ](element, "events");
                 if (events && events.valid &&
                     $.map(events.valid, function(e){
-                        return e.namespace.indexOf('form') !== -1 ? 1 : null;
+                        return ~e.namespace.indexOf('form') ? 1 : null;
                     }).length
                 ) {
                     me.isAjaxSubmit = true;
@@ -410,7 +410,7 @@
             if (field.rule.match(/match|checked/)) {
                 field.must = true;
             }
-            if (field.rule.indexOf('required') !== -1) {
+            if (~field.rule.indexOf('required')) {
                 field.required = true;
                 attr(el, ARIA_REQUIRED, true);
             }
@@ -1640,7 +1640,7 @@
 
             if (type === 'POST') {
                 search = url.indexOf('?');
-                if (search !== -1) {
+                if (~search) {
                     data += '&' + url.substring(search + 1, url.length);
                     url = url.substring(0, search);
                 }
