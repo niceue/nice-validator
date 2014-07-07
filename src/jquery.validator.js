@@ -414,8 +414,8 @@
                 field.required = true;
                 attr(el, ARIA_REQUIRED, true);
             }
-            if ('timely' in field && !field.timely || !me.options.timely) {
-                attr(el, DATA_TIMELY, 0);
+            if ('timely' in field) {
+                attr(el, DATA_TIMELY, +field.timely);
             }
             if (isString(field.target)) {
                 attr(el, DATA_TARGET, field.target);
@@ -910,7 +910,7 @@
             if ( !field.rules ) me._parse(el);
             if (me.options.debug) debug.info(field.key);
 
-            // if the field is not required and it has a blank value
+            // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !el.value) {
                 if ( attr(el, DATA_INPUT_STATUS) === 'tip' ) {
                     return;
