@@ -7,7 +7,7 @@
         define(function(require, exports, module){
             var $ = require('jquery');
             $._VALIDATOR_URI = module.uri;
-            require('../src/jquery.validator')($);
+            require('nice-validator')($);
             factory($);
         });
     } else {
@@ -33,6 +33,8 @@
      */
     $.validator.config({
         messages: {
+            error: "網絡異常",
+            timeout: "請求超時",
             required: "{0}不能為空",
             remote: "{0}已被使用",
             integer: {

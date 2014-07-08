@@ -7,7 +7,7 @@
         define(function(require, exports, module){
             var $ = require('jquery');
             $._VALIDATOR_URI = module.uri;
-            require('../src/jquery.validator')($);
+            require('nice-validator')($);
             factory($);
         });
     } else {
@@ -33,6 +33,8 @@
      */
     $.validator.config({
         messages: {
+            error: "ネットワークエラー",
+            timeout: "要求がタイムアウトしました",
             required: "このフィールドは必須です",
             remote: "この値が使用されている",
             integer: {
