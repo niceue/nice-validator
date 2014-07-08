@@ -4,6 +4,9 @@ exports.lang = {
     defaultMsg: "{0}格式不正確",
     loadingMsg: "正在驗證...",
 
+    error: "網絡異常",
+    timeout: "請求超時",
+
     digits: "請輸入數字",
 
     required: "{0}不能為空",

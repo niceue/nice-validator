@@ -4,6 +4,9 @@ exports.lang = {
     defaultMsg: "このフィールドは有効ではありません",
     loadingMsg: "検証プロセス...",
 
+    error: "ネットワークエラー",
+    timeout: "要求がタイムアウトしました",
+
     digits: "番号を入力してください",
 
     required: "このフィールドは必須です",

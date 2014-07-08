@@ -4,6 +4,9 @@ exports.lang = {
     defaultMsg: "This field is not valid.",
     loadingMsg: "Validating...",
 
+    error: "Network Error.",
+    timeout: "Request timed out.",
+
     digits: "Please enter only digits.",
 
     required: "This field is required.",
