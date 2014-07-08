@@ -7,7 +7,7 @@
         define(function(require, exports, module){
             var $ = require('jquery');
             $._VALIDATOR_URI = module.uri;
-            require('../src/jquery.validator')($);
+            require('nice-validator')($);
             factory($);
         });
     } else {
@@ -42,6 +42,8 @@
      */
     $.validator.config({
         messages: {
+            error: "<#=error#>",
+            timeout: "<#=timeout#>",
             required: "<#=required#>",
             remote: "<#=remote#>",
             integer: {

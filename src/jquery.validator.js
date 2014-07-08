@@ -7,7 +7,7 @@
 (function(factory) {
     if (typeof define === 'function') {
         // Register as an anonymous module.
-        define([], function(){
+        define('nice-validator', [], function(){
             return factory;
         });
     } else {
