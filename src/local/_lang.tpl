@@ -5,9 +5,8 @@
 (function(factory) {
     if (typeof define === 'function') {
         define(function(require, exports, module){
-            var $ = require('jquery');
-            $._VALIDATOR_URI = module.uri;
-            require('nice-validator')($);
+            var $ = require('jquery'); $._VALIDATOR_URI = module.uri;
+            require('../jquery.validator.js')($);
             factory($);
         });
     } else {
