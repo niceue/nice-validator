@@ -1,4 +1,13 @@
-exports.local= "Chinese; 中文; TW (Taiwan)";
+exports.local = "Chinese; 中文; TW (Taiwan)";
+
+exports.rules = {
+    digits: [/^\d+$/, "請輸入數字"],
+    letters: [/^[a-z]+$/i, "請輸入字母"],
+    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "請輸入正確的日期,例:yyyy-mm-dd"],
+    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "請輸入正確的時間,例:14:30或14:30:00"],
+    email:[/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, '請輸入有效的電郵'],
+    url: [/^(https?|s?ftp):\/\/\S+$/i, "請輸入有效的網址"]
+};
 
 exports.lang = {
     defaultMsg: "{0}格式不正確",
@@ -6,8 +15,6 @@ exports.lang = {
 
     error: "網絡異常",
     timeout: "請求超時",
-
-    digits: "請輸入數字",
 
     required: "{0}不能為空",
     remote: "{0}已被使用",

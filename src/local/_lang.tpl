@@ -24,14 +24,19 @@
         
         // Custom rules
         rules: {
-            digits: [/^\d+$/, "<#=digits#>"]
             <# 
             if (rules) {
-                for(var i in rules) {
-                    if ( typeof rules[i] === 'object' ) {
-                        echo( ',' + i + ': [' + rules[i][0].toString() + ', "' + rules[i][1] + '"]' );
+                var mark, i;
+                for(i in rules) {
+                    if (!mark) {
+                        mark = true;
                     } else {
-                        echo( ',' + i + ': ' + rules[i].toString().replace(/\n\s{4}/g,'\n            ') );
+                        echo(',');
+                    }
+                    if ( typeof rules[i] === 'object' ) {
+                        echo( i + ': [' + rules[i][0].toString() + ', "' + rules[i][1] + '"]' );
+                    } else {
+                        echo( i + ': ' + rules[i].toString().replace(/\n\s{4}/g,'\n            ') );
                     }
             #>
             <# }} #>

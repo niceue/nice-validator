@@ -25,6 +25,11 @@
         // Custom rules
         rules: {
             digits: [/^\d+$/, "Please enter only digits."]
+            ,letters: [/^[a-z]+$/i, "Please enter only letters."]
+            ,date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "Please enter a valid date, eg. yyyy-mm-dd"]
+            ,time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "Please enter a valid time, eg. 14:30 or 14:30:00"]
+            ,email: [/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, "Please enter a valid email address."]
+            ,url: [/^(https?|s?ftp):\/\/\S+$/i, "Please enter a valid URL."]
             
         }
     });
