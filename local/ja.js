@@ -6,7 +6,7 @@
     if (typeof define === 'function') {
         define(function(require, exports, module){
             var $ = require('jquery'); $._VALIDATOR_URI = module.uri;
-            require('../jquery.validator.js')($);
+            require('../jquery.validator')($);
             factory($);
         });
     } else {
