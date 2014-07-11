@@ -1399,7 +1399,9 @@
             if (params) {
                 if (params.length === 1) {
                     if (!checkRuleName(params[0])) {
-                        isValid = !!$(params[0], me.$el).length;
+                        if (!val && !$(params[0], me.$el).length ) {
+                            return null;
+                        }
                     }
                     else if (me.rules[params[0]]) {
                         if (!val && !me.test(element, params[0]) ) {
