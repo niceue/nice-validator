@@ -751,20 +751,18 @@
                 }
             }
 
-            if (field.rules) {
-                rule = field.rules[field._i];
-                if (rule.not) {
-                    msg = undefined;
-                    isValid = method === "required" || !isValid;
-                }
-                if (rule.or) {
-                    if (isValid) {
-                        while ( field._i < field.rules.length && field.rules[field._i].or ) {
-                            field._i++;
-                        }
-                    } else {
-                        transfer = true;
+            rule = field.rules[field._i];
+            if (rule.not) {
+                msg = undefined;
+                isValid = method === "required" || !isValid;
+            }
+            if (rule.or) {
+                if (isValid) {
+                    while ( field._i < field.rules.length && field.rules[field._i].or ) {
+                        field._i++;
                     }
+                } else {
+                    transfer = true;
                 }
             }
 
@@ -907,7 +905,8 @@
 
             field.isValid = true;
 
-            if ( !field.rules ) me._parse(el);
+            if (!field.rules) me._parse(el);
+            if (!field.rules) return;
             if (me.options.debug) debug.info(field.key);
 
             // if the field is not required, and that has a blank value
@@ -921,9 +920,7 @@
                 }
             }
 
-            if (field.rule) {
-                me._checkRule(el, field);
-            }
+            me._checkRule(el, field);
         },
 
         /* Detecting whether the value of an element that matches a rule
@@ -1333,7 +1330,7 @@
     }
 
     function checkRuleName(name) {
-        return /^[\w\d]+$/.test(name);
+        return (/^[\w\d]+$/).test(name);
     }
 
 
