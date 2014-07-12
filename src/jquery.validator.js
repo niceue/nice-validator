@@ -52,10 +52,6 @@
         CLS_NS_FIELD = '.field',
         CLS_NS_FORM = '.form',
         CLS_WRAPPER = 'nice-' + NS,
-        CLS_MSG_OK = 'n-ok',
-        CLS_MSG_ERROR = 'n-error',
-        CLS_MSG_TIP = 'n-tip',
-        CLS_MSG_LOADING = 'n-loading',
         CLS_MSG_BOX = 'msg-box',
         ARIA_REQUIRED = 'aria-required',
         ARIA_INVALID = 'aria-invalid',
@@ -122,15 +118,8 @@
 
             msgWrapper: 'span',
             msgMaker: function(opt) {
-                var html,
-                    cls = {
-                        error: CLS_MSG_ERROR,
-                        ok: CLS_MSG_OK,
-                        tip: CLS_MSG_TIP,
-                        loading: CLS_MSG_LOADING
-                    }[opt.type];
-
-                html = '<span class="msg-wrap '+ cls +'" role="alert">';
+                var html;
+                html = '<span class="msg-wrap n-'+ opt.type +'" role="alert">';
                 html += opt.arrow + opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
                 html += '</span>';
                 return html;
