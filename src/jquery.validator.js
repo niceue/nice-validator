@@ -1056,13 +1056,14 @@
         /* @interface: showMsg
          */
         showMsg: function(el, msgOpt, /*INTERNAL*/ field) {
+            if (!el) return;
             var me = this,
                 opt = me.options,
                 msgMaker;
 
             if (typeof el === 'object' && !el.nodeName && !msgOpt) {
-                $.each(el, function(name, msg) {
-                    var el = me.elements[name] || me.$el.find(':input[name="' + name + '"]')[0];
+                $.each(el, function(key, msg) {
+                    var el = me.elements[key] || me.$el.find(key2selector(key))[0];
                     me.showMsg(el, msg);
                 });
                 return;
@@ -1333,6 +1334,10 @@
         return (/^[\w\d]+$/).test(name);
     }
 
+    function key2selector(key) {
+        return key.charAt(0) === "#" ? key : ':input[name="'+ key +'"]';
+    }
+
 
     // Global events
     $(document)
@@ -1506,7 +1511,7 @@
                 key = params[1];
             }
 
-            selector2 = key.charAt(0) === '#' ? key : ':input[name="' + key + '"]';
+            selector2 = key2selector(key);
             elem2 = me.$el.find(selector2)[0];
             // If the compared field is not exist
             if (!elem2) return;
@@ -1638,10 +1643,10 @@
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    var arr = name.split(':'), selector;
+                    var arr = name.split(':'), key;
                     name = trim(arr[0]);
-                    selector = trim(arr[1] || '') || name;
-                    data[ name ] = me.$el.find( selector.charAt(0)==='#' ? selector : ':input[name="' + selector + '"]').val();
+                    key = trim(arr[1] || '') || name;
+                    data[ name ] = me.$el.find( key2selector(key) ).val();
                 });
             }
             data = $.param(data);
