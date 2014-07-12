@@ -247,7 +247,7 @@
     };
 
 
-    // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[novalidate])"
+    // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled)"
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
 
@@ -355,7 +355,7 @@
             // Processing field information
             if (isObject(fields)) {
                 $.each(fields, function(k, v) {
-                    // delete the field from settings
+                    // delete a field from settings
                     if (v === null) {
                         var el = me.elements[k];
                         if (el) me._resetElement(el, true);
