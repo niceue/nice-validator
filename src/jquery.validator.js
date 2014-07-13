@@ -794,7 +794,7 @@
             }
 
             // the current rule has passed, continue to validate
-            if (transfer || isValid && field._i < field.rules.length - 1) {
+            if ((transfer || isValid) && field._i < field.rules.length - 1) {
                 field._i++;
                 me._checkRule(el, field);
             }
