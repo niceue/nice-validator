@@ -82,7 +82,7 @@
 
     /* Themes
      */
-    var TPL_ARROW = '<span class="n-arrow"><b>◆</b><i>◆</i></span>';
+    var TPL_ARROW = '<span class="n-arrow"><b>◆</b><i>◆</i></span><span class="n-icon"></span>';
     $.validator.setTheme({
         'simple_right': {
             formClass: 'n-simple',
@@ -95,17 +95,17 @@
         'yellow_top': {
             formClass: 'n-yellow',
             msgClass: 'n-top',
-            msgArrow: TPL_ARROW
+            msgIcon: TPL_ICON
         },
         'yellow_right': {
             formClass: 'n-yellow',
             msgClass: 'n-right',
-            msgArrow: TPL_ARROW
+            msgIcon: TPL_ICON
         },
         'yellow_right_effect': {
             formClass: 'n-yellow',
             msgClass: 'n-right',
-            msgArrow: TPL_ARROW,
+            msgIcon: TPL_ICON,
             msgShow: function($msgbox, type){
                 var $el = $msgbox.children();
                 if ($el.is(':animated')) return;
