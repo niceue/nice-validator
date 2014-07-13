@@ -1303,7 +1303,7 @@
         var pos;
 
         if (str) pos = rPos.exec(str);
-        return pos ? pos[1] : '';
+        return pos && pos[1];
     }
 
     // Check whether the element is checkbox or radio
