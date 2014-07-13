@@ -120,12 +120,11 @@
             msgMaker: function(opt) {
                 var html;
                 html = '<span class="msg-wrap n-'+ opt.type +'" role="alert">';
-                html += opt.arrow + opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
+                html += opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
                 html += '</span>';
                 return html;
             },
             msgIcon: '<span class="n-icon"></span>',
-            msgArrow: '',
             msgClass: '',
             //msgStyle: null,
             //msgShow: null,
@@ -164,7 +163,6 @@
         msgWrapper    {String}     'span'     Message wrapper tag name
         msgMaker      {Function}              Message HTML maker
         msgIcon       {String}                Icon template
-        msgArrow      {String}                Small arrow template
         msgStyle      {String}                Custom message style
         msgClass      {String}                Additional added to the message class names
         formClass     {String}                Additional added to the form class names
@@ -305,7 +303,6 @@
                 cls: opt.msgClass,
                 style: opt.msgStyle,
                 icon: opt.msgIcon,
-                arrow: opt.msgArrow,
                 show: opt.msgShow,
                 hide: opt.msgHide
             };
