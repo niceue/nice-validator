@@ -20,8 +20,8 @@ exports.rules = {
         if (!params) return true;
         var ext = params[0];
         return (ext === '*') ||
-               (new RegExp(".(?:" + (ext || "png|jpg|jpeg|gif") + ")$", "i")).test(element.value) ||
-               this.renderMsg("只接受{1}后缀", ext.replace('|', ','));
+               (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+               this.renderMsg("只接受{1}后缀", ext.replace(/\|/g, ','));
     }
 };
 
