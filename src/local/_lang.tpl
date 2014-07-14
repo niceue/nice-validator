@@ -91,7 +91,7 @@
 
     /* Themes
      */
-    var TPL_ARROW = '<span class="n-arrow"><b>◆</b><i>◆</i></span><span class="n-icon"></span>';
+    var TPL_ICON = '<span class="n-arrow"><b>◆</b><i>◆</i></span><span class="n-icon"></span>';
     $.validator.setTheme({
         'simple_right': {
             formClass: 'n-simple',
