@@ -3,10 +3,18 @@ exports.local = "Japanese; 日本語";
 exports.rules = {
     digits: [/^\d+$/, "数字だけを入力してください"],
     letters: [/^[a-z]+$/i, "手紙のみでお願いします"],
-    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "例えば、正しい日付を入力してください：YYYY-MM-DD"],
-    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "例えば、正確な時刻を入力してください：14:30或14:30:00"],
+    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "有効な日付を入力してください、，フォーマット：YYYY-MM-DD"],
+    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "有効な時刻を入力してください，00:00~23:59の間"],
     email:[/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, '有効なメールアドレスを入力してください'],
-    url: [/^(https?|s?ftp):\/\/\S+$/i, "有効なURLを入力してください"]
+    url: [/^(https?|s?ftp):\/\/\S+$/i, "有効なURLを入力してください"],
+    //可接受的后缀名，など：accept(png|jpg|bmp|gif);
+    accept: function(element, params){
+        if (!params) return true;
+        var ext = params[0];
+        return (ext === '*') ||
+               (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+               this.renderMsg("ファイル拡張子を{1}のみを受け入れる", ext.replace(/\|/g, '、'));
+    }
 };
 
 exports.lang = {

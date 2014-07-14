@@ -3,10 +3,18 @@ exports.local = "Chinese; 中文; TW (Taiwan)";
 exports.rules = {
     digits: [/^\d+$/, "請輸入數字"],
     letters: [/^[a-z]+$/i, "請輸入字母"],
-    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "請輸入正確的日期,例:yyyy-mm-dd"],
-    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "請輸入正確的時間,例:14:30或14:30:00"],
+    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "請輸入有效的日期，格式:yyyy-mm-dd"],
+    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "請輸入有效的時間，00:00到23:59之間"],
     email:[/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, '請輸入有效的電郵'],
-    url: [/^(https?|s?ftp):\/\/\S+$/i, "請輸入有效的網址"]
+    url: [/^(https?|s?ftp):\/\/\S+$/i, "請輸入有效的網址"],
+    //可接受的後綴名，例如：accept(png|jpg|bmp|gif);
+    accept: function(element, params){
+        if (!params) return true;
+        var ext = params[0];
+        return (ext === '*') ||
+               (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+               this.renderMsg("只接受{1}後綴的文件", ext.replace(/\|/g, ','));
+    }
 };
 
 exports.lang = {

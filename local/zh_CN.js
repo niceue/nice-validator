@@ -25,8 +25,8 @@
         rules: {
             digits: [/^\d+$/, "请输入数字"]
             ,letters: [/^[a-z]+$/i, "请输入字母"]
-            ,date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "请输入正确的日期,例:yyyy-mm-dd"]
-            ,time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "请输入正确的时间,例:14:30或14:30:00"]
+            ,date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "请输入有效的日期，格式:yyyy-mm-dd"]
+            ,time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "请输入有效的时间，00:00到23:59之间"]
             ,email: [/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, "请输入有效的邮箱"]
             ,url: [/^(https?|s?ftp):\/\/\S+$/i, "请输入有效的网址"]
             ,qq: [/^[1-9]\d{4,}$/, "请输入有效的QQ号"]
@@ -41,8 +41,8 @@
                 if (!params) return true;
                 var ext = params[0];
                 return (ext === '*') ||
-                       (new RegExp(".(?:" + (ext || "png|jpg|jpeg|gif") + ")$", "i")).test(element.value) ||
-                       this.renderMsg("只接受{1}后缀", ext.replace('|', ','));
+                       (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+                       this.renderMsg("只接受{1}后缀的文件", ext.replace(/\|/g, ','));
             }
             
         }

@@ -3,8 +3,8 @@ exports.local = "Chinese; 中文";
 exports.rules = {
     digits: [/^\d+$/, "请输入数字"],
     letters: [/^[a-z]+$/i, "请输入字母"], //纯字母
-    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "请输入正确的日期,例:yyyy-mm-dd"],
-    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "请输入正确的时间,例:14:30或14:30:00"],
+    date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "请输入有效的日期，格式:yyyy-mm-dd"],
+    time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "请输入有效的时间，00:00到23:59之间"],
     email:[/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, '请输入有效的邮箱'],
     url: [/^(https?|s?ftp):\/\/\S+$/i, "请输入有效的网址"],
     qq: [/^[1-9]\d{4,}$/,"请输入有效的QQ号"],
@@ -15,13 +15,13 @@ exports.rules = {
     chinese: [/^[\u0391-\uFFE5]+$/, "请输入中文字符"],
     username: [/^\w{3,12}$/, "请输入3-12位数字、字母、下划线"], //用户名
     password: [/^[\S]{6,16}$/, "请输入6-16位字符，不能包含空格"], //密码
-    //可接受的后缀名
+    //可接受的后缀名，例如：accept(png|jpg|bmp|gif);
     accept: function(element, params){
         if (!params) return true;
         var ext = params[0];
         return (ext === '*') ||
                (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
-               this.renderMsg("只接受{1}后缀", ext.replace(/\|/g, ','));
+               this.renderMsg("只接受{1}后缀的文件", ext.replace(/\|/g, ','));
     }
 };
 
