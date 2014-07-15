@@ -7,7 +7,7 @@ exports.rules = {
     time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "有効な時刻を入力してください，00:00~23:59の間"],
     email:[/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, '有効なメールアドレスを入力してください'],
     url: [/^(https?|s?ftp):\/\/\S+$/i, "有効なURLを入力してください"],
-    //可接受的后缀名，など：accept(png|jpg|bmp|gif);
+    //許容可能なファイル拡張子，など：accept(png|jpg|bmp|gif);
     accept: function(element, params){
         if (!params) return true;
         var ext = params[0];
