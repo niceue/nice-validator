@@ -1105,12 +1105,6 @@
             }
         },
 
-        /* @interface: setMsg
-         */
-        setMsg: function(obj) {
-            new Messages(obj, this.messages);
-        },
-
         /* @interface: setRule
          */
         setRule: function(obj) {
