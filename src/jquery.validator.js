@@ -61,7 +61,6 @@
         DATA_OK = 'data-ok',
         DATA_TIMELY = 'data-timely',
         DATA_TARGET = 'data-target',
-        DATA_INPUT_STATUS = 'data-inputstatus',
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
@@ -567,8 +566,8 @@
             if (me.verifying) return;
 
             if (e.type !== 'showtip') {
-                if ( attr(el, DATA_INPUT_STATUS) === 'error' ) {
-                    if (opt.focusCleanup) {
+                if (opt.focusCleanup) {
+                    if ( attr(el, ARIA_INVALID) === 'true' ) {
                         $(el).removeClass(opt.invalidClass);
                         me.hideMsg(el);
                     }
@@ -897,9 +896,6 @@
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !el.value) {
-                if ( attr(el, DATA_INPUT_STATUS) === 'tip' ) {
-                    return;
-                }
                 if (!checkable(el)) {
                     me._validatedField(el, field, {isValid: true});
                     return;
@@ -1060,8 +1056,6 @@
             el = $(el).get(0);
 
             if ($(el).is(INPUT_SELECTOR)) {
-                // mark message status
-                attr(el, DATA_INPUT_STATUS, msgOpt.type);
                 field = field || me.getField(el);
                 if (field) {
                     msgOpt.style = field.msgStyle || msgOpt.style;
@@ -1093,7 +1087,6 @@
             el = $(el).get(0);
             msgOpt = me._getMsgOpt(msgOpt);
             if ($(el).is(INPUT_SELECTOR)) {
-                attr(el, DATA_INPUT_STATUS, null);
                 attr(el, ARIA_INVALID, null);
                 field = field || me.getField(el);
                 if (field) {
