@@ -1105,15 +1105,6 @@
             }
         },
 
-        /* @interface: setRule
-         */
-        setRule: function(obj) {
-            new Rules(obj, this.rules);
-            $.map(this.fields, function(field){
-                field.old = {};
-            });
-        },
-
         // Get field information
         getField: function(el) {
             var me = this,
