@@ -157,6 +157,7 @@
         validClass    {String}                Add the class name to a valid field
         invalidClass  {String}                Add the class name to a invalid field
 
+        display       {Function}
         msgShow       {Function}    null      When show a message, will trigger this callback
         msgHide       {Function}    null      When hide a message, will trigger this callback
         msgWrapper    {String}     'span'     Message wrapper tag name
@@ -177,6 +178,7 @@
         {String|Object} value                 Rule string, or an object is passed more arguments
 
         fields[key][rule]       {String}      Rule string
+        fields[key][display]    {String|Function}
         fields[key][tip]        {String}      Custom friendly message when focus the input
         fields[key][ok]         {String}      Custom success message
         fields[key][msg]        {Object}      Custom error message
