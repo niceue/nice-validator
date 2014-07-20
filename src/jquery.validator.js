@@ -254,6 +254,11 @@
                elem.disabled === false;
     };
 
+    // any value, but not only whitespace
+    $.expr[":"].filled = function(elem) {
+        return !!trim(elem.value);
+    };
+
 
     // Constructor for Validator
     function Validator(element, options) {
