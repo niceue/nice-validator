@@ -399,7 +399,7 @@
             field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
 
-            if (field.rule.match(/match|checked/)) {
+            if (/match\(|checked/.test(field.rule)) {
                 field.must = true;
             }
             if (~field.rule.indexOf('required')) {
