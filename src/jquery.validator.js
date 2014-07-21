@@ -758,10 +758,12 @@
                 }
             }
 
+            if (transfer) {
+                isValid = true;
+            }
             // message analysis, and throw rule level event
-            if (!transfer) {
+            else {
                 if (isValid) {
-                    msgOpt.isValid = isValid;
                     if (opt.showOk !== false) {
                         if (!isString(msg)) {
                             if (isString(field.ok)) {
@@ -790,14 +792,15 @@
                     $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
+            msgOpt.isValid = isValid;
 
             // output the debug message
             if (opt.debug) {
-                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msgOpt.msg || isValid));
+                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msgOpt.msg));
             }
 
             // the current rule has passed, continue to validate
-            if ((transfer || isValid) && field._i < field.rules.length - 1) {
+            if (isValid && field._i < field.rules.length - 1) {
                 field._i++;
                 me._checkRule(el, field);
             }
