@@ -616,9 +616,18 @@
             else {
                 if ( timely === 0 ) return;
 
-                if (etype !== 'focusout') {
-                    if ( timely < 2 ) return;
-
+                if (etype === 'focusout') {
+                    if (timely === 2) {
+                        field = me.getField(el);
+                        if (field.old.ret) {
+                            me._validatedField(el, field, field.old.ret);
+                        }
+                        return;
+                    }
+                }
+                else {
+                    if (timely < 2) return;
+                    // handle keyup
                     if (etype === 'keyup') {
                         var key = e.keyCode,
                             specialKey = {
@@ -686,10 +695,12 @@
                 }
                 me.isValid = false;
             }
-            field.old.value = el.value;
-            field.old.id = el.id;
             me.elements[field.key] = ret.element = el;
             me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
+
+            field.old.value = el.value;
+            field.old.id = el.id;
+            field.old.ret = ret;
 
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
@@ -765,11 +776,10 @@
             else {
                 if (isValid) {
                     if (opt.showOk !== false) {
+                        msg = attr(el, DATA_OK) || msg;
                         if (!isString(msg)) {
                             if (isString(field.ok)) {
                                 msg = field.ok;
-                            } else if (isString(attr(el, DATA_OK))) {
-                                msg = attr(el, DATA_OK);
                             } else if (isString(opt.showOk)) {
                                 msg = opt.showOk;
                             }
@@ -779,7 +789,7 @@
                             msgOpt.msg = msg;
                         }
                     }
-                    $(el).trigger('valid'+CLS_NS_RULE, [method, msgOpt.msg]);
+                    $(el).trigger('valid'+CLS_NS_RULE, [method, msg]);
                 } else {
                     /* rule message priority:
                         1. custom field message;
