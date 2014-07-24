@@ -776,13 +776,9 @@
             else {
                 if (isValid) {
                     if (opt.showOk !== false) {
-                        msg = attr(el, DATA_OK) || msg;
-                        if (!isString(msg)) {
-                            if (isString(field.ok)) {
-                                msg = field.ok;
-                            } else if (isString(opt.showOk)) {
-                                msg = opt.showOk;
-                            }
+                        msg = attr(el, DATA_OK) || (isString(field.ok) ? field.ok : msg);
+                        if (!isString(msg) && isString(opt.showOk)) {
+                            msg = opt.showOk;
                         }
                         if (isString(msg)) {
                             msgOpt.showOk = isValid;
