@@ -620,7 +620,7 @@
                     if (timely === 2) {
                         field = me.getField(el);
                         if (field.old.ret) {
-                            me._validatedField(el, field, field.old.ret);
+                            me._makeMsg(el, field, field.old.ret);
                         }
                         return;
                     }
@@ -711,10 +711,13 @@
             me.$el.triggerHandler('validation', [ret, me]);
 
             if (me.checkOnly) return;
+            me._makeMsg.apply(me, arguments);
+        },
 
+        _makeMsg: function(el, field, ret) {
             // show or hide the message
-            if (field.msgMaker || opt.msgMaker) {
-                me[ ret.showOk || ret.msg ? 'showMsg' : 'hideMsg' ](el, ret, field);
+            if (field.msgMaker || this.options.msgMaker) {
+                this[ ret.showOk || ret.msg ? 'showMsg' : 'hideMsg' ](el, ret, field);
             }
         },
 
@@ -832,12 +835,12 @@
             old = field.old;
             field._r = method;
 
-            if ( !field.must && old.ret !== undefined &&
+            if ( !field.must && rule.ret !== undefined &&
                  old.rule === rule && old.id === el.id &&
                  el.value && old.value === el.value )
             {
                 // get result from cache
-                ret = old.ret;
+                ret = rule.ret;
             }
             else {
                 // get result from current rule
@@ -879,7 +882,7 @@
                         if (result === undefined) result = dataFilter(data.data);
 
                         old.rule = rule;
-                        old.ret = result;
+                        rule.ret = result;
                         me._validatedRule(el, field, result);
                     },
                     function(jqXHR, textStatus){
