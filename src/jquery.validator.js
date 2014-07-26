@@ -595,7 +595,6 @@
             var me = this,
                 opt = me.options,
                 field,
-                must,
                 el = e.target,
                 etype = e.type,
                 timely,
@@ -609,11 +608,7 @@
             timely = attr(elem || el, DATA_TIMELY);
             timely = timely !== null ? +timely : +opt.timely;
 
-            // must be verified, if it is a manual trigger
-            if (etype === 'validate') {
-                must = true;
-            }
-            else {
+            if (etype !== 'validate') {
                 if ( timely === 0 ) return;
 
                 if (etype === 'focusout') {
@@ -659,10 +654,10 @@
             if (timer) {
                 if (field._t) clearTimeout(field._t);
                 field._t = setTimeout(function() {
-                    me._validate(el, field, must);
+                    me._validate(el, field);
                 }, timer);
             } else {
-                me._validate(el, field, must);
+                me._validate(el, field);
             }
         },
 
