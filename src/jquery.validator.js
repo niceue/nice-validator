@@ -1614,7 +1614,7 @@
                 arr = rAjaxType.exec(params[0]),
                 url = arr[2],
                 type = (arr[1] || 'POST').toUpperCase(),
-                search,
+                //search,
                 data = {};
 
             data[element.name] = element.value;
@@ -1629,13 +1629,12 @@
             }
             data = $.param(data);
 
-            if (type === 'POST') {
+            /*if (type === 'POST') {
                 search = url.indexOf('?');
                 if (~search) {
                     data += '&' + url.substring(search + 1, url.length);
-                    url = url.substring(0, search);
                 }
-            }
+            }*/
 
             // Asynchronous validation need to return jqXHR objects
             return $.ajax({
