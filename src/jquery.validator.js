@@ -1612,9 +1612,6 @@
 
             var me = this,
                 arr = rAjaxType.exec(params[0]),
-                url = arr[2],
-                type = (arr[1] || 'POST').toUpperCase(),
-                //search,
                 data = {};
 
             data[element.name] = element.value;
@@ -1627,19 +1624,11 @@
                     data[ name ] = me.$el.find( key2selector(key) ).val();
                 });
             }
-            data = $.param(data);
-
-            /*if (type === 'POST') {
-                search = url.indexOf('?');
-                if (~search) {
-                    data += '&' + url.substring(search + 1, url.length);
-                }
-            }*/
 
             // Asynchronous validation need to return jqXHR objects
             return $.ajax({
-                url: url,
-                type: type,
+                url: arr[2],
+                type: arr[1] || 'POST',
                 data: data,
                 cache: false
             });
