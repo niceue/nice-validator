@@ -61,6 +61,7 @@
         DATA_OK = 'data-ok',
         DATA_TIMELY = 'data-timely',
         DATA_TARGET = 'data-target',
+        DATA_MUST = 'data-must',
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
@@ -399,7 +400,7 @@
             field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
 
-            if (/match\(|checked/.test(field.rule)) {
+            if (attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule)) {
                 field.must = true;
             }
             if (~field.rule.indexOf('required')) {
