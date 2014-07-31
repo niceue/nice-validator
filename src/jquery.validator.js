@@ -136,8 +136,7 @@
         themes = {
             'default': {
                 formClass: 'n-default',
-                msgClass: 'n-right',
-                showOk: ''
+                msgClass: 'n-right'
             }
         };
 
