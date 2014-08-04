@@ -614,7 +614,7 @@
                 if (etype === 'focusout') {
                     if (timely === 2) {
                         field = me.getField(el);
-                        if (field.old.ret) {
+                        if (field.old.ret && !opt.focusCleanup) {
                             me._makeMsg(el, field, field.old.ret);
                         }
                         return;
