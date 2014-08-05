@@ -16,8 +16,10 @@
     /* Global configuration
      */
     $.validator.config({
-        //stopOnError: false,
+        //stopOnError: true,
+        //focusCleanup: true,
         //theme: 'yellow_right',
+        //timely: 2,
         defaultMsg: "{0}格式不正确",
         loadingMsg: "正在验证...",
         

@@ -860,7 +860,7 @@
                             dataFilter = field.dataFilter || me.options.dataFilter;
 
                         // detect if it is json format
-                        if (/jsonp?/.test(this.dataType)) {
+                        if (this.dataType === 'json') {
                             data = d;
                         } else if (trim(data).charAt(0) === '{') {
                             data = $.parseJSON(data) || {};
