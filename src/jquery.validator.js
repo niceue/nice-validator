@@ -614,7 +614,7 @@
                 if (etype === 'focusout') {
                     if (timely === 2) {
                         field = me.getField(el);
-                        if (field.old.ret) {
+                        if (field.old.ret && !opt.focusCleanup) {
                             me._makeMsg(el, field, field.old.ret);
                         }
                         return;
@@ -1101,9 +1101,9 @@
             el = $(el).get(0);
             msgOpt = me._getMsgOpt(msgOpt);
             if ($(el).is(INPUT_SELECTOR)) {
-                attr(el, ARIA_INVALID, null);
                 field = field || me.getField(el);
                 if (field) {
+                    if (field.isValid) attr(el, ARIA_INVALID, null);
                     msgOpt.wrapper = field.msgWrapper || msgOpt.wrapper;
                     msgOpt.target = field.target || opt.target;
                 }
