@@ -1569,7 +1569,7 @@
             count = me.$el.find('input[name="' + element.name + '"]').filter(function() {
                 var el = this;
                 if (!elem && checkable(el)) elem = el;
-                return !el.disabled && el.checked && $(el).is(':visible');
+                return !el.disabled && el.checked;
             }).length;
 
             if (params) {
