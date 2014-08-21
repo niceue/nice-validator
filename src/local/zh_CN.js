@@ -45,12 +45,12 @@ exports.lang = {
     match_neq: "{0}与{1}不能相同",
     match_lt: "{0}必须小于{1}",
     match_gt: "{0}必须大于{1}",
-    match_lte: "{0}必须小于或等于{1}",
-    match_gte: "{0}必须大于或等于{1}",
+    match_lte: "{0}不能大于{1}",
+    match_gte: "{0}不能小于{1}",
 
     range_rg: "请输入{1}到{2}的数",
-    range_gte: "请输入大于或等于{1}的数",
-    range_lte: "请输入小于或等于{1}的数",
+    range_gte: "请输入不小于{1}的数",
+    range_lte: "请输入最大{1}的数",
     
     checked_eq: "请选择{1}项",
     checked_rg: "请选择{1}到{2}项",

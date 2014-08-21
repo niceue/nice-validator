@@ -37,12 +37,12 @@ exports.lang = {
     match_neq: "{0}與{1}不能相同",
     match_lt: "{0}必須小於{1}",
     match_gt: "{0}必須大於{1}",
-    match_lte: "{0}必須小於或等於{1}",
-    match_gte: "{0}必須大於或等於{1}",
+    match_lte: "{0}不能大於{1}",
+    match_gte: "{0}不能小於{1}",
 
     range_rg: "請輸入{1}到{2}的數",
-    range_gte: "請輸入大於或等於{1}的數",
-    range_lte: "請輸入小於或等於{1}的數",
+    range_gte: "請輸入不小於{1}的數",
+    range_lte: "請輸入最大{1}的數",
     
     checked_eq: "請選擇{1}項",
     checked_rg: "請選擇{1}到{2}項",
