@@ -15,3 +15,6 @@ Thumbs.db
 src/libs
 src/test.html
 src/index.html
+
+.idea
+*.iml
