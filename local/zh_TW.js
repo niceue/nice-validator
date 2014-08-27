@@ -33,9 +33,10 @@
             ,url: [/^(https?|s?ftp):\/\/\S+$/i, "請輸入有效的網址"]
             ,accept: function (element, params){
                 if (!params) return true;
-                var ext = params[0];
+                var ext = params[0],
+                    value = $(element).val();
                 return (ext === '*') ||
-                       (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+                       (new RegExp(".(?:" + ext + ")$", "i")).test(value) ||
                        this.renderMsg("只接受{1}後綴的文件", ext.replace(/\|/g, ','));
             }
             
