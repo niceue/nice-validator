@@ -33,9 +33,10 @@
             ,url: [/^(https?|s?ftp):\/\/\S+$/i, "有効なURLを入力してください"]
             ,accept: function (element, params){
                 if (!params) return true;
-                var ext = params[0];
+                var ext = params[0],
+                    value = $(element).val();
                 return (ext === '*') ||
-                       (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+                       (new RegExp(".(?:" + ext + ")$", "i")).test(value) ||
                        this.renderMsg("ファイル拡張子を{1}のみを受け入れる", ext.replace(/\|/g, '、'));
             }
             

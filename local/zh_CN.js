@@ -41,9 +41,10 @@
             ,password: [/^[\S]{6,16}$/, "请输入6-16位字符，不能包含空格"]
             ,accept: function (element, params){
                 if (!params) return true;
-                var ext = params[0];
+                var ext = params[0],
+                    value = $(element).val();
                 return (ext === '*') ||
-                       (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+                       (new RegExp(".(?:" + ext + ")$", "i")).test(value) ||
                        this.renderMsg("只接受{1}后缀的文件", ext.replace(/\|/g, ','));
             }
             

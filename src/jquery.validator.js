@@ -92,6 +92,9 @@
                 return el.getAttribute(key);
             }
         },
+        elementValue = function(element) {
+            return $(element).val();
+        },
         debug = window.console || {
             log: noop,
             info: noop
@@ -256,7 +259,7 @@
 
     // any value, but not only whitespace
     $.expr[":"].filled = function(elem) {
-        return !!trim(elem.value);
+        return !!trim(elementValue(elem));
     };
 
 
@@ -636,7 +639,7 @@
                             };
 
                         // only gets focus, no verification
-                        if (key === 9 && !el.value) return;
+                        if (key === 9 && !elementValue(el)) return;
 
                         // do not validate, if triggered by these keys
                         if (key < 48 && !specialKey[key]) return;
@@ -695,7 +698,7 @@
             me.elements[field.key] = ret.element = el;
             me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
 
-            field.old.value = el.value;
+            field.old.value = elementValue(el);
             field.old.id = el.id;
             field.old.ret = ret;
 
@@ -825,6 +828,7 @@
                 key = field.key,
                 rule = field.rules[field._i],
                 method = rule.method,
+                value = elementValue(el),
                 params = rule.params;
 
             // request has been sent, wait it
@@ -834,7 +838,7 @@
 
             if ( !field.must && rule.ret !== undefined &&
                  old.rule === rule && old.id === el.id &&
-                 el.value && old.value === el.value )
+                value && old.value === value )
             {
                 // get result from cache
                 ret = rule.ret;
@@ -911,7 +915,7 @@
             if (me.options.debug) debug.info(field.key);
 
             // if the field is not required, and that has a blank value
-            if (!field.required && !field.must && !el.value) {
+            if (!field.required && !field.must && !elementValue(el)) {
                 if (!checkable(el)) {
                     me._validatedField(el, field, {isValid: true});
                     return;
@@ -1217,11 +1221,11 @@
                 return fn;
             case 'array':
                 return function(el) {
-                    return fn[0].test(el.value) || fn[1] || false;
+                    return fn[0].test(elementValue(el)) || fn[1] || false;
                 };
             case 'regexp':
                 return function(el) {
-                    return fn.test(el.value);
+                    return fn.test(elementValue(el));
                 };
         }
     }
@@ -1378,7 +1382,7 @@
          */
         required: function(element, params, field) {
             var me = this,
-                val = trim(element.value),
+                val = trim(elementValue(element)),
                 isValid = true;
 
             if (params) {
@@ -1408,7 +1412,7 @@
                         ret;
                         
                     isValid = $elements.filter(function(){
-                        return !!trim(this.value);
+                        return !!trim(elementValue(this));
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
@@ -1463,7 +1467,7 @@
             }
             re = '^(?:' + re + ')$';
 
-            return new RegExp(re).test(element.value) || this.messages.integer[key];
+            return new RegExp(re).test(elementValue(element)) || this.messages.integer[key];
         },
 
         /** match another field
@@ -1496,8 +1500,8 @@
             // If the compared field is not exist
             if (!elem2) return;
             field2 = me.getField(elem2);
-            a = element.value;
-            b = elem2.value;
+            a = elementValue(element);
+            b = elementValue(elem2);
 
             if (!field._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
@@ -1551,7 +1555,7 @@
             range[~100]    Number less than or equal to 100
          **/
         range: function(element, params) {
-            return this.getRangeMsg(+element.value, params, 'range');
+            return this.getRangeMsg(+elementValue(element), params, 'range');
         },
 
         /** how many checkbox or radio inputs that checked
@@ -1589,7 +1593,7 @@
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
         length: function(element, params) {
-            var value = element.value,
+            var value = elementValue(element),
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
 
             return this.getRangeMsg(len, params, 'length', (params[1] ? '_2' : ''));
@@ -1616,7 +1620,7 @@
                 arr = rAjaxType.exec(params[0]),
                 data = {};
 
-            data[element.name] = element.value;
+            data[element.name] = elementValue(element);
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
@@ -1642,7 +1646,7 @@
          *  filter(regexp)  filter the "regexp" matched characters
          */
         filter: function(element, params) {
-            element.value = element.value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
+            element.value = elementValue(element).replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
         }
     });
 

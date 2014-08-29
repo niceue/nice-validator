@@ -33,9 +33,10 @@
             ,url: [/^(https?|s?ftp):\/\/\S+$/i, "Please enter a valid URL."]
             ,accept: function (element, params){
                 if (!params) return true;
-                var ext = params[0];
+                var ext = params[0],
+                    value = $(element).val();
                 return (ext === '*') ||
-                       (new RegExp(".(?:" + ext + ")$", "i")).test(element.value) ||
+                       (new RegExp(".(?:" + ext + ")$", "i")).test(value) ||
                        this.renderMsg("Only accept {1} file extension.", ext.replace(/\|/g, ', '));
             }
             
