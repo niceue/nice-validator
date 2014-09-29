@@ -292,7 +292,7 @@
             dataOpt = attr(element, 'data-'+ NS +'-option');
             dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
             themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
-            opt = me.options = $.extend({}, defaults, themeOpt, dataOpt, me.options, options);
+            opt = me.options = $.extend({}, defaults, themeOpt, me.options, options, dataOpt);
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
