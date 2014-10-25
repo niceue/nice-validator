@@ -83,7 +83,7 @@
         isObject = function(o) {
             return o && Object.prototype.toString.call(o) === '[object Object]';
         },
-        isIE6 = !window.XMLHttpRequest,
+        isIE = +(navigator.userAgent.match(/MSIE (\d+)/) && RegExp.$1),
         attr = function(el, key, value) {
             if (value !== undefined) {
                 if (value === null) el.removeAttribute(key);
@@ -342,7 +342,7 @@
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
                 if (opt.timely !== 0) {
-                    me.$el.on('keyup'+ CLS_NS +' paste'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
+                    me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
                           .on('click'+ CLS_NS, ':radio,:checkbox', proxy(me, '_focusout'))
                           .on('change'+ CLS_NS, 'select,input[type="file"]', proxy(me, '_focusout'));
                 }
@@ -593,7 +593,7 @@
             });
         },
 
-        // Handle focusout/validate/keyup/click/change/paste events
+        // Handle focusout/validate/keyup/click/change/input events
         _focusout: function(e, elem) {
             var me = this,
                 opt = me.options,
@@ -1090,7 +1090,7 @@
                 cls = $msgbox[0].className;
                 
             !rPos.test(cls) && $msgbox.addClass(msgOpt.cls);
-            if ( isIE6 && msgOpt.pos === 'bottom' ) {
+            if ( isIE === 6 && msgOpt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
             $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
