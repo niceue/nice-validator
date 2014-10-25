@@ -196,7 +196,7 @@
         fields[key][timely]     {Boolean}     Whether to enable timely verification
         fields[key][target]     {jqSelector}  Verify the current field, but the message can be displayed on target element
      */
-    $.fn[NS] = function(options) {
+    $.fn[NS] = $.fn.niceValidator = function(options) {
         var that = this,
             args = arguments;
 
