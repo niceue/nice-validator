@@ -865,17 +865,17 @@
                             result,
                             dataFilter = field.dataFilter || me.options.dataFilter;
 
+                        if (!isFunction(dataFilter)) {
+                            dataFilter = function(data) {
+                                if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
+                            };
+                        }
+
                         // detect if data is json or jsonp format
                         if (/jsonp?/.test(this.dataType)) {
                             data = d;
                         } else if (trim(data).charAt(0) === '{') {
                             data = $.parseJSON(data) || {};
-                        }
-
-                        if (!isFunction(dataFilter)) {
-                            dataFilter = function(data) {
-                                if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
-                            };
                         }
 
                         // filter data
@@ -1618,7 +1618,8 @@
 
             var me = this,
                 arr = rAjaxType.exec(params[0]),
-                data = {};
+                data = {},
+                dataType;
 
             data[element.name] = elementValue(element);
             // There are extra fields
@@ -1631,11 +1632,17 @@
                 });
             }
 
+            // force jsonp dataType
+            if (/^https?:/.test(arr[2]) && !~arr[2].indexOf(location.host)) {
+                dataType = 'jsonp';   
+            }
+
             // Asynchronous validation need to return jqXHR objects
             return $.ajax({
                 url: arr[2],
                 type: arr[1] || 'POST',
                 data: data,
+                dataType: dataType,
                 cache: false
             });
         },
