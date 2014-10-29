@@ -791,8 +791,8 @@
                     $(el).trigger('valid'+CLS_NS_RULE, [method, msg]);
                 } else {
                     /* rule message priority:
-                        1. custom field message;
-                        2. custom DOM message
+                        1. custom DOM message
+                        2. custom field message;
                         3. global defined message;
                         4. rule returned message;
                         5. default message;
