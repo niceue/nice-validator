@@ -409,6 +409,10 @@
                 field.required = true;
                 attr(el, ARIA_REQUIRED, true);
             }
+            if (!('showOk' in field)) {
+                field.showOk = me.options.showOk;
+            }
+
             if ('timely' in field) {
                 attr(el, DATA_TIMELY, +field.timely);
             }
@@ -778,10 +782,11 @@
             // message analysis, and throw rule level event
             else {
                 if (isValid) {
-                    if (opt.showOk !== false) {
-                        msg = attr(el, DATA_OK) || (isString(field.ok) ? field.ok : msg);
-                        if (!isString(msg) && isString(opt.showOk)) {
-                            msg = opt.showOk;
+                    if (field.showOk !== false) {
+                        var temp = attr(el, DATA_OK);
+                        msg = temp === null ? isString(field.ok) ? field.ok : msg : temp;
+                        if (!isString(msg) && isString(field.showOk)) {
+                            msg = field.showOk;
                         }
                         if (isString(msg)) {
                             msgOpt.showOk = isValid;
@@ -1479,6 +1484,8 @@
             match[lte, count]  The value must be less than or equal to the value of the count field
             match[gt, count]   The value must be greater than the value of the count field
             match[gte, count]  The value must be greater than or equal to the value of the count field
+            match[gte, startDate, date]
+            match[gte, startTime, time]
          **/
         match: function(element, params, field) {
             if (!params) return;
@@ -1609,9 +1616,10 @@
                 3. json wrapper:
                     {"status": 1, "data": {"ok": ""}}  {"status": 1, "data": {"error": "Error Message"}}
          * @example:
-            The simplest:       remote(path/to/server.php);
-            With parameters:    remote(path/to/server.php, name1, name2, ...);
-            By GET:             remote(get:path/to/server.php, name1, name2, ...);
+            The simplest:       remote(path/to/server);
+            With parameters:    remote(path/to/server, name1, name2, ...);
+            By GET:             remote(get:path/to/server, name1, name2, ...);
+            Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3)
          */
         remote: function(element, params) {
             if (!params) return;
