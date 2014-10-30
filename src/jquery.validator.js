@@ -337,8 +337,9 @@
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
                       .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
                       .on('reset'+ CLS_NS, proxy(me, '_reset'))
-                      .on('showtip'+ CLS_NS, proxy(me, '_showTip'))
-                      .on('focusin'+ CLS_NS +' click'+ CLS_NS +' showtip'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
+                      .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
+                      .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
+                      .on('focusin'+ CLS_NS +' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
                 if (opt.timely !== 0) {
@@ -579,12 +580,10 @@
 
             if (me.verifying) return;
 
-            if (e.type !== 'showtip') {
-                if (opt.focusCleanup) {
-                    if ( attr(el, ARIA_INVALID) === 'true' ) {
-                        $(el).removeClass(opt.invalidClass);
-                        me.hideMsg(el);
-                    }
+            if (opt.focusCleanup) {
+                if ( attr(el, ARIA_INVALID) === 'true' ) {
+                    $(el).removeClass(opt.invalidClass);
+                    me.hideMsg(el);
                 }
             }
 
@@ -670,16 +669,26 @@
             }
         },
 
-        _showTip: function(e){
-            var me = this;
+        _showmsg: function(e, type, msg) {
+            var me = this,
+                el = e.target;
 
-            if (me.$el[0] !== e.target) return;
-            me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]").each(function(){
-                me.showMsg(this, {
-                    msg: attr(this, DATA_TIP),
-                    type: 'tip'
+            if ( $(el).is(':input') ) {
+                me.showMsg(el, {type: type, msg: msg});
+            }
+            else if (type === 'tip') {
+                me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
+                    me.showMsg(this, {type: type, msg: msg});
                 });
-            });
+            }
+        },
+
+        _hidemsg: function(e) {
+            var $el = $(e.target);
+
+            if ( $el.is(':input') ) {
+                this.hideMsg($el);
+            }
         },
 
         // Validated a field
@@ -1068,7 +1077,7 @@
                 opt = me.options,
                 msgMaker;
 
-            if (typeof el === 'object' && !el.nodeName && !msgOpt) {
+            if (isObject(el) && !el.jquery && !msgOpt) {
                 $.each(el, function(key, msg) {
                     var el = me.elements[key] || me.$el.find(key2selector(key))[0];
                     me.showMsg(el, msg);
@@ -1077,8 +1086,13 @@
             }
 
             msgOpt = me._getMsgOpt(msgOpt);
-            if (!msgOpt.msg && !msgOpt.showOk) return;
             el = $(el).get(0);
+
+            if (!msgOpt.msg && msgOpt.type !== 'error') {
+                msgOpt.msg = attr(el, 'data-' + msgOpt.type);
+            }
+
+            if (!msgOpt.msg && !msgOpt.showOk) return;
 
             if ($(el).is(INPUT_SELECTOR)) {
                 field = field || me.getField(el);
