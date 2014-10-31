@@ -1088,11 +1088,13 @@
             msgOpt = me._getMsgOpt(msgOpt);
             el = $(el).get(0);
 
+            // ok or tip
             if (!msgOpt.msg && msgOpt.type !== 'error') {
-                msgOpt.msg = attr(el, 'data-' + msgOpt.type);
+                var temp = attr(el, 'data-' + msgOpt.type);
+                if (temp !== null) msgOpt.msg = temp;
             }
 
-            if (!msgOpt.msg && !msgOpt.showOk) return;
+            if (!isString(msgOpt.msg)) return;
 
             if ($(el).is(INPUT_SELECTOR)) {
                 field = field || me.getField(el);
