@@ -1658,7 +1658,7 @@
 
             // force jsonp dataType
             if (/^https?:/.test(arr[2]) && !~arr[2].indexOf(location.host)) {
-                dataType = 'jsonp';   
+                dataType = 'jsonp';
             }
 
             // Asynchronous validation need to return jqXHR objects
