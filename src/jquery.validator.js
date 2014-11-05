@@ -1635,7 +1635,8 @@
             The simplest:       remote(path/to/server);
             With parameters:    remote(path/to/server, name1, name2, ...);
             By GET:             remote(get:path/to/server, name1, name2, ...);
-            Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3)
+            Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3, ...)
+            Query String        remote(path/to/server, foo=1&bar=2, name1, name2, ...)
          */
         remote: function(element, params) {
             if (!params) return;
@@ -1643,20 +1644,26 @@
             var me = this,
                 arr = rAjaxType.exec(params[0]),
                 data = {},
+                queryString = '',
                 dataType;
 
             data[element.name] = elementValue(element);
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
-                    var arr = name.split(':'), key;
-                    name = trim(arr[0]);
-                    key = trim(arr[1] || '') || name;
-                    data[ name ] = me.$el.find( key2selector(key) ).val();
+                    var arr, key;
+                    if (~name.indexOf('=')) {
+                        queryString += '&' + name;
+                    } else {
+                        arr = name.split(':');
+                        name = trim(arr[0]);
+                        key = trim(arr[1]) || name;
+                        data[ name ] = me.$el.find( key2selector(key) ).val();
+                    }
                 });
             }
 
-            // force jsonp dataType
+            // Cross-domain request, force jsonp dataType
             if (/^https?:/.test(arr[2]) && !~arr[2].indexOf(location.host)) {
                 dataType = 'jsonp';
             }
@@ -1665,7 +1672,7 @@
             return $.ajax({
                 url: arr[2],
                 type: arr[1] || 'POST',
-                data: data,
+                data: $.param(data) + queryString,
                 dataType: dataType,
                 cache: false
             });
