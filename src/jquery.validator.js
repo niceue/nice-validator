@@ -557,9 +557,11 @@
 
             me.errors = {};
             if (e) {
+                me.reseting = true;
                 me.$el.find(INPUT_SELECTOR).each( function(i, el){
                     me._resetElement(el);
                 });
+                delete me.reseting;
             }
         },
 
@@ -1130,7 +1132,7 @@
             if ($(el).is(INPUT_SELECTOR)) {
                 field = field || me.getField(el);
                 if (field) {
-                    if (field.isValid) attr(el, ARIA_INVALID, null);
+                    if (field.isValid || me.reseting) attr(el, ARIA_INVALID, null);
                     msgOpt.wrapper = field.msgWrapper || msgOpt.wrapper;
                     msgOpt.target = field.target || opt.target;
                 }
