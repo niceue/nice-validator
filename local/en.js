@@ -27,7 +27,7 @@
         rules: {
             digits: [/^\d+$/, "Please enter only digits."]
             ,letters: [/^[a-z]+$/i, "Please enter only letters."]
-            ,date: [/^\d{4}-\d{1,2}-\d{1,2}$/, "Please enter a valid date, format: yyyy-mm-dd"]
+            ,date: [/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date, format: yyyy-mm-dd"]
             ,time: [/^([01]\d|2[0-3])(:[0-5]\d){1,2}$/, "Please enter a valid time, between 00:00 and 23:59"]
             ,email: [/^[\w\+\-]+(\.[\w\+\-]+)*@[a-z\d\-]+(\.[a-z\d\-]+)*\.([a-z]{2,4})$/i, "Please enter a valid email address."]
             ,url: [/^(https?|s?ftp):\/\/\S+$/i, "Please enter a valid URL."]
