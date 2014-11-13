@@ -154,7 +154,7 @@
         focusInvalid  {Boolean}     true      Whether to focus the field that is invalid
         ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
         
-        beforeSubmit  {Function}              Do something before submitting the form
+        beforeSubmit  {Function}              Do something before submiting the form
         dataFilter    {Function}              Conversion ajax results
         valid         {Function}              Triggered when the form is valid
         invalid       {Function}              Triggered when the form is invalid
@@ -345,8 +345,8 @@
 
                 if (opt.timely !== 0) {
                     me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
-                          .on('click'+ CLS_NS, ':radio,:checkbox', proxy(me, '_focusout'))
-                          .on('change'+ CLS_NS, 'select,input[type="file"]', proxy(me, '_focusout'));
+                          .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
+                          .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
                 }
 
                 // cache the novalidate attribute value
@@ -634,12 +634,12 @@
                     }
                 }
                 else {
-                    if (timely < 2) return;
+                    if (timely < 2 && !e.data) return;
 
                     // mark timestamp to reduce the frequency of the received event
                     timestamp = +new Date();
-                    if ( timestamp - (el._dataTimestamp || 0) < 200 ) return;
-                    el._dataTimestamp = timestamp;
+                    if ( timestamp - (el._ts || 0) < 100 ) return;
+                    el._ts = timestamp;
 
                     // handle keyup
                     if (etype === 'keyup') {
@@ -659,7 +659,7 @@
                         if (key < 48 && !specialKey[key]) return;
                     }
                     // keyboard events, reducing the frequency of verification
-                    timer = timely >=100 ? timely : 500;
+                    timer = timely >=100 ? timely : 400;
                 }
             }
 
@@ -669,8 +669,13 @@
             field = me.getField(el);
             if (!field) return;
 
-            if (timer) {
-                if (field._t) clearTimeout(field._t);
+            clearTimeout(field._t);
+
+            // not validate field unless fill a value
+            if (opt.ignoreBlank && !value) {
+                me.hideMsg(el);
+            }
+            else if (timer) {
                 field._t = setTimeout(function() {
                     me._validate(el, field);
                 }, timer);
@@ -1415,11 +1420,6 @@
             var me = this,
                 val = trim(elementValue(element)),
                 isValid = true;
-
-            // not validate field unless fill a value
-            if (me.options.ignoreBlank && !val) {
-                return null;
-            }
 
             if (params) {
                 if (params.length === 1) {
