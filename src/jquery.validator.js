@@ -605,6 +605,7 @@
                 opt = me.options,
                 field,
                 el = e.target,
+                value = elementValue(el),
                 etype = e.type,
                 timely,
                 timer = 0;
@@ -614,7 +615,7 @@
                 elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
             }
             // not validate field unless fill a value
-            else if (opt.ignoreBlank && !elementValue(el)) {
+            else if (opt.ignoreBlank && !value) {
                 me.hideMsg(el);
                 return;
             }
@@ -650,7 +651,7 @@
                             };
 
                         // only gets focus, no verification
-                        if (key === 9 && !elementValue(el)) return;
+                        if (key === 9 && !value) return;
 
                         // do not validate, if triggered by these keys
                         if (key < 48 && !specialKey[key]) return;
