@@ -111,6 +111,7 @@
             //stopOnError: false,
             //focusCleanup: false,
             focusInvalid: true,
+            ignoreBlank: true,
             beforeSubmit: noop,
             //dataFilter: null,
             //valid: null,
@@ -598,7 +599,7 @@
             });
         },
 
-        // Handle focusout/validate/keyup/click/change/input events
+        // Handle "focusout/validate/keyup/click/change/input" events
         _focusout: function(e, elem) {
             var me = this,
                 opt = me.options,
@@ -611,6 +612,11 @@
             // Just for checkbox and radio
             if (!elem && checkable(el)) {
                 elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
+            }
+            // not validate field unless fill a value
+            else if (opt.ignoreBlank && !elementValue(el)) {
+                me.hideMsg(el);
+                return;
             }
 
             timely = attr(elem || el, DATA_TIMELY);
