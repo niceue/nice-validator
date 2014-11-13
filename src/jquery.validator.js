@@ -607,17 +607,13 @@
                 el = e.target,
                 value = elementValue(el),
                 etype = e.type,
+                timestamp,
                 timely,
                 timer = 0;
 
             // Just for checkbox and radio
             if (!elem && checkable(el)) {
                 elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
-            }
-            // not validate field unless fill a value
-            else if (opt.ignoreBlank && !value) {
-                me.hideMsg(el);
-                return;
             }
 
             timely = attr(elem || el, DATA_TIMELY);
@@ -639,6 +635,12 @@
                 }
                 else {
                     if (timely < 2) return;
+
+                    // mark timestamp to reduce the frequency of the received event
+                    timestamp = +new Date();
+                    if ( timestamp - (el._dataTimestamp || 0) < 200 ) return;
+                    el._dataTimestamp = timestamp;
+
                     // handle keyup
                     if (etype === 'keyup') {
                         var key = e.keyCode,
@@ -655,10 +657,9 @@
 
                         // do not validate, if triggered by these keys
                         if (key < 48 && !specialKey[key]) return;
-
-                        // keyboard events, reducing the frequency of verification
-                        timer = timely >=100 ? timely : 500;
                     }
+                    // keyboard events, reducing the frequency of verification
+                    timer = timely >=100 ? timely : 500;
                 }
             }
 
@@ -1414,6 +1415,11 @@
             var me = this,
                 val = trim(elementValue(element)),
                 isValid = true;
+
+            // not validate field unless fill a value
+            if (me.options.ignoreBlank && !val) {
+                return null;
+            }
 
             if (params) {
                 if (params.length === 1) {
