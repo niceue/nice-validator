@@ -111,7 +111,7 @@
             //stopOnError: false,
             //focusCleanup: false,
             focusInvalid: true,
-            ignoreBlank: true,
+            //ignoreBlank: false,
             beforeSubmit: noop,
             //dataFilter: null,
             //valid: null,
