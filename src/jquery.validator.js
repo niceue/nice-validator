@@ -134,7 +134,7 @@
             //msgShow: null,
             //msgHide: null,
             //showOk: true,
-            defaultMsg: '{0} is not valid.',
+            defaultMsg: "This field is not valid.",
             loadingMsg: 'Validating...'
         },
         themes = {
