@@ -317,6 +317,10 @@
                 hide: opt.msgHide
             };
 
+            if (isString(opt.target)) {
+                me.$el.find(opt.target).addClass('msg-container');
+            }
+
             // Guess whether it use ajax submit
             me.isAjaxSubmit = false;
             if (opt.valid) {
@@ -1044,7 +1048,7 @@
         },
 
         _getMsgDOM: function(el, msgOpt) {
-            var $el = $(el), $msgbox, datafor, tgt;
+            var $el = $(el), $msgbox, datafor, tgt, container;
 
             if ($el.is(':input')) {
                 tgt = msgOpt.target || attr(el, DATA_TARGET);
@@ -1054,7 +1058,7 @@
                         if (tgt.is(':input')) {
                             el = tgt.get(0);
                         } else {
-                            $msgbox = tgt;
+                            container = tgt;
                         }
                     }
                 }
@@ -1077,7 +1081,11 @@
                     var $parent = $el.parent();
                     $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
                 } else {
-                    $msgbox[!msgOpt.pos || msgOpt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
+                    if (container) {
+                        $msgbox.appendTo(container);
+                    } else {
+                        $msgbox[!msgOpt.pos || msgOpt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
+                    }
                 }
             }
 
