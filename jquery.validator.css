@@ -3,6 +3,8 @@
  * http://niceue.com/validator/
  */
 .n-inline-block,.nice-validator input,.nice-validator select,.nice-validator textarea,.msg-wrap,.n-icon,.n-msg{display:inline-block;*display:inline;*zoom:1}
+.nice-validator .msg-container .msg-box{display:block}
+.nice-validator .msg-container .msg-wrap{position:static}
 .msg-box{position:relative;*zoom:1}
 .msg-wrap{position:relative;white-space:nowrap}
 .msg-wrap,.n-icon,.n-msg{vertical-align:top}

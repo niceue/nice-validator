@@ -39,6 +39,10 @@ inline-block() {
     input, select, textarea {
         @extend .n-inline-block
     }
+    .msg-container {
+        .msg-box {display: block;}
+        .msg-wrap {position:static;}
+    }
 }
 .msg-box {
     position:relative;

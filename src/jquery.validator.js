@@ -152,6 +152,7 @@
         stopOnError   {Boolean}     false     Whether to stop validate when found an error input
         focusCleanup  {Boolean}     false     Whether to clean up the field message when focus the field
         focusInvalid  {Boolean}     true      Whether to focus the field that is invalid
+        ignoreBlank   {Boolean}     false     When the field has no value, whether to ignore verification
         ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
         
         beforeSubmit  {Function}              Do something before submiting the form
