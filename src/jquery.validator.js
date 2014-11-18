@@ -612,6 +612,7 @@
                 el = e.target,
                 value = elementValue(el),
                 etype = e.type,
+                special = etype === 'validate',
                 timestamp,
                 timely,
                 timer = 0;
@@ -624,7 +625,7 @@
             timely = attr(elem || el, DATA_TIMELY);
             timely = timely !== null ? +timely : +opt.timely;
 
-            if (etype !== 'validate') {
+            if (!special) {
                 if ( timely === 0 ) return;
 
                 if (etype === 'focusout') {
@@ -685,6 +686,7 @@
                     me._validate(el, field);
                 }, timer);
             } else {
+                if (special) field.old = {};
                 me._validate(el, field);
             }
         },
