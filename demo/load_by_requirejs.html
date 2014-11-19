@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>Load By RequireJS</title>
+    <meta charset="utf-8">
+    <title>Load By RequireJS</title>
 </head>
 
 <body>
 
 <form>
-	<p><input type="text" name="username" data-rule="required"></p>
-	<p><input type="password" name="password" data-rule="required"></p>
-	<p><button type="submit">Submit</button></p>
+    <p><input type="text" name="username" data-rule="required"></p>
+    <p><input type="password" name="password" data-rule="required"></p>
+    <p><button type="submit">Submit</button></p>
 </form>
 
 
 <script src="lib/require.js"></script>
 <script>
 requirejs.config({
-	paths: {
-		jquery: 'lib/jquery-1.11.1.min',
-		validator: '../local/en'
-	}
+    paths: {
+        jquery: 'lib/jquery-1.11.1.min',
+        validator: '../local/en'
+    }
 });
 
 define('demo', ['jquery', 'validator'], function($){
-	// do something
+    // do something
 });
 
 require(['demo']);
