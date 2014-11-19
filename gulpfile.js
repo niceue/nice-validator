@@ -90,7 +90,7 @@ gulp.task('release', ['test', 'build', 'i18n'], function () {
         );
     });
     var zip = require('gulp-zip');
-    return gulp.src(['src/jquery.validator.js', 'images/*', '!images/Thumbs.db', 'local/*', 'demo/*', 'jquery.validator.js', 'jquery.validator.css', 'package.json', 'README.md'], {base: './'})
+    return gulp.src(['src/jquery.validator.js', 'images/*', '!images/Thumbs.db', 'local/*', 'demo/**/*', 'jquery.validator.js', 'jquery.validator.css', 'package.json', 'README.md'], {base: './'})
         .pipe(zip(pkg.name + '-release-' + pkg.version  + '.zip'))
         .pipe(gulp.dest('./'));
 });
