@@ -13,6 +13,7 @@
         factory(jQuery);
     }
 }(function($) {
+
     /* Global configuration
      */
     $.validator.config({
@@ -40,12 +41,9 @@
                        this.renderMsg("Only accept {1} file extension.", ext.replace(/\|/g, ', '));
             }
             
-        }
-    });
+        },
 
-    /* Default error messages
-     */
-    $.validator.config({
+        // Default error messages
         messages: {
             error: "Network Error.",
             timeout: "Request timed out.",
@@ -120,32 +118,21 @@
                 var $el = $msgbox.children();
                 if ($el.is(':animated')) return;
                 if (type === 'error') {
-                    $el.css({
-                        left: '20px',
-                        opacity: 0
-                    }).delay(100).show().stop().animate({
-                        left: '-4px',
-                        opacity: 1
-                    }, 150).animate({
-                        left: '3px'
-                    }, 80).animate({
-                        left: 0
-                    }, 80);
+                    $el.css({left: '20px', opacity: 0})
+                        .delay(100).show().stop()
+                        .animate({left: '-4px', opacity: 1}, 150)
+                        .animate({left: '3px'}, 80)
+                        .animate({left: 0}, 80);
                 } else {
-                    $el.css({
-                        left: 0,
-                        opacity: 1
-                    }).fadeIn(200);
+                    $el.css({left: 0, opacity: 1}).fadeIn(200);
                 }
             },
             msgHide: function($msgbox, type){
                 var $el = $msgbox.children();
-                $el.stop().delay(100).show().animate({
-                    left: '20px',
-                    opacity: 0
-                }, 300, function(){
-                    $msgbox.hide();
-                });
+                $el.stop().delay(100).show()
+                    .animate({left: '20px', opacity: 0}, 300, function(){
+                        $msgbox.hide();
+                    });
             }
         }
     });
