@@ -12,7 +12,8 @@ Thumbs.db
 *.log
 
 node_modules
-src/libs
+src/lib
 src/*.html
 /*.bat
 /*.sh
+/*.zip
