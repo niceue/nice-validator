@@ -2,8 +2,7 @@
  * (c) 2012-2014 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
-/*jshint evil:true, expr:true, strict:false*/
-/*global define*/
+/*jshint evil:true*/
 (function(factory) {
     if (typeof define === 'function') {
         // Register as an anonymous module.
