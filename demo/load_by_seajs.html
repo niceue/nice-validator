@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Load By Sea.js</title>
+</head>
+
+<body>
+
+<form>
+	<p><input type="text" name="username" data-rule="required"></p>
+	<p><input type="password" name="password" data-rule="required"></p>
+	<p><button type="submit">提交</button></p>
+</form>
+
+
+<script src="lib/sea.js" id="seajsnode"></script>
+<script>
+seajs.config({
+	base: './',
+	alias: {
+		jquery: 'lib/jquery-1.11.1.min',
+		validator: '../local/zh_CN'
+	}
+});
+
+// define a module
+define('demo', function(require){
+	var $ = require('jquery');
+	require('validator');
+	// do something
+});
+
+// use module
+seajs.use('demo');
+
+</script>
+</body>
+</html>
