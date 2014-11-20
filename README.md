@@ -1,6 +1,5 @@
 ## nice Validator
 [![Build Status](https://travis-ci.org/niceue/validator.png)](https://travis-ci.org/niceue/validator)
-[![Coverage Status](https://coveralls.io/repos/niceue/validator/badge.png)](https://coveralls.io/r/niceue/validator)
 
 Simple, smart and pleasant verification solution.
 
