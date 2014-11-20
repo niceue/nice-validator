@@ -33,7 +33,7 @@ gulp.task('test', ['lint'], function () {
 });
 
 // build main files
-gulp.task('build', function () {
+gulp.task('build', ['test'], function () {
     gulp.src('src/jquery.validator.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
@@ -52,9 +52,9 @@ gulp.task('build', function () {
 
 // build local settings
 gulp.task('i18n', function () {
-    var compiler = tpl( fs.readFileSync( './src/local/_lang.tpl' ).toString() );
+    var compiler = tpl( fs.readFileSync( 'src/local/_lang.tpl' ).toString() );
     
-    fs.readdirSync('./src/local/').forEach(function(f){
+    fs.readdirSync('src/local/').forEach(function(f){
         var name = path.basename(f);
         if ( /^[a-z]{2}(?:_[A-Z]{2})?\.js/.test(name) ) {
             i18n( name );
@@ -72,7 +72,7 @@ gulp.task('i18n', function () {
             str = compiler.render(data);
 
             fs.writeFileSync(outfile, str);
-            console.log( 'ok: '+outfile );
+            console.log( 'ok: '+ outfile );
     }
 });
 
@@ -95,9 +95,10 @@ gulp.task('release', ['test', 'build', 'i18n'], function () {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['test', 'build']);
+gulp.task('default', ['build', 'i18n']);
 
 
+// tiny template engine
 function Compiler(html) {
     html = html || '';
     if (/\.(?=tpl|html)$/.test(html)) html = fs.readFileSync(html);
