@@ -22,8 +22,8 @@ Simple, smart and pleasant verification solution.
 - To contribute or send an idea, github message me or fork the project
 
 ### Build
-`nice Validator` use [gulp](http://gulpjs.com/) to build project.  
-you should have installed [nodejs](nodejs.org), cd the `validator` directory.
+nice Validator use [gulp](http://gulpjs.com/) to build project.  
+you should have installed [nodejs](nodejs.org), cd the `validator` directory, and install dependencies:
 ```
 $ npm install -g gulp
 $ npm install
@@ -34,4 +34,4 @@ $ gulp
 ```
 
 ### License
-`nice Validator`is available under the terms of the [MIT License](https://github.com/niceue/validator/blob/master/LICENSE.txt).
+nice Validator is available under the terms of the [MIT License](https://github.com/niceue/validator/blob/master/LICENSE.txt).
