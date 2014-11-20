@@ -238,7 +238,7 @@
             function(isValid){
                 if (!isValid && opt.focusInvalid && !me.checkOnly) {
                     // navigate to the error element
-                    me.$el.find(':input[' + ARIA_INVALID + ']:first').focus();
+                    me.$el.find('[' + ARIA_INVALID + ']:input:first').focus();
                 }
                 hasCallback && callback.call(null, isValid);
                 me.checkOnly = false;
@@ -531,7 +531,7 @@
                     if (!isValid) {
                         if (opt.focusInvalid) {
                             // navigate to the error element
-                            me.$el.find(':input[' + ARIA_INVALID + '="true"]:first').focus();
+                            me.$el.find('[' + ARIA_INVALID + '="true"]:input:first').focus();
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
@@ -1365,13 +1365,13 @@
     }
 
     function key2selector(key) {
-        return key.charAt(0) === "#" ? key : ':input[name="'+ key +'"]';
+        return key.charAt(0) === "#" ? key : '[name="'+ key +'"]:input';
     }
 
 
     // Global events
     $(document)
-    .on('focusin', ':input['+DATA_RULE+']', function(e) {
+    .on('focusin', '['+DATA_RULE+']:input', function(e) {
         initByInput(e);
     })
 
