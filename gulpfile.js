@@ -77,7 +77,7 @@ gulp.task('i18n', function () {
 });
 
 // when release a version
-gulp.task('release', ['test', 'build', 'i18n'], function () {
+gulp.task('release', ['build', 'i18n'], function () {
     var JQUERY_JSON = './niceValidator.jquery.json';
     fs.readFile(JQUERY_JSON, function(err, data){
         if (err) throw err;
@@ -90,7 +90,15 @@ gulp.task('release', ['test', 'build', 'i18n'], function () {
         );
     });
     var zip = require('gulp-zip');
-    return gulp.src(['src/jquery.validator.js', 'images/*', '!images/Thumbs.db', 'local/*', 'demo/**/*', 'jquery.validator.js', 'jquery.validator.css', 'package.json', 'README.md'], {base: './'})
+    return gulp.src([
+            'src/jquery.validator.js',
+            'images/*', '!images/Thumbs.db',
+            'local/*',
+            'demo/**/*',
+            'jquery.validator.js',
+            'jquery.validator.css',
+            'README.md'
+        ], {base: './'})
         .pipe(zip(pkg.name + '-release-' + pkg.version  + '.zip'))
         .pipe(gulp.dest('./'));
 });
