@@ -22,8 +22,16 @@ Simple, smart and pleasant verification solution.
 - To contribute or send an idea, github message me or fork the project
 
 ### Build
-`nice Validator` use [UglifyJS2](https://github.com/mishoo/UglifyJS) ,and [Stylus](http://learnboost.github.io/stylus/) to build project,<br>
-you should have installed [nodejs](nodejs.org), cd the `validator` directory and run `npm install`.
+`nice Validator` use [gulp](http://gulpjs.com/) to build project.  
+you should have installed [nodejs](nodejs.org), cd the `validator` directory.
+```
+$ npm install -g gulp
+$ npm install
+```
+Then run gulp will automatic test and build
+```
+$ gulp
+```
 
 ### License
 `nice Validator`is available under the terms of the [MIT License](https://github.com/niceue/validator/blob/master/LICENSE.txt).
