@@ -1,8 +1,9 @@
 ## nice Validator
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/niceue/validator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/niceue/validator.png)](https://travis-ci.org/niceue/validator)
-Simple, smart and pleasant verification solution.
 [![Coverage Status](https://coveralls.io/repos/niceue/validator/badge.png)](https://coveralls.io/r/niceue/validator)
+
+Simple, smart and pleasant verification solution.
 
 ### Documention
 [English](https://github.com/niceue/validator/wiki/Getting-Started) (0.8+)  
