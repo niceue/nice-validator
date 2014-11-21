@@ -1,0 +1,38 @@
+{
+  "name": "nice-validator",
+  "version": "0.8.0",
+  "description": "Simple, smart and pleasant verification solution.",
+  "moduleType": [
+    "amd",
+    "cmd",
+    "globals"
+  ],
+  "keywords": [
+    "jquery-plugin",
+    "form",
+    "validate",
+    "validation",
+    "validator",
+    "nice-validator"
+  ],
+  "authors": [
+    "Jony Zhang <zj86@live.cn>"
+  ],
+  "license": "MIT",
+  "homepage": "http://niceue.com/validator/",
+  "dependencies": {
+    "jquery": "^1.7.0"
+  },
+  "ignore": [
+    "**/.*",
+    ".*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "*.md",
+    "*.json",
+    "src/**/*",
+    "!src/*.js",
+    "gulpfile.js"
+  ]
+}
