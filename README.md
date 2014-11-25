@@ -23,7 +23,7 @@ Simple, smart and pleasant verification solution.
 
 ### Build
 nice Validator use [gulp](http://gulpjs.com/) to build project.  
-you should have installed [nodejs](nodejs.org), cd the `validator` directory, and install dependencies:
+you should have installed [node.js](http://nodejs.org/), cd the `validator` directory, and install dependencies:
 ```
 $ npm install -g gulp
 $ npm install
