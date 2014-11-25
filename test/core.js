@@ -63,7 +63,7 @@ describe('Core', function(){
         });
     });
 
-    describe('Initialization', function(){
+    describe('Options', function(){
 
     });
 
