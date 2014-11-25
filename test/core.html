@@ -2,17 +2,13 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Nice Validator Test</title>
-  <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+  <title>Test Core</title>
+  <link rel="stylesheet" href="lib/mocha.css" />
+  <script src="lib/mocha.min.js"></script>
+  <script src="lib/assert.js"></script>
   <style>
     form {position: absolute; z-index: -1; left: -100%;}
   </style>
-  <script src="../node_modules/mocha/mocha.js"></script>
-  <script src="lib/assert.js"></script>
-  <script>
-    mocha.ui('bdd');
-    mocha.reporter('html');
-  </script>
 </head>
 <body>
   <div id="mocha"></div>
@@ -20,6 +16,7 @@
   <form id="dom_way">
     <input type="email" name="email" data-rule="required;email">
     <input type="password" name="password" data-rule="required">
+    <button type="submit">Submit</button>
   </form>
   
   <form id="js_way">
@@ -27,19 +24,10 @@
     <input type="password" name="password">
     <button type="submit">Submit</button>
   </form>
-  
-  <form id="normal_form">
-    <input type="text" name="normal" data-rule="digits">
-    <input type="text" id="only_id" data-rule="required">
-    <input type="checkbox" name="">
-  </form>
     
   <script src="lib/jquery-1.11.1.min.js"></script>
   <script src="../jquery.validator.js?local=en"></script>
   <script src="core.js"></script>
-  <!--<script src="methods.js"></script>
-  <script src="events.js"></script>
-  <script src="rules.js"></script>-->
   <script>
     if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
