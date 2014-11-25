@@ -1,11 +1,11 @@
 var fs = require('fs'),
     path = require('path'),
     gulp = require('gulp'),
+    cp = require('child_process'),
     insert = require('gulp-insert'),
     jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify'),
-    stylus = require('gulp-stylus'),
-    mocha = require('gulp-mocha');
+    stylus = require('gulp-stylus');
 
 var pkg = require('./package');
 var banner = '/*! nice Validator '+ pkg.version +'\n'+
@@ -16,20 +16,22 @@ var banner = '/*! nice Validator '+ pkg.version +'\n'+
 
 // run jshint
 gulp.task('lint', function () {
-    gulp.src(['src/*.js', 'test/*.js'])
+    gulp.src(['src/*.js', 'src/local/*.js', 'test/*.js'])
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
 });
 
 // run unit tests
-gulp.task('test', ['lint'], function () {
-    return gulp.src(['test/test-*.js'], { read: false })
-        .pipe(mocha({
-            reporter: 'spec',
-            globals: {
-                should: require('should')
-            }
-        }));
+gulp.task('test', ['lint'], function (done) {
+    //return gulp.src(['test/*.html', '!test/index.html'], { read: false })
+        //.pipe(shell(['mocha-phantomjs <%= file.path %>']))
+    cp.exec('mocha-phantomjs test/core.html', function (error, stdout, stderr){
+        console.log(stdout);
+        if (stderr) console.log(stderr);
+        if (error) console.log('exec error: ' + error);
+        done();
+    });
+    
 });
 
 // build main files
@@ -78,26 +80,21 @@ gulp.task('i18n', function () {
 
 // when release a version
 gulp.task('release', ['build', 'i18n'], function () {
-    var JQUERY_JSON = './niceValidator.jquery.json';
-    fs.readFile(JQUERY_JSON, function(err, data){
-        if (err) throw err;
-        fs.writeFile(
-            JQUERY_JSON,
-            data.toString().replace(/("version":\s")([^"]*)/, "$1" + pkg.version),
-            function(err){
-                if (err) throw err;
-            }
-        );
-    });
+    gulp.src('./niceValidator.jquery.json')
+        .pipe(insert.transform(function(contents) {
+            return contents.replace(/("version":\s")([^"]*)/, "$1" + pkg.version);
+        }))
+        .pipe(gulp.dest('./'));
+
     var zip = require('gulp-zip');
-    return gulp.src([
-            'src/jquery.validator.js',
-            'images/*', '!images/Thumbs.db',
-            'local/*',
-            'demo/**/*',
-            'jquery.validator.js',
-            'jquery.validator.css',
-            'README.md'
+    gulp.src([
+            "src/jquery.validator.js",
+            "images/*", "!images/Thumbs.db",
+            "local/*",
+            "demo/**/*",
+            "jquery.validator.js",
+            "jquery.validator.css",
+            "README.md"
         ], {base: './'})
         .pipe(zip(pkg.name + '-release-' + pkg.version  + '.zip'))
         .pipe(gulp.dest('./'));
