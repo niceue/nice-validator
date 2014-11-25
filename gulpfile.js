@@ -23,8 +23,6 @@ gulp.task('lint', function () {
 
 // run unit tests
 gulp.task('test', ['lint'], function (done) {
-    //return gulp.src(['test/*.html', '!test/index.html'], { read: false })
-        //.pipe(shell(['mocha-phantomjs <%= file.path %>']))
     cp.exec('mocha-phantomjs test/core.html', function (error, stdout, stderr){
         console.log(stdout);
         if (stderr) console.log(stderr);
