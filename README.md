@@ -17,18 +17,23 @@ Simple, smart and pleasant verification solution.
   * Firefox 3.5+
   * Opera
 
+### Bower
+```
+$ bower install nice-validator
+```
+
 ### Bugs / Contributions
 - [Report a bug](https://github.com/niceue/validator/issues)
 - To contribute or send an idea, github message me or fork the project
 
 ### Build
-nice Validator use [gulp](http://gulpjs.com/) to build project.  
-you should have installed [node.js](http://nodejs.org/), cd the `validator` directory, and install dependencies:
+First, you need [node.js](http://nodejs.org/) v0.10+ installed.
+Then first run the following command to install dependencies:
 ```
 $ npm install -g gulp
 $ npm install
 ```
-Then run gulp will automatic test and build
+Run the unit test and build:
 ```
 $ gulp
 ```
