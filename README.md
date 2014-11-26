@@ -39,4 +39,4 @@ $ gulp
 ```
 
 ### License
-nice Validator is available under the terms of the [MIT License](https://github.com/niceue/validator/blob/master/LICENSE.txt).
+nice Validator is available under the terms of the [MIT License](http://niceue.com/licenses/MIT-LICENSE.txt).
