@@ -3,15 +3,11 @@
  * Locale: <#=local_string#>
  *********************************/
 (function(factory) {
-    if (typeof define === 'function') {
-        define(function(require, exports, module){
-            var $ = require('jquery'); $._VALIDATOR_URI = module.uri;
-            require('../jquery.validator')($);
-            factory($);
-        });
-    } else {
-        factory(jQuery);
-    }
+    'function' === typeof define && (define.amd || define.cmd) ? define(function(require, exports, module){
+        var $ = require('jquery'); $._VALIDATOR_URI = module.uri;
+        require('../jquery.validator')($);
+        factory($);
+    }) : factory(jQuery);
 }(function($) {
 
     /* Global configuration

@@ -4,7 +4,7 @@
  */
 /*jshint evil:true*/
 (function(factory) {
-    if (typeof define === 'function') {
+    if ('function' === typeof define && (define.amd || define.cmd)) {
         // Register as an anonymous module.
         define([], function(){
             return factory;
