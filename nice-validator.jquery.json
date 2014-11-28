@@ -3,7 +3,7 @@
     "title": "nice Validator",
     "description": "Simple, smart and pleasant verification solution.",
     "version": "0.8.0",
-    "keywords": ["form", "validate", "validation", "validator"],
+    "keywords": ["jquery-plugin", "form", "validate", "validation", "validator", "nice-validator"],
     "author": {
         "name": "Jony Zhang",
         "url": "http://niceue.com",
