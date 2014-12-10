@@ -11,7 +11,7 @@ afterEach(function(){
             data = $form.data('validator');
         if (data) {
             data.destroy();
-            $form.find(':input[data-cacherule]').attr('data-rule', function(){
+            $form.trigger('reset').find(':input[data-cacherule]').attr('data-rule', function(){
                 return $(this).attr('data-cacherule');
             });
         }
@@ -60,70 +60,21 @@ describe('Core', function(){
             data = $js_way.data('validator');
             assert.ok(data && data.fields.email);
         });
+
+        it('Initialization with valid callback', function(done){
+            data = $dom_way.data('validator');
+            assert.ok(!data);
+            $dom_way.validator(function(){
+                done();
+            }).find('input').val('abc@gmail.com');
+            data = $dom_way.data('validator');
+            assert.ok(data && data.fields.email);
+            $dom_way.trigger('validate');
+        });
     });
 
-    describe('Options', function(){
-        describe('#timely', function(){
-            it('timely: 0', function(){
-                var $input = $dom_way.find('input[name="email"]'), d;
+    describe('.isValid()', function(){
 
-                data = $dom_way.validator({
-                    timely: 0
-                }).data('validator');
-
-                d = data.fields['email'];
-                
-                $input.val('abc@gmail.com');
-                $input.trigger('focusout input');
-                assert.ok(d.isValid !== true);
-
-                $input.trigger('validate');
-                assert.ok(d.isValid === true);
-
-                $input.val('abc');
-                $dom_way.trigger('submit');
-                assert.ok(d.isValid !== true);
-            });
-
-            it('timely: 1', function(){
-                var $input = $dom_way.find('input[name="email"]'), d;
-
-                data = $dom_way.validator({
-                    timely: 1
-                }).data('validator');
-
-                d = data.fields['email'];
-                
-                $input.val('abc@gmail.com');
-                $input.trigger('focusout');
-                assert.ok(d.isValid === true);
-
-                $input.val('abc');
-                $dom_way.trigger('submit');
-                assert.ok(d.isValid !== true);
-            });
-
-            /*it('timely: 2', function(){
-                var $input = $dom_way.find('input[name="email"]'), d;
-
-                data = $dom_way.validator({
-                    timely: 2
-                }).data('validator');
-
-                d = data.fields['email'];
-                
-                $input.val('abc@gmail.com');
-                $input.trigger('focusout');
-                assert.ok(d.isValid !== true);
-
-                $input.trigger('input');
-                assert.ok(d.isValid === true);
-
-                $input.val('abc@gmail.com');
-                $dom_way.trigger('submit');
-                assert.ok(d.isValid === true);
-            });*/
-        });
     });
 
 });
