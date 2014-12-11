@@ -1365,7 +1365,7 @@
     }
 
     function key2selector(key) {
-        return key.charAt(0) === "#" ? key : '[name="'+ key +'"]:input';
+        return key.charAt(0) === "#" ? key.replace(/(:|\.|\[|\])/g, "\\$1") : '[name="'+ key +'"]:input';
     }
 
 
