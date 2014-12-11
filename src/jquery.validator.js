@@ -15,36 +15,6 @@
 }(function($, undefined) {
     "use strict";
 
-    // Resource loader
-    (function(URI){
-        var arr, node,
-            scripts = document.getElementsByTagName('script');
-
-        if (URI) {
-            node = scripts[0];
-            arr = URI.match(/(.*)\/local\/(\w{2,5})\.js/);
-        } else {
-            var i = scripts.length, re = /(.*validator.js)\?.*local=(\w+)/;
-            while (i-- && !arr) {
-                node = scripts[i];
-                arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
-            }
-        }
-        if (arr) {
-            var dir = arr[0].split('/').slice(0, -1).join('/').replace(/\/(local|src)$/,'')+'/',
-                el = document.createElement('link');
-            el.rel = 'stylesheet';
-            el.href = dir + 'jquery.validator.css';
-            node.parentNode.insertBefore(el, node);
-            if (!URI) {
-                el = document.createElement('script');
-                el.async = 1;
-                el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
-                node.parentNode.insertBefore(el, node);
-            }
-        }
-    })($._VALIDATOR_URI);
-
     var NS = 'validator',
         CLS_NS = '.' + NS,
         CLS_NS_RULE = '.rule',
@@ -609,10 +579,11 @@
                 opt = me.options,
                 field,
                 el = e.target,
-                value = elementValue(el),
                 etype = e.type,
+                value = elementValue(el),
                 special = etype === 'validate',
                 timestamp,
+                key, specialKey,
                 timely,
                 timer = 0;
 
@@ -648,14 +619,14 @@
 
                     // handle keyup
                     if (etype === 'keyup') {
-                        var key = e.keyCode,
-                            specialKey = {
-                                8: 1,  // Backspace
-                                9: 1,  // Tab
-                                16: 1, // Shift
-                                32: 1, // Space
-                                46: 1  // Delete
-                            };
+                        key = e.keyCode;
+                        specialKey = {
+                            8: 1,  // Backspace
+                            9: 1,  // Tab
+                            16: 1, // Shift
+                            32: 1, // Space
+                            46: 1  // Delete
+                        };
 
                         // only gets focus, no verification
                         if (key === 9 && !value) return;
@@ -766,6 +737,7 @@
                 rule,
                 method = field._r,
                 transfer,
+                temp,
                 isValid = false;
 
             // use null to break validation from a field
@@ -813,7 +785,7 @@
             else {
                 if (isValid) {
                     if (field.showOk !== false) {
-                        var temp = attr(el, DATA_OK);
+                        temp = attr(el, DATA_OK);
                         msg = temp === null ? isString(field.ok) ? field.ok : msg : temp;
                         if (!isString(msg) && isString(field.showOk)) {
                             msg = field.showOk;
@@ -1100,7 +1072,9 @@
             if (!el) return;
             var me = this,
                 opt = me.options,
-                msgMaker;
+                msgMaker,
+                temp,
+                $msgbox;
 
             if (isObject(el) && !el.jquery && !msgOpt) {
                 $.each(el, function(key, msg) {
@@ -1115,7 +1089,7 @@
 
             // ok or tip
             if (!msgOpt.msg && msgOpt.type !== 'error') {
-                var temp = attr(el, 'data-' + msgOpt.type);
+                temp = attr(el, 'data-' + msgOpt.type);
                 if (temp !== null) msgOpt.msg = temp;
             }
 
@@ -1132,10 +1106,9 @@
             }
             if (!(msgMaker = (field || {}).msgMaker || opt.msgMaker)) return;
             
-            var $msgbox = me._getMsgDOM(el, msgOpt),
-                cls = $msgbox[0].className;
+            $msgbox = me._getMsgDOM(el, msgOpt);
                 
-            !rPos.test(cls) && $msgbox.addClass(msgOpt.cls);
+            !rPos.test($msgbox[0].className) && $msgbox.addClass(msgOpt.cls);
             if ( isIE === 6 && msgOpt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
             }
@@ -1148,7 +1121,8 @@
          */
         hideMsg: function(el, msgOpt, /*INTERNAL*/ field) {
             var me = this,
-                opt = me.options;
+                opt = me.options,
+                $msgbox;
 
             el = $(el).get(0);
             msgOpt = me._getMsgOpt(msgOpt);
@@ -1161,7 +1135,7 @@
                 }
             }
 
-            var $msgbox = me._getMsgDOM(el, msgOpt);
+            $msgbox = me._getMsgDOM(el, msgOpt);
             if (!$msgbox.length) return;
 
             if ( isFunction(msgOpt.hide) ) {
@@ -1207,8 +1181,8 @@
         /* @interface: isFormValid
          */
         isFormValid: function() {
-            var fields = this.fields;
-            for (var k in fields) {
+            var fields = this.fields, k;
+            for (k in fields) {
                 if (!fields[k].isValid) {
                     return fields[k].isValid;
                 }
@@ -1240,23 +1214,23 @@
 
     // Rule class
     function Rules(obj, context) {
-        var that = context ? context === true ? this : context : Rules.prototype;
-
         if (!isObject(obj)) return;
 
-        for (var k in obj) if (checkRuleName(k)) {
-            that[k] = getRule(obj[k]);
+        var k, that = context ? context === true ? this : context : Rules.prototype;
+
+        for (k in obj) {
+            if (checkRuleName(k))
+                that[k] = getRule(obj[k]);
         }
     }
 
     // Message class
     function Messages(obj, context) {
-        var that = context ? context === true ? this : context : Messages.prototype;
-
         if (!isObject(obj)) return;
 
-        for (var k in obj) {
-            if (!obj[k]) return;
+        var k, that = context ? context === true ? this : context : Messages.prototype;
+
+        for (k in obj) {
             that[k] = obj[k];
         }
     }
@@ -1377,19 +1351,19 @@
     })
 
     .on('click', 'input,button', function(e){
-        var input = this, name = input.name;
+        var input = this, name = input.name, attrNode, elem;
         if (!input.form) return;
 
         if (input.type === 'submit') {
             submitButton = input;
-            var attrNode = input.getAttributeNode('formnovalidate');
+            attrNode = input.getAttributeNode('formnovalidate');
             if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
                 novalidateonce = true;
             }
         }
         else if (attr(input.form, NOVALIDATE) === null) {
             if (name && checkable(input)) {
-                var elem = input.form.elements[name];
+                elem = input.form.elements[name];
                 if (elem.length) elem = elem[0];
                 if (attr(elem, DATA_RULE)) {
                     initByInput(e, elem);
@@ -1747,5 +1721,36 @@
     };
 
     $[NS] = Validator;
+
+        // Resource loader
+    (function(URI){
+        var arr, node, i, re, dir, el,
+            scripts = document.getElementsByTagName('script');
+
+        if (URI) {
+            node = scripts[0];
+            arr = URI.match(/(.*)\/local\/(\w{2,5})\.js/);
+        } else {
+            i = scripts.length;
+            re = /(.*validator.js)\?.*local=(\w+)/;
+            while (i-- && !arr) {
+                node = scripts[i];
+                arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
+            }
+        }
+        if (arr) {
+            dir = arr[0].split('/').slice(0, -1).join('/').replace(/\/(local|src)$/,'')+'/';
+            el = document.createElement('link');
+            el.rel = 'stylesheet';
+            el.href = dir + 'jquery.validator.css';
+            node.parentNode.insertBefore(el, node);
+            if (!URI) {
+                el = document.createElement('script');
+                el.async = 1;
+                el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
+                node.parentNode.insertBefore(el, node);
+            }
+        }
+    })($._VALIDATOR_URI);
 
 }));
