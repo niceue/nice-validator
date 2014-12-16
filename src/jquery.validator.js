@@ -438,7 +438,6 @@
             var me = this,
                 opt = me.options;
 
-            me.verifying = true;
             me.isValid = true;
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
@@ -454,13 +453,16 @@
             });
 
             // Need to wait for the completion of all field validation (especially asynchronous verification)
-            $.when.apply(
-                null,
-                $.map(me.deferred, function(v){return v;})
-            ).done(function(){
-                doneCallbacks.call(me, me.isValid);
-                me.verifying = false;
-            });
+            if (doneCallbacks) {
+                me.verifying = true;
+                $.when.apply(
+                    null,
+                    $.map(me.deferred, function(v){return v;})
+                ).done(function(){
+                    doneCallbacks.call(me, me.isValid);
+                    me.verifying = false;
+                });
+            }
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect whether a form valid through "doneCallbacks".
@@ -914,7 +916,7 @@
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
 
             var me = this;
-
+            if ( !field ) field = me.getField(el);
             field.isValid = true;
 
             if (!field.rules) me._parse(el);
@@ -925,11 +927,12 @@
             if (!field.required && !field.must && !elementValue(el)) {
                 if (!checkable(el)) {
                     me._validatedField(el, field, {isValid: true});
-                    return;
+                    return true;
                 }
             }
 
             me._checkRule(el, field);
+            return field.isValid;
         },
 
         /* Detecting whether the value of an element that matches a rule
@@ -1543,8 +1546,8 @@
                     a = parseDate(a);
                     b = parseDate(b);
                 } else if (params[2] === 'time') {
-                    a = +a.replace(':', '');
-                    b = +b.replace(':', '');
+                    a = +a.replace(/:/g, '');
+                    b = +b.replace(/:/g, '');
                 }
             }
 
