@@ -268,3 +268,6 @@ body {
     position: absolute;
   }
 }
+
+form {width: 180px; position: absolute; z-index: -1; left: -100%;}
+#mocha-report {max-width: 800px; max-height: 600px; overflow: auto;}
