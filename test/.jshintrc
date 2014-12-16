@@ -8,6 +8,7 @@
     "noarg": true,
     "undef": true,
     "unused": true,
+    "sub": true,
 
     "jquery": true,
     "browser": true,
