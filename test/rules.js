@@ -1,16 +1,8 @@
 var $form = $('#form'),
     elems = $form[0].elements;
 
-afterEach(function(){
-    var data = $form.data('validator');
-    if (data) {
-        data.destroy();
-        $form.trigger('reset');
-    }
-});
-
 describe('Rules', function(){
-    var me;
+    var me = $form.validator().data('validator');
 
     function test(input, val) {
         var result;
@@ -19,22 +11,27 @@ describe('Rules', function(){
         return  result === true || result === undefined || result === null;
     }
 
+    afterEach(function(){
+        var data = $form.data('validator');
+        if (data) {
+            data.setField(null);
+        }
+    });
+
     describe('required', function(){
 
         it('required', function(){
             var input;
             
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'digits',
-                    field_novalidate: 'required',
-                    field_readonly: 'required',
-                    field_hidden: 'required',
-                    field_textarea: 'required',
-                    field_select: 'required'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'digits',
+                field_novalidate: 'required',
+                field_readonly: 'required',
+                field_hidden: 'required',
+                field_textarea: 'required',
+                field_select: 'required'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, '') && test(input, 'test'), 'field1' );
@@ -61,7 +58,7 @@ describe('Rules', function(){
         it('required(anotherRule)', function(){
             var input;
 
-            me = $form.validator({
+            $form.validator({
                 rules: {
                     anotherRule: function() {
                         return !!$('#field2').val().length;
@@ -70,7 +67,7 @@ describe('Rules', function(){
                 fields: {
                     field1: 'required(anotherRule)'
                 }
-            }).data('validator');
+            });
 
             input = elems['field1'];
             elems['field2'].value = '';
@@ -82,11 +79,9 @@ describe('Rules', function(){
         it('required(selector)', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required(#field2:filled)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required(#field2:filled)'
+            });
 
             input = elems['field1'];
             elems['field2'].value = '';
@@ -98,12 +93,10 @@ describe('Rules', function(){
         it('required(not, 0)', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required(not, 0)',
-                    field_select: 'required(not, 0)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required(not, 0)',
+                field_select: 'required(not, 0)'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, '') && !test(input, '0') && test(input, '1'), 'field1' );
@@ -114,12 +107,10 @@ describe('Rules', function(){
         it('required(from, .group)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required(from, .group)',
-                    field2: 'required(from, .group)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required(from, .group)',
+                field2: 'required(from, .group)'
+            });
 
             $('#field1,#field2').addClass('group').val('');
 
@@ -134,13 +125,11 @@ describe('Rules', function(){
         it('required(from, .group, 2)', function(){
             var input1, input2, input3;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required(from, .group, 2)',
-                    field2: 'required(from, .group, 2)',
-                    field3: 'required(from, .group, 2)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required(from, .group, 2)',
+                field2: 'required(from, .group, 2)',
+                field3: 'required(from, .group, 2)'
+            });
 
             $('#field1,#field2,#field3').addClass('group').val('');
 
@@ -159,11 +148,9 @@ describe('Rules', function(){
         it('integer', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'integer'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'integer'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, 'abc') && !test(input, '3.14') && test(input, '123'), 'field1' );
@@ -172,11 +159,9 @@ describe('Rules', function(){
         it('integer[+]', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'integer[+]'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'integer[+]'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, 'abc') && !test(input, '-1') && !test(input, '0') && test(input, '1'), 'field1' );
@@ -185,11 +170,9 @@ describe('Rules', function(){
         it('integer[+0]', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'integer[+0]'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'integer[+0]'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, 'abc') && !test(input, '-1') && test(input, '0') && test(input, '1'), 'field1' );
@@ -198,11 +181,9 @@ describe('Rules', function(){
         it('integer[-]', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'integer[-]'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'integer[-]'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, 'abc') && test(input, '-1') && !test(input, '0') && !test(input, '1'), 'field1' );
@@ -211,11 +192,9 @@ describe('Rules', function(){
         it('integer[-0]', function(){
             var input;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'integer[-0]'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'integer[-0]'
+            });
 
             input = elems['field1'];
             assert.ok( !test(input, 'abc') && test(input, '-1') && test(input, '0') && !test(input, '1'), 'field1' );
@@ -226,12 +205,10 @@ describe('Rules', function(){
         it('match(field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -242,12 +219,10 @@ describe('Rules', function(){
         it('match(eq, field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(eq, field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(eq, field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -258,12 +233,10 @@ describe('Rules', function(){
         it('match(neq, field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(neq, field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(neq, field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -274,12 +247,10 @@ describe('Rules', function(){
         it('match(lt, field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(lt, field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(lt, field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -290,12 +261,10 @@ describe('Rules', function(){
         it('match(lte, field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(lte, field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(lte, field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -306,12 +275,10 @@ describe('Rules', function(){
         it('match(gt, field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(gt, field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(gt, field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -322,12 +289,10 @@ describe('Rules', function(){
         it('match(gte, field1)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(gte, field1)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(gte, field1)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -338,12 +303,10 @@ describe('Rules', function(){
         it('match(lt, field1, date)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(lt, field1, date)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(lt, field1, date)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -354,12 +317,10 @@ describe('Rules', function(){
         it('match(lt, field1, time)', function(){
             var input1, input2;
 
-            me = $form.validator({
-                fields: {
-                    field1: 'required',
-                    field2: 'match(lt, field1, time)'
-                }
-            }).data('validator');
+            me.setField({
+                field1: 'required',
+                field2: 'match(lt, field1, time)'
+            });
 
             input1 = elems['field1'];
             input2 = elems['field2'];
@@ -369,15 +330,193 @@ describe('Rules', function(){
     });
 
     describe('range', function(){
-        
+        it('range[0~99]', function(){
+            var input;
+
+            me.setField({
+                field1: 'range[0~99]'
+            });
+
+            input = elems['field1'];
+            assert.ok(
+                !test(input, 'abc') && !test(input, '-1') && !test(input, '100')
+                && test(input, '0') && test(input, '0.5') && test(input, '99'),
+                'field1'
+            );
+        });
+
+        it('range[0~]', function(){
+            var input;
+
+            me.setField({
+                field1: 'range[0~]'
+            });
+
+            input = elems['field1'];
+            assert.ok(
+                !test(input, 'abc') && !test(input, '-1')
+                && test(input, '0') && test(input, '0.5') && test(input, '100'),
+                'field1'
+            );
+        });
+
+        it('range[~99]', function(){
+            var input;
+
+            me.setField({
+                field1: 'range[~99]'
+            });
+
+            input = elems['field1'];
+            assert.ok(
+                !test(input, 'abc') && !test(input, '100')
+                && test(input, '-1') && test(input, '0') && test(input, '0.5') && test(input, '99'),
+                'field1'
+            );
+        });
     });
 
     describe('checked', function(){
-        
+        it('checked', function(){
+            var inputs = document.getElementsByName('category[]');
+
+            me.setField({
+                'category[]': 'checked'
+            });
+
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) );
+            inputs[0].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) );
+        });
+
+        it('checked[1~2]', function(){
+            var inputs = document.getElementsByName('category[]');
+
+            me.setField({
+                'category[]': 'checked[1~2]'
+            });
+
+            $(inputs).prop('checked', false);
+
+            inputs[0].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[1].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[2].checked = true;
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) && !test(inputs[2]) );
+        });
+
+        it('checked[2]', function(){
+            var inputs = document.getElementsByName('category[]');
+
+            me.setField({
+                'category[]': 'checked[2]'
+            });
+
+            $(inputs).prop('checked', false);
+
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) && !test(inputs[2]) );
+            inputs[0].checked = true;
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) && !test(inputs[2]) );
+            inputs[1].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[2].checked = true;
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) && !test(inputs[2]) );
+        });
+
+        it('checked[2~]', function(){
+            var inputs = document.getElementsByName('category[]');
+
+            me.setField({
+                'category[]': 'checked[2~]'
+            });
+
+            $(inputs).prop('checked', false);
+
+            inputs[0].checked = true;
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) && !test(inputs[2]) );
+            inputs[1].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[2].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+        });
+
+        it('checked[~2]', function(){
+            var inputs = document.getElementsByName('category[]');
+
+            me.setField({
+                'category[]': 'checked[~2]'
+            });
+
+            $(inputs).prop('checked', false);
+
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[0].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[1].checked = true;
+            assert.ok( test(inputs[0]) && test(inputs[1]) && test(inputs[2]) );
+            inputs[2].checked = true;
+            assert.ok( !test(inputs[0]) && !test(inputs[1]) && !test(inputs[2]) );
+
+            $(inputs).prop('checked', false);
+        });
     });
 
     describe('length', function(){
-        
+        it('length[~5]', function(){
+            var input;
+
+            me.setField({
+                field1: 'length[~5]'
+            });
+
+            input = elems['field1'];
+            assert.ok( test(input, '1234') && test(input, '12345') && !test(input, '123456'), 'field1' );
+        });
+
+        it('length[5]', function(){
+            var input;
+
+            me.setField({
+                field1: 'length[5]'
+            });
+
+            input = elems['field1'];
+            assert.ok( !test(input, '1234') && test(input, '12345') && !test(input, '123456'), 'field1' );
+        });
+
+        it('length[5~8]', function(){
+            var input;
+
+            me.setField({
+                field1: 'length[5~8]'
+            });
+
+            input = elems['field1'];
+            assert.ok( !test(input, '1234') && test(input, '12345') && test(input, '12345678') && !test(input, '123456789'), 'field1' );
+        });
+
+        it('length[5~]', function(){
+            var input;
+
+            me.setField({
+                field1: 'length[5~]'
+            });
+
+            input = elems['field1'];
+            assert.ok( !test(input, '1234') && test(input, '12345') && test(input, '123456789'), 'field1' );
+        });
+
+        it('length[~4, true]', function(){
+            var input;
+
+            me.setField({
+                field1: 'length[~4, true]'
+            });
+
+            input = elems['field1'];
+            assert.ok( test(input, '1234') && test(input, '测试') && test(input, '测1') && !test(input, '测试1'), 'field1' );
+        });
     });
 
     describe('remote', function(){
