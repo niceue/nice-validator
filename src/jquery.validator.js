@@ -332,13 +332,16 @@
         },
 
         _initFields: function(fields) {
-            var me = this;
+            var me = this,
+                clear = fields === null;
 
             // Processing field information
+            if (clear) fields = me.fields;
+
             if (isObject(fields)) {
                 $.each(fields, function(k, v) {
                     // delete a field from settings
-                    if (v === null) {
+                    if (v === null || clear) {
                         var el = me.elements[k];
                         if (el) me._resetElement(el, true);
                         delete me.fields[k];
@@ -1174,7 +1177,7 @@
                 fields[key] = obj;
             }
             // update fields
-            else if (isObject(key)) {
+            else {
                 fields = key;
             }
 
