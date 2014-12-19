@@ -339,8 +339,8 @@ describe('Rules', function(){
 
             input = elems['field1'];
             assert.ok(
-                !test(input, 'abc') && !test(input, '-1') && !test(input, '100')
-                && test(input, '0') && test(input, '0.5') && test(input, '99'),
+                !test(input, 'abc') && !test(input, '-1') && !test(input, '100') &&
+                 test(input, '0') && test(input, '0.5') && test(input, '99'),
                 'field1'
             );
         });
@@ -354,8 +354,8 @@ describe('Rules', function(){
 
             input = elems['field1'];
             assert.ok(
-                !test(input, 'abc') && !test(input, '-1')
-                && test(input, '0') && test(input, '0.5') && test(input, '100'),
+                !test(input, 'abc') && !test(input, '-1') &&
+                 test(input, '0') && test(input, '0.5') && test(input, '100'),
                 'field1'
             );
         });
@@ -369,8 +369,8 @@ describe('Rules', function(){
 
             input = elems['field1'];
             assert.ok(
-                !test(input, 'abc') && !test(input, '100')
-                && test(input, '-1') && test(input, '0') && test(input, '0.5') && test(input, '99'),
+                !test(input, 'abc') && !test(input, '100') &&
+                 test(input, '-1') && test(input, '0') && test(input, '0.5') && test(input, '99'),
                 'field1'
             );
         });
