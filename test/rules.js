@@ -1,8 +1,7 @@
-var $form = $('#form'),
-    elems = $form[0].elements;
-
 describe('Rules', function(){
-    var me = $form.validator().data('validator');
+    var $form = $('#form'),
+        elems = $form[0].elements,
+        me = $form.validator().data('validator');
 
     function test(input, val) {
         var result;

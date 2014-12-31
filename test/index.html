@@ -12,6 +12,7 @@
 <body>
   <div id="mocha"></div>
 
+  <!-- common test -->
   <form id="form">
     <input type="text" name="field1" id="field1">
     <input type="text" name="field2" id="field2">
@@ -41,8 +42,22 @@
         <input type="radio" name="gender" value="female">
     </div>
   </form>
-    
 
+  <!-- test DOM way -->
+  <form id="dom_way">
+    <input type="email" name="email" data-rule="required;email">
+    <input type="password" name="password" data-rule="required">
+    <button type="submit">Submit</button>
+  </form>
+  
+  <!-- test JS way -->
+  <form id="js_way">
+    <input type="email" name="email">
+    <input type="password" name="password">
+    <button type="submit">Submit</button>
+  </form>
+    
+  <script src="core.js"></script>
   <script src="rules.js"></script>
   <script>
     (window.mochaPhantomJS || mocha).run();

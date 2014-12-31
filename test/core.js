@@ -1,27 +1,27 @@
-before(function(){
-    $('form').find(':input[data-rule]')
-    .attr('data-cacherule', function(){
-        return $(this).attr('data-rule');
-    });
-});
-
-afterEach(function(){
-    $('form').each(function(){
-        var $form = $(this),
-            data = $form.data('validator');
-        if (data) {
-            data.destroy();
-            $form.trigger('reset').find(':input[data-cacherule]').attr('data-rule', function(){
-                return $(this).attr('data-cacherule');
-            });
-        }
-    }); 
-});
-
 describe('Core', function(){
     var $dom_way = $('#dom_way'),
         $js_way = $('#js_way'),
         data;
+
+    before(function(){
+        $('#dom_way').find(':input[data-rule]')
+        .attr('data-cacherule', function(){
+            return $(this).attr('data-rule');
+        });
+    });
+
+    afterEach(function(){
+        $('#dom_way,#js_way').each(function(){
+            var $form = $(this),
+                data = $form.data('validator');
+            if (data) {
+                data.destroy();
+                $form.trigger('reset').find(':input[data-cacherule]').attr('data-rule', function(){
+                    return $(this).attr('data-cacherule');
+                });
+            }
+        }); 
+    });
 
     describe('Initialization', function(){
         it('Automatic initialization when the form input focusin', function(){
