@@ -23,7 +23,7 @@ gulp.task('lint', function () {
 
 // run unit tests
 gulp.task('test', ['lint'], function (done) {
-    cp.exec('mocha-phantomjs test/core.html', function (error, stdout, stderr){
+    cp.exec('mocha-phantomjs test/index.html', function (error, stdout, stderr){
         console.log(stdout);
         if (stderr) console.log(stderr);
         if (error) console.log('exec error: ' + error);
