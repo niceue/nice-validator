@@ -52,7 +52,7 @@
         isObject = function(o) {
             return o && Object.prototype.toString.call(o) === '[object Object]';
         },
-        isIE = +(navigator.userAgent.match(/MSIE (\d+)/) && RegExp.$1),
+        isIE = document.documentMode || +(navigator.userAgent.match(/MSIE (\d+)/) && RegExp.$1),
         attr = function(el, key, value) {
             if (value !== undefined) {
                 if (value === null) el.removeAttribute(key);
