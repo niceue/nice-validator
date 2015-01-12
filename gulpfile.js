@@ -16,7 +16,7 @@ var banner = '/*! nice Validator '+ pkg.version +'\n'+
 
 // run jshint
 gulp.task('lint', function () {
-    gulp.src(['src/*.js', 'src/local/*.js', 'test/*.js'])
+    gulp.src(['src/*.js', 'src/local/*.js', 'test/unit/*.js'])
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
 });
