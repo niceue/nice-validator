@@ -714,6 +714,7 @@
 
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
+            isFunction(opt.validation) && opt.validation.call(me, el, ret);
             $(el).attr( ARIA_INVALID, isValid ? null : true )
                  .removeClass( isValid ? opt.invalidClass : opt.validClass )
                  .addClass( !ret.skip ? isValid ? opt.validClass : opt.invalidClass : "" )
