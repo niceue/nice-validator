@@ -1515,7 +1515,7 @@
 
             var me = this,
                 a, b,
-                key, msg, type = 'eq',
+                key, msg, type = 'eq', parser,
                 selector2, elem2, field2;
 
             if (params.length === 1) {
@@ -1545,11 +1545,12 @@
                 return null;
             }
 
-            if (params[2]) {
-                if (params[2] === 'date') {
+            parser = params[2];
+            if (parser) {
+                if (/^date(time)?$/i.test(parser)) {
                     a = parseDate(a);
                     b = parseDate(b);
-                } else if (params[2] === 'time') {
+                } else if (parser === 'time') {
                     a = +a.replace(/:/g, '');
                     b = +b.replace(/:/g, '');
                 }
