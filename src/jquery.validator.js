@@ -427,7 +427,7 @@
                     field.rules.push({
                         not: args[1] === "!",
                         method: args[2],
-                        params: args[3] ? args[3].split(', ') : undefined,
+                        params: args[3] ? $.map(args[3].split(', '), function(i){return trim(i)}) : undefined,
                         or: args[5] === "|"
                     });
                 });
