@@ -313,6 +313,20 @@ describe('Rules', function(){
             assert.ok( test(input2, '2014-12-11') && !test(input2, '2014-12-12'), 'field1' );
         });
 
+        it('match(lt, field1, datetime)', function(){
+            var input1, input2;
+
+            me.setField({
+                field1: 'required',
+                field2: 'match(lt, field1, datetime)'
+            });
+
+            input1 = elems['field1'];
+            input2 = elems['field2'];
+            input1.value = '2014-12-12 12:12:12';
+            assert.ok( test(input2, '2014-12-11 12:12:12') && test(input2, '2014-12-12 12:12:11') && !test(input2, '2014-12-12 12:12:12'), 'field1' );
+        });
+
         it('match(lt, field1, time)', function(){
             var input1, input2;
 
