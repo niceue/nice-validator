@@ -1352,6 +1352,10 @@
 
 
     // Global events
+    $(window).on('beforeunload', function(){
+        this.focus();
+    });
+    
     $(document)
     .on('focusin', '['+DATA_RULE+']:input', function(e) {
         initByInput(e);
