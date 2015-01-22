@@ -1,5 +1,5 @@
 /*! nice Validator 0.7.3
- * (c) 2012-2014 Jony Zhang <zj86@live.cn>, MIT Licensed
+ * (c) 2012-2015 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
 /*jshint evil:true, expr:true, strict:false*/
@@ -1317,6 +1317,10 @@
 
 
     // Global events
+    $(window).on('beforeunload', function(){
+        this.focus();
+    });
+    
     $(document)
     .on('focusin', ':input['+DATA_RULE+']', function(e) {
         initByInput(e);
