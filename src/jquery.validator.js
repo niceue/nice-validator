@@ -238,7 +238,7 @@
     function Validator(element, options) {
         var me = this;
 
-        if (!me instanceof Validator) return new Validator(element, options);
+        if (!(me instanceof Validator)) return new Validator(element, options);
 
         me.$el = $(element);
         if (me.$el.length) {
