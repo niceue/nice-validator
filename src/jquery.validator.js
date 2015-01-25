@@ -1734,7 +1734,7 @@
 
     $[NS] = Validator;
 
-        // Resource loader
+    // Resource loader
     (function(URI){
         var arr, node, i, re, dir, el,
             scripts = document.getElementsByTagName('script');
@@ -1758,7 +1758,6 @@
             node.parentNode.insertBefore(el, node);
             if (!URI) {
                 el = document.createElement('script');
-                el.async = 1;
                 el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
                 node.parentNode.insertBefore(el, node);
             }
