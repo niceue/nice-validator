@@ -297,7 +297,7 @@
                 me.isAjaxSubmit = true;
             } else {
                 // if there is a "valid.form" event
-                var events = $[ $._data ? '_data' : 'data' ](element, "events");
+                var events = ($._data || $.data)(element, "events");
                 if (events && events.valid &&
                     $.map(events.valid, function(e){
                         return ~e.namespace.indexOf('form') ? 1 : null;
