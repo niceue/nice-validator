@@ -1680,7 +1680,7 @@
                 dataType = 'jsonp';
             }
 
-            // Asynchronous validation need to return jqXHR objects
+            // Asynchronous validation need return jqXHR objects
             return $.ajax({
                 url: arr[2],
                 type: arr[1] || 'POST',
@@ -1692,8 +1692,8 @@
 
         /** filters, direct filtration without prompting error (support custom regular expressions)
          * @example:
-         *  filter          filter "<>"
-         *  filter(regexp)  filter the "regexp" matched characters
+         *  filter          filtering "<>"
+         *  filter(regexp)  filtering the "regexp" matched characters
          */
         filter: function(element, params) {
             element.value = elementValue(element).replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
