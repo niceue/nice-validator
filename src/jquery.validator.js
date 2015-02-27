@@ -1038,6 +1038,8 @@
                     if (tgt.length) {
                         if (tgt.is(':input')) {
                             el = tgt.get(0);
+                        } else if (tgt.hasClass(CLS_MSG_BOX)) {
+                            $msgbox = tgt;
                         } else {
                             container = tgt;
                         }
