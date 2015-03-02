@@ -1734,11 +1734,9 @@
      */
     Validator.setTheme = function(name, obj) {
         if (isObject(name)) {
-            $.each(name, function(i, o) {
-                themes[i] = o;
-            });
+            $.extend(true, themes, name);
         } else if (isString(name) && isObject(obj)) {
-            themes[name] = obj;
+            themes[name] = $.extend(themes[name], obj);
         }
     };
 
