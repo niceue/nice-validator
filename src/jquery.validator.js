@@ -242,9 +242,17 @@
 
         me.$el = $(element);
         if (me.$el.length) {
-            me._init(me.$el[0], options);
+            if (Validator.loading) {
+                $(window).on('validatorready', init);
+            } else {
+                init();
+            }
         } else if(isString(element)) {
             preinitialized[element] = options;
+        }
+
+        function init() {
+            me._init(me.$el[0], options);
         }
     }
 
@@ -1759,8 +1767,17 @@
             el.href = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
             if (!URI) {
+                Validator.loading = 1;
                 el = document.createElement('script');
                 el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
+                i = 'onload' in el ? 'onload' : 'onreadystatechange';
+                el[i] = function() {
+                    if (!el.readyState || /loaded|complete/.test(el.readyState)) {
+                        $(window).trigger('validatorready');
+                        delete Validator.loading;
+                        el = el[i] = null;
+                    }
+                };
                 node.parentNode.insertBefore(el, node);
             }
         }
