@@ -1450,7 +1450,7 @@
                 }
                 else if (params[0] === 'from') {
                     var $elements = me.$el.find(params[1]),
-                        VALIDATED_RULE = 'validated_rule',
+                        VALIDATED = '_validated_',
                         ret;
                         
                     isValid = $elements.filter(function(){
@@ -1463,12 +1463,12 @@
                         ret = getDataMsg($elements[0], field) || false;
                     }
 
-                    if(!$(element).data(VALIDATED_RULE)) {
-                        $elements.data(VALIDATED_RULE, true).each(function(){
+                    if(!$(element).data(VALIDATED)) {
+                        $elements.data(VALIDATED, 1).each(function(){
                             if (element !== this) {
                                 me._checkRule(this, me.getField(this));
                             }
-                        }).removeData(VALIDATED_RULE);
+                        }).removeData(VALIDATED);
                     }
 
                     return ret;
@@ -1698,6 +1698,20 @@
                 dataType: dataType,
                 cache: false
             });
+        },
+
+        /** validate other fields
+         * @example:
+         *  validate(name1, #id2)
+         */
+        validate: function(element, params) {
+            var VALIDATED = '_validated_';
+            if(!params || $(element).data(VALIDATED)) return;
+            this.$el.find( 
+                $.map(params, function(key){
+                    return key2selector(key);
+                }).join(',')
+            ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
         /** filters, direct filtration without prompting error (support custom regular expressions)
