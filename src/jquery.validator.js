@@ -93,10 +93,11 @@
             msgMaker: function(opt) {
                 var html;
                 html = '<span class="msg-wrap n-'+ opt.type +'" role="alert">';
-                html += opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
+                html += opt.arrow + opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
                 html += '</span>';
                 return html;
             },
+            msgArrow: '',
             msgIcon: '<span class="n-icon"></span>',
             msgClass: '',
             //msgStyle: null,
@@ -290,6 +291,7 @@
                 wrapper: opt.msgWrapper,
                 cls: opt.msgClass,
                 style: opt.msgStyle,
+                arrow: opt.msgArrow,
                 icon: opt.msgIcon,
                 show: opt.msgShow,
                 hide: opt.msgHide
