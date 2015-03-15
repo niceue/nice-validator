@@ -34,7 +34,7 @@
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
-        rRules = /(!?)\s?(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||&)?/g,
+        rRules = /(&)?(!)?\s?(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||&)?/g,
         rRule = /(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
@@ -433,12 +433,13 @@
                 field.rules = [];
                 arr[2].replace(rRules, function(){
                     var args = arguments;
-                    args[3] = args[3] || args[4];
+                    args[4] = args[4] || args[5];
                     field.rules.push({
-                        not: args[1] === "!",
-                        method: args[2],
-                        params: args[3] ? $.map(args[3].split(', '), function(i){return trim(i)}) : undefined,
-                        or: args[5] === "|"
+                        and: args[1] === "&",
+                        not: args[2] === "!",
+                        or: args[6] === "|",
+                        method: args[3],
+                        params: args[4] ? $.map(args[4].split(', '), function(i){return trim(i)}) : undefined
                     });
                 });
             }
@@ -792,6 +793,8 @@
                 } else {
                     transfer = true;
                 }
+            } else if (rule.and) {
+                if (!field.isValid) transfer = true;
             }
 
             if (transfer) {
