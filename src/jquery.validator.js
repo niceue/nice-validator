@@ -603,15 +603,14 @@
                 timely,
                 timer = 0;
 
-            // Just for checkbox and radio
-            if (!elem && checkable(el)) {
-                elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
-            }
-
-            timely = attr(elem || el, DATA_TIMELY);
-            timely = timely !== null ? +timely : +opt.timely;
-
             if (!special) {
+                // Just for checkbox and radio
+                if (!elem && checkable(el)) {
+                    elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
+                }
+                timely = attr(elem || el, DATA_TIMELY);
+                timely = timely !== null ? +timely : +opt.timely;
+
                 if ( timely === 0 ) return;
 
                 if (etype === 'focusout') {
@@ -655,7 +654,7 @@
                 }
             }
 
-            // if the current field is ignored, exit
+            // if the current field is ignored
             if (opt.ignore && $(el).is(opt.ignore)) return;
 
             field = me.getField(el);
@@ -664,7 +663,7 @@
             clearTimeout(field._t);
 
             // not validate field unless fill a value
-            if (opt.ignoreBlank && !value) {
+            if (!special && opt.ignoreBlank && !value) {
                 me.hideMsg(el);
             }
             else if (timer) {
