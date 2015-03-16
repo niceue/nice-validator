@@ -815,6 +815,7 @@
                     }
                     $(el).trigger('valid'+CLS_NS_RULE, [method, msg]);
                 } else {
+                    field.isValid = false;
                     /* rule message priority:
                         1. custom DOM message
                         2. custom field message;
