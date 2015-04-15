@@ -823,7 +823,9 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msgOpt.msg = (getDataMsg(el, field, msg || me.messages[method]) || defaults.defaultMsg).replace('{0}', me._getDisplay(el, field.display || ''));
+                    msgOpt.msg = (getDataMsg(el, field, msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
+                        return me._getDisplay(el, field.display) || arguments[1];
+                    });
                     $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
             }
