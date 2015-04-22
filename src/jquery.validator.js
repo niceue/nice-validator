@@ -907,8 +907,8 @@
                         }
 
                         // filter data
-                        result = dataFilter(data);
-                        if (result === undefined) result = dataFilter(data.data);
+                        result = dataFilter.call(me, data, el);
+                        if (result === undefined) result = dataFilter.call(me, data.data, el);
 
                         old.rule = rule;
                         rule.ret = result;
@@ -1732,7 +1732,9 @@
          *  filter(regexp)  filtering the "regexp" matched characters
          */
         filter: function(element, params) {
-            element.value = elementValue(element).replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
+            var value = elementValue(element), temp;
+            temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
+            if (temp !== value) element.value = temp;
         }
     });
 
