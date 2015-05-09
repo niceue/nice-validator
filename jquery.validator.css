@@ -28,6 +28,14 @@
 .n-msg {
   vertical-align: top;
 }
+.msg-box .msg-wrap .n-error,
+.msg-box .msg-wrap .n-ok,
+.msg-box .msg-wrap .n-tip {
+  display: block;
+  background: none;
+  box-shadow: none;
+  padding: 3px 2px;
+}
 .n-arrow {
   position: absolute;
   overflow: hidden;
@@ -72,7 +80,7 @@
 .n-ok {
   color: #390;
 }
-.n-tip,
+.n-tip .n-msg,
 .n-loading {
   color: #808080;
 }
@@ -256,7 +264,4 @@
 .n-yellow .n-ok .n-arrow i,
 .n-yellow .n-loading .n-arrow i {
   color: #f8fdff;
-}
-.n-yellow .n-tip .n-icon {
-  display: none;
 }
