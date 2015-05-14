@@ -464,7 +464,7 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                autoSubmit = e.type === 'submit' && e.isDefaultPrevented();
+                autoSubmit = e.type === 'submit' && !e.isDefaultPrevented();
 
             e.preventDefault();
             if (
