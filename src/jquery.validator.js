@@ -502,6 +502,7 @@
                 autoSubmit = e.type === 'submit' && !e.isDefaultPrevented();
 
             e.preventDefault();
+
             if (
                 novalidateonce && !!~(novalidateonce = false) ||
                 // Prevent duplicate submission
@@ -511,6 +512,14 @@
                 // trigger the beforeSubmit callback.
                 opt.beforeSubmit.call(me, form) === false
             ) {
+                return;
+            }
+
+            // Prevent infinite loop and repeated verification
+            if (e.isTrigger && me.isValid) {
+                if (autoSubmit) {
+                    submitForm();
+                }
                 return;
             }
 
@@ -542,16 +551,20 @@
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
 
-                    if (isValid && !me.isAjaxSubmit && autoSubmit) {
-                        novalidateonce = true;
-                        // For asp.NET controls
-                        if (submitButton && submitButton.name) {
-                            me.$el.append('<input type="hidden" name="'+ submitButton.name +'" value="'+ $(submitButton).val() +'">');
-                        }
-                        form.submit();
+                    if (isValid && autoSubmit && !me.isAjaxSubmit) {
+                        submitForm();
                     }
                 }
             );
+            
+            function submitForm() {
+                novalidateonce = true;
+                // For asp.NET controls
+                if (submitButton && submitButton.name) {
+                    me.$el.append('<input type="hidden" name="'+ submitButton.name +'" value="'+ $(submitButton).val() +'">');
+                }
+                form.submit();
+            }
         },
 
         _reset: function(e) {
