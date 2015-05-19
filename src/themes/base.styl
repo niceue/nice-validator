@@ -56,6 +56,16 @@ inline-block() {
     @extend .n-inline-block
     vertical-align:top;
 }
+.msg-box {
+    .msg-wrap {
+        .n-error, .n-ok, .n-tip {
+            display: block;
+            background: none;
+            box-shadow: none;
+            padding: 3px 2px;
+        }
+    }
+}
 
 .n-arrow {
     position: absolute; 
@@ -97,7 +107,7 @@ inline-block() {
 // tooltip
 .n-error {color:#CC3333;}
 .n-ok {color:#390;}
-.n-tip, .n-loading {color:#808080;}
+.n-tip .n-msg, .n-loading {color:#808080;}
 
 // icons
 .n-error .n-icon {background-position:0 0;}

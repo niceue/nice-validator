@@ -92,8 +92,14 @@
             msgWrapper: 'span',
             msgMaker: function(opt) {
                 var html;
-                html = '<span class="msg-wrap n-'+ opt.type +'" role="alert">';
-                html += opt.arrow + opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
+                html = '<span role="alert" class="msg-wrap n-'+ opt.type + '">' + opt.arrow;
+                if (opt.result) {
+                    $.each(opt.result, function(i, obj){
+                        html += '<span class="n-'+ obj.type +'">' + opt.icon + '<span class="n-msg">' + obj.msg + '</span></span>';
+                    });
+                } else {
+                    html += opt.icon + '<span class="n-msg">' + opt.msg + '</span>';
+                }
                 html += '</span>';
                 return html;
             },
@@ -324,7 +330,7 @@
                       .on('reset'+ CLS_NS, proxy(me, '_reset'))
                       .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
                       .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
-                      .on('focusin'+ CLS_NS +' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
+                      .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
                 if (opt.timely !== 0) {
@@ -374,6 +380,7 @@
             var me = this,
                 field,
                 key = el.name,
+                timely,
                 dataRule = attr(el, DATA_RULE);
 
             dataRule && attr(el, DATA_RULE, null);
@@ -402,9 +409,13 @@
                 field.showOk = me.options.showOk;
             }
 
-            if ('timely' in field) {
-                attr(el, DATA_TIMELY, +field.timely);
+            timely = attr(el, DATA_TIMELY);
+            if (!timely) {
+                if ('timely' in field) attr(el, DATA_TIMELY, +field.timely);
+            } else {
+                field.timely = +timely;
             }
+
             if (isString(field.target)) {
                 attr(el, DATA_TARGET, field.target);
             }
@@ -488,9 +499,10 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                autoSubmit = e.type === 'submit';
+                autoSubmit = e.type === 'submit' && !e.isDefaultPrevented();
 
             e.preventDefault();
+
             if (
                 novalidateonce && !!~(novalidateonce = false) ||
                 // Prevent duplicate submission
@@ -500,6 +512,14 @@
                 // trigger the beforeSubmit callback.
                 opt.beforeSubmit.call(me, form) === false
             ) {
+                return;
+            }
+
+            // Prevent infinite loop and repeated verification
+            if (e.isTrigger && me.isValid) {
+                if (autoSubmit) {
+                    submitForm();
+                }
                 return;
             }
 
@@ -531,16 +551,20 @@
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
 
-                    if (isValid && !me.isAjaxSubmit && autoSubmit) {
-                        novalidateonce = true;
-                        // For asp.NET controls
-                        if (submitButton && submitButton.name) {
-                            me.$el.append('<input type="hidden" name="'+ submitButton.name +'" value="'+ $(submitButton).val() +'">');
-                        }
-                        form.submit();
+                    if (isValid && autoSubmit && !me.isAjaxSubmit) {
+                        submitForm();
                     }
                 }
             );
+            
+            function submitForm() {
+                novalidateonce = true;
+                // For asp.NET controls
+                if (submitButton && submitButton.name) {
+                    me.$el.append('<input type="hidden" name="'+ submitButton.name +'" value="'+ $(submitButton).val() +'">');
+                }
+                form.submit();
+            }
         },
 
         _reset: function(e) {
@@ -565,13 +589,19 @@
             }
         },
 
+        _getTimely: function(el, opt) {
+            var timely = attr(el, DATA_TIMELY);
+            return timely !== null ? +timely : +opt.timely;
+        },
+
         _focusin: function(e) {
             var me = this,
                 opt = me.options,
                 el = e.target,
+                timely,
                 msg;
 
-            if (me.verifying) return;
+            if (me.verifying || (e.type==='click' && document.activeElement === el)) return;
 
             if (opt.focusCleanup) {
                 if ( attr(el, ARIA_INVALID) === 'true' ) {
@@ -581,12 +611,18 @@
             }
 
             msg = attr(el, DATA_TIP);
-            if (!msg) return;
 
-            me.showMsg(el, {
-                type: 'tip',
-                msg: msg
-            });
+            if (msg) {
+                me.showMsg(el, {
+                    type: 'tip',
+                    msg: msg
+                });
+            } else {
+                timely = me._getTimely(el, opt);
+                if (timely === 8 || timely === 9) {
+                    me._focusout(e);
+                }
+            }
         },
 
         // Handle "focusout/validate/keyup/click/change/input" events
@@ -597,6 +633,7 @@
                 el = e.target,
                 etype = e.type,
                 value = elementValue(el),
+                focusin = etype === 'focusin',
                 special = etype === 'validate',
                 timestamp,
                 key, specialKey,
@@ -608,15 +645,15 @@
                 if (!elem && checkable(el)) {
                     elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
                 }
-                timely = attr(elem || el, DATA_TIMELY);
-                timely = timely !== null ? +timely : +opt.timely;
-
-                if ( timely === 0 ) return;
+                timely = me._getTimely(elem || el, opt);
 
                 if (etype === 'focusout') {
-                    if (timely === 2) {
-                        if (!opt.focusCleanup) {
-                            field = me.getField(el);
+                    if (timely === 2 || timely === 8) {
+                        field = me.getField(el);
+                        if (field.isValid && !field.showOk) {
+                            me.hideMsg(el);
+                        }
+                        else if (!opt.focusCleanup && !opt.ignoreBlank || value) {
                             if (field && field.old.ret) {
                                 me._makeMsg(el, field, field.old.ret);
                             }
@@ -625,12 +662,13 @@
                     }
                 }
                 else {
-                    if (timely < 2 && !e.data) return;
+                    if (!timely || timely < 2 && !e.data) return;
 
                     // mark timestamp to reduce the frequency of the received event
                     timestamp = +new Date();
-                    if ( timestamp - (el._ts || 0) < 100 ) return;
+                    if ( timestamp - (el._ts || 0) < 100 || (etype === 'keyup' && el._et === 'input') ) return;
                     el._ts = timestamp;
+                    el._et = etype;
 
                     // handle keyup
                     if (etype === 'keyup') {
@@ -649,8 +687,10 @@
                         // do not validate, if triggered by these keys
                         if (key < 48 && !specialKey[key]) return;
                     }
-                    // keyboard events, reducing the frequency of verification
-                    timer = timely >=100 ? timely : 400;
+                    if (!focusin) {
+                        // keyboard events, reducing the frequency of verification
+                        timer = timely >=100 ? timely : 400;
+                    }
                 }
             }
 
@@ -663,16 +703,21 @@
             clearTimeout(field._t);
 
             // not validate field unless fill a value
-            if (!special && opt.ignoreBlank && !value) {
+            if (!timely || (opt.ignoreBlank && !value && !special && !focusin)) {
                 me.hideMsg(el);
             }
-            else if (timer) {
-                field._t = setTimeout(function() {
+            else {
+                field._e = etype;
+                field.value = value;
+                if (timely !== undefined) field.timely = timely;
+                if (timer) {
+                    field._t = setTimeout(function() {
+                        me._validate(el, field);
+                    }, timer);
+                } else {
+                    if (special) field.old = {};
                     me._validate(el, field);
-                }, timer);
-            } else {
-                if (special) field.old = {};
-                me._validate(el, field);
+                }
             }
         },
 
@@ -722,6 +767,7 @@
             field.old.id = el.id;
             field.old.ret = ret;
 
+
             // trigger callback and event
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             isFunction(opt.validation) && opt.validation.call(me, el, ret);
@@ -733,12 +779,14 @@
 
             if (me.checkOnly) return;
             me._makeMsg.apply(me, arguments);
+            delete field._e;
         },
 
         _makeMsg: function(el, field, ret) {
             // show or hide the message
             if (field.msgMaker || this.options.msgMaker) {
-                this[ ret.showOk || ret.msg ? 'showMsg' : 'hideMsg' ](el, ret, field);
+                var mustShow = field._e === 'focusin' || (!ret.isValid || field.timely === 8 && field._e !== 'focusout');
+                this[ ret.showOk || ret.msg || mustShow ? 'showMsg' : 'hideMsg' ](el, ret, field);
             }
         },
 
@@ -752,6 +800,8 @@
                 msg,
                 rule,
                 method = field._r,
+                timely = field.timely || opt.timely,
+                special = timely === 9 || timely === 8,
                 transfer,
                 temp,
                 isValid = false;
@@ -801,7 +851,19 @@
             }
             // message analysis, and throw rule level event
             else {
-                if (isValid) {
+                if (!isValid || special) {
+                    /* rule message priority:
+                        1. custom DOM message
+                        2. custom field message;
+                        3. global defined message;
+                        4. rule returned message;
+                        5. default message;
+                    */
+                    msg = (getDataMsg(el, field, msg || rule.msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
+                        return me._getDisplay(el, field.display) || arguments[1];
+                    });
+                }
+                else if (isValid) {
                     if (field.showOk !== false) {
                         temp = attr(el, DATA_OK);
                         msg = temp === null ? isString(field.ok) ? field.ok : msg : temp;
@@ -810,41 +872,47 @@
                         }
                         if (isString(msg)) {
                             msgOpt.showOk = isValid;
-                            msgOpt.msg = msg;
                         }
                     }
-                    $(el).trigger('valid'+CLS_NS_RULE, [method, msg]);
-                } else {
-                    field.isValid = false;
-                    /* rule message priority:
-                        1. custom DOM message
-                        2. custom field message;
-                        3. global defined message;
-                        4. rule returned message;
-                        5. default message;
-                    */
-                    msgOpt.msg = (getDataMsg(el, field, msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
-                        return me._getDisplay(el, field.display) || arguments[1];
-                    });
-                    $(el).trigger('invalid'+CLS_NS_RULE, [method, msgOpt.msg]);
                 }
+                if (!isValid) field.isValid = false;
+                msgOpt.msg = msg;
+                $(el).trigger( (isValid ? 'valid' : 'invalid') + CLS_NS_RULE, [method, msg]);
             }
-            msgOpt.isValid = isValid;
+
+            if (special && (!transfer || rule.and)) {
+                if (!isValid && !field._m) field._m = msg;
+                field._v = field._v || [];
+                field._v.push({
+                    type: isValid ? !transfer ? 'ok' : 'tip' : 'error',
+                    msg: msg || rule.msg
+                });
+            }
 
             // output the debug message
             if (opt.debug) {
-                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msgOpt.msg));
+                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msg));
             }
 
             // the current rule has passed, continue to validate
-            if (isValid && field._i < field.rules.length - 1) {
+            if ( (isValid || special) && field._i < field.rules.length - 1) {
                 field._i++;
                 me._checkRule(el, field);
             }
             // field was invalid, or all fields was valid
             else {
                 field._i = 0;
+                msgOpt.isValid = field.isValid;
+                if (special) {
+                    msgOpt.result = field._v;
+                    msgOpt.msg = field._m || '';
+                    if (!field.value && (field._e==='focusin' || (field._e && timely === 8)) || (opt.focusCleanup && field._e==='focusin')) {
+                        msgOpt.type = 'tip';
+                    }
+                }
                 me._validatedField(el, field, msgOpt);
+                delete field._m;
+                delete field._v;
             }
         },
 
@@ -852,6 +920,7 @@
         _checkRule: function(el, field) {
             var me = this,
                 ret,
+                fn,
                 old,
                 key = field.key,
                 rule = field.rules[field._i],
@@ -873,7 +942,9 @@
             }
             else {
                 // get result from current rule
-                ret = (getDataRule(el, method) || me.rules[method] || noop).call(me, el, params, field);
+                fn = getDataRule(el, method) || me.rules[method] || noop;
+                ret = fn.call(me, el, params, field);
+                if (fn.msg) rule.msg = fn.msg;
             }
 
             // asynchronous validation
@@ -935,7 +1006,7 @@
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
 
             var me = this;
-            if ( !field ) field = me.getField(el);
+            field = field || me.getField(el);
             field.isValid = true;
 
             if (!field.rules) me._parse(el);
@@ -1265,9 +1336,12 @@
             case 'function':
                 return fn;
             case 'array':
-                return function(el) {
+                var f = function(el) {
+                    fn.msg = fn[1];
                     return fn[0].test(elementValue(el)) || fn[1] || false;
                 };
+                f.msg = fn[1];
+                return f;
             case 'regexp':
                 return function(el) {
                     return fn.test(elementValue(el));
@@ -1780,7 +1854,7 @@
             arr = URI.match(/(.*)\/local\/(\w{2,5})\.js/);
         } else {
             i = scripts.length;
-            re = /(.*validator.js)\?.*local=(\w+)/;
+            re = /(.*validator.js)\?.*local=(\w*)/;
             while (i-- && !arr) {
                 node = scripts[i];
                 arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
@@ -1795,7 +1869,7 @@
             if (!URI) {
                 Validator.loading = 1;
                 el = document.createElement('script');
-                el.src = dir + 'local/' + arr[2].replace('-','_') + '.js';
+                el.src = dir + 'local/' + (arr[2] || navigator.language || navigator.userLanguage).replace('-','_') + '.js';
                 i = 'onload' in el ? 'onload' : 'onreadystatechange';
                 el[i] = function() {
                     if (!el.readyState || /loaded|complete/.test(el.readyState)) {
