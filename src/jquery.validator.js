@@ -1847,7 +1847,8 @@
     // Resource loader
     (function(URI){
         var arr, node, i, re, dir, el,
-            scripts = document.getElementsByTagName('script');
+            doc = document,
+            scripts = doc.getElementsByTagName('script');
 
         if (URI) {
             node = scripts[0];
@@ -1862,14 +1863,14 @@
         }
         if (arr) {
             dir = arr[0].split('/').slice(0, -1).join('/').replace(/\/(local|src)$/,'')+'/';
-            el = document.createElement('link');
+            el = doc.createElement('link');
             el.rel = 'stylesheet';
             el.href = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
             if (!URI) {
                 Validator.loading = 1;
-                el = document.createElement('script');
-                el.src = dir + 'local/' + (arr[2] || navigator.language || navigator.userLanguage).replace('-','_') + '.js';
+                el = doc.createElement('script');
+                el.src = dir + 'local/' + (arr[2] || doc.documentElement.lang || 'en').replace('-','_') + '.js';
                 i = 'onload' in el ? 'onload' : 'onreadystatechange';
                 el[i] = function() {
                     if (!el.readyState || /loaded|complete/.test(el.readyState)) {
