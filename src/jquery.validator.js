@@ -1852,10 +1852,10 @@
 
         if (URI) {
             node = scripts[0];
-            arr = URI.match(/(.*)\/local\/(\w{2,5})\.js/);
+            arr = URI.match(/(.*)\/local\/([\w\-]{2,5})\.js/);
         } else {
             i = scripts.length;
-            re = /(.*validator.js)\?.*local=(\w*)/;
+            re = /(.*validator.js)\?.*local=([\w\-]*)/;
             while (i-- && !arr) {
                 node = scripts[i];
                 arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
@@ -1870,7 +1870,7 @@
             if (!URI) {
                 Validator.loading = 1;
                 el = doc.createElement('script');
-                el.src = dir + 'local/' + (arr[2] || doc.documentElement.lang || 'en').replace('-','_') + '.js';
+                el.src = dir + 'local/' + (arr[2] || doc.documentElement.lang || 'en').replace('_','-') + '.js';
                 i = 'onload' in el ? 'onload' : 'onreadystatechange';
                 el[i] = function() {
                     if (!el.readyState || /loaded|complete/.test(el.readyState)) {
