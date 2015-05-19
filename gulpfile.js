@@ -56,7 +56,7 @@ gulp.task('i18n', function () {
     
     fs.readdirSync('src/local/').forEach(function(f){
         var name = path.basename(f);
-        if ( /^[a-z]{2}(?:_[A-Z]{2})?\.js/.test(name) ) {
+        if ( /^[a-z]{2}(?:-[A-Z]{2})?\.js/.test(name) ) {
             i18n( name );
         }
     });
