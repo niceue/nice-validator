@@ -875,7 +875,7 @@
                         }
                     }
                 }
-                if (!isValid) field.isValid = false;
+                field.isValid = isValid;
                 msgOpt.msg = msg;
                 $(el).trigger( (isValid ? 'valid' : 'invalid') + CLS_NS_RULE, [method, msg]);
             }
