@@ -978,8 +978,9 @@
                         }
 
                         // filter data
-                        result = dataFilter.call(me, data, el);
-                        if (result === undefined) result = dataFilter.call(me, data.data, el);
+                        jqXHR.settings = this;
+                        result = dataFilter.call(jqXHR, data, el);
+                        if (result === undefined) result = dataFilter.call(jqXHR, data.data, el);
 
                         old.rule = rule;
                         rule.ret = result;
