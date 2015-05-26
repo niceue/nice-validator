@@ -307,22 +307,6 @@
                 me.$el.find(opt.target).addClass('msg-container');
             }
 
-            // Guess whether it use ajax submit
-            me.isAjaxSubmit = false;
-            if (opt.valid) {
-                me.isAjaxSubmit = true;
-            } else {
-                // if there is a "valid.form" event
-                var events = ($._data || $.data)(element, "events");
-                if (events && events.valid &&
-                    $.map(events.valid, function(e){
-                        return ~e.namespace.indexOf('form') ? 1 : null;
-                    }).length
-                ) {
-                    me.isAjaxSubmit = true;
-                }
-            }
-
             // Initialization events and make a cache
             if (!me.$el.data(NS)) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
@@ -344,6 +328,23 @@
                 // Initialization is complete, stop off default HTML5 form validation
                 // If use "jQuery.attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
+            }
+        },
+
+        // Guess whether the form use ajax submit
+        _guessAjax: function(form) {
+            var me = this;
+
+            if ( !(me.isAjaxSubmit = !!me.options.valid) ) {
+                // if there is a "valid.form" event
+                var events = ($._data || $.data)(form, "events");
+                if (events && events.valid &&
+                    $.map(events.valid, function(e){
+                        return ~e.namespace.indexOf('form') ? 1 : null;
+                    }).length
+                ) {
+                    me.isAjaxSubmit = true;
+                }
             }
         },
 
@@ -463,14 +464,14 @@
             var me = this,
                 opt = me.options;
 
-            me.isValid = true;
+            me.hasError = false;
             if (opt.ignore) $inputs = $inputs.not(opt.ignore);
 
             $inputs.each(function(i, el) {
                 var field = me.getField(el);
                 if (field) {
                     me._validate(el, field);
-                    if (!me.isValid && opt.stopOnError) {
+                    if (me.hasError && opt.stopOnError) {
                         // stop the verification
                         return false;
                     }
@@ -484,14 +485,14 @@
                     null,
                     $.map(me.deferred, function(v){return v;})
                 ).done(function(){
-                    doneCallbacks.call(me, me.isValid);
+                    doneCallbacks.call(me, !me.hasError);
                     me.verifying = false;
                 });
             }
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect whether a form valid through "doneCallbacks".
-            return !$.isEmptyObject(me.deferred) ? undefined : me.isValid;
+            return !$.isEmptyObject(me.deferred) ? undefined : !me.hasError;
         },
 
         // Verify the whole form
@@ -499,7 +500,8 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                autoSubmit = e.type === 'submit' && !e.isDefaultPrevented();
+                isDefaultPrevented = e.isDefaultPrevented(),
+                autoSubmit;
 
             e.preventDefault();
 
@@ -515,11 +517,15 @@
                 return;
             }
 
+            if (me.isAjaxSubmit === undefined) {
+                me._guessAjax(form);
+            }
+
+            autoSubmit = e.type === 'submit' && !isDefaultPrevented && !me.isAjaxSubmit;
+
             // Prevent infinite loop and repeated verification
-            if (e.isTrigger && me.isValid) {
-                if (autoSubmit) {
-                    submitForm();
-                }
+            if (e.isTrigger && me.isValid && autoSubmit) {
+                submitForm();
                 return;
             }
 
@@ -546,12 +552,13 @@
 
                     // releasing submit
                     me.submiting = false;
+                    me.isValid = isValid;
 
                     // trigger callback and event
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
 
-                    if (isValid && autoSubmit && !me.isAjaxSubmit) {
+                    if (isValid && autoSubmit) {
                         submitForm();
                     }
                 }
@@ -759,6 +766,7 @@
                     me.errors[field.key] = ret.msg;
                 }
                 me.isValid = false;
+                me.hasError = true;
             }
             me.elements[field.key] = ret.element = el;
             me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
