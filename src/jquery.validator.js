@@ -4,7 +4,7 @@
  */
 /*jshint evil:true*/
 (function(factory) {
-    if ('function' === typeof define && (define.amd || define.cmd)) {
+    if ( 'function' === typeof define && (define.amd || define.cmd) ) {
         // Register as an anonymous module.
         define([], function(){
             return factory;
@@ -54,7 +54,7 @@
         },
         isIE = document.documentMode || +(navigator.userAgent.match(/MSIE (\d+)/) && RegExp.$1),
         attr = function(el, key, value) {
-            if (value !== undefined) {
+            if ( value !== undefined ) {
                 if (value === null) el.removeAttribute(key);
                 else el.setAttribute(key, '' + value);
             } else {
@@ -181,13 +181,16 @@
         if (that.is(':input')) return that;
         !that.is('form') && (that = this.find('form'));
         !that.length && (that = this);
+
         that.each(function() {
             var cache = $(this).data(NS);
+
             if (cache) {
-                if (isString(options)) {
-                    if (options.charAt(0) === '_') return;
+                if ( isString(options) ) {
+                    if ( options.charAt(0) === '_' ) return;
                     cache[options].apply(cache, Array.prototype.slice.call(args, 1));
-                } else if (options) {
+                }
+                else if (options) {
                     cache._reset(true);
                     cache._init(this, options);
                 }
@@ -231,7 +234,9 @@
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
 
-        return (name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] || name === 'select' || name === 'textarea') &&
+        return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
+                 name === 'select' ||
+                 name === 'textarea' ) &&
                elem.disabled === false;
     };
 
@@ -245,16 +250,20 @@
     function Validator(element, options) {
         var me = this;
 
-        if (!(me instanceof Validator)) return new Validator(element, options);
+        if ( !(me instanceof Validator) ) {
+            return new Validator(element, options);
+        }
 
         me.$el = $(element);
+
         if (me.$el.length) {
             if (Validator.loading) {
                 $(window).on('validatorready', init);
             } else {
                 init();
             }
-        } else if(isString(element)) {
+        }
+        else if ( isString(element) ) {
             preinitialized[element] = options;
         }
 
@@ -269,7 +278,7 @@
                 opt, themeOpt, dataOpt;
 
             // Initialization options
-            if (isFunction(options)) {
+            if ( isFunction(options) ) {
                 options = {
                     valid: options
                 };
@@ -303,12 +312,12 @@
                 hide: opt.msgHide
             };
 
-            if (isString(opt.target)) {
+            if ( isString(opt.target) ) {
                 me.$el.find(opt.target).addClass('msg-container');
             }
 
             // Initialization events and make a cache
-            if (!me.$el.data(NS)) {
+            if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
                       .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
                       .on('reset'+ CLS_NS, proxy(me, '_reset'))
@@ -317,7 +326,7 @@
                       .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
-                if (opt.timely !== 0) {
+                if ( opt.timely !== 0 ) {
                     me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
                           .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
                           .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
@@ -338,7 +347,7 @@
             if ( !(me.isAjaxSubmit = !!me.options.valid) ) {
                 // if there is a "valid.form" event
                 var events = ($._data || $.data)(form, "events");
-                if (events && events.valid &&
+                if ( events && events.valid &&
                     $.map(events.valid, function(e){
                         return ~e.namespace.indexOf('form') ? 1 : null;
                     }).length
@@ -355,10 +364,10 @@
             // Processing field information
             if (clear) fields = me.fields;
 
-            if (isObject(fields)) {
+            if ( isObject(fields) ) {
                 $.each(fields, function(k, v) {
                     // delete a field from settings
-                    if (v === null || clear) {
+                    if ( v === null || clear ) {
                         var el = me.elements[k];
                         if (el) me._resetElement(el, true);
                         delete me.fields[k];
@@ -387,7 +396,7 @@
             dataRule && attr(el, DATA_RULE, null);
 
             // if the field has passed the key as id mode, or it doesn't has a name
-            if (el.id && ('#' + el.id in me.fields) || !el.name) {
+            if ( el.id && ('#' + el.id in me.fields) || !el.name ) {
                 key = '#' + el.id;
             }
             // doesn't verify a field that has neither id nor name
@@ -399,14 +408,14 @@
             field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
 
-            if (attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule)) {
+            if ( attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule) ) {
                 field.must = true;
             }
-            if (~field.rule.indexOf('required')) {
+            if ( ~field.rule.indexOf('required') ) {
                 field.required = true;
                 attr(el, ARIA_REQUIRED, true);
             }
-            if (!('showOk' in field)) {
+            if ( !('showOk' in field) ) {
                 field.showOk = me.options.showOk;
             }
 
@@ -417,10 +426,10 @@
                 field.timely = +timely;
             }
 
-            if (isString(field.target)) {
+            if ( isString(field.target) ) {
                 attr(el, DATA_TARGET, field.target);
             }
-            if (isString(field.tip)) {
+            if ( isString(field.tip) ) {
                 attr(el, DATA_TIP, field.tip);
             }
 
@@ -451,7 +460,9 @@
                         not: args[2] === "!",
                         or: args[6] === "|",
                         method: args[3],
-                        params: args[4] ? $.map(args[4].split(', '), function(i){return trim(i)}) : undefined
+                        params: args[4] ?
+                            $.map( args[4].split(', '), function(i){return trim(i)} ) :
+                            undefined
                     });
                 });
             }
@@ -465,7 +476,9 @@
                 opt = me.options;
 
             me.hasError = false;
-            if (opt.ignore) $inputs = $inputs.not(opt.ignore);
+            if (opt.ignore) {
+                $inputs = $inputs.not(opt.ignore);
+            }
 
             $inputs.each(function(i, el) {
                 var field = me.getField(el);
@@ -608,7 +621,9 @@
                 timely,
                 msg;
 
-            if (me.verifying || (e.type==='click' && document.activeElement === el)) return;
+            if ( me.verifying || ( e.type==='click' && document.activeElement === el ) ) {
+                return;
+            }
 
             if (opt.focusCleanup) {
                 if ( attr(el, ARIA_INVALID) === 'true' ) {
@@ -626,7 +641,7 @@
                 });
             } else {
                 timely = me._getTimely(el, opt);
-                if (timely === 8 || timely === 9) {
+                if ( timely === 8 || timely === 9 ) {
                     me._focusout(e);
                 }
             }
@@ -658,13 +673,13 @@
                 }
                 timely = me._getTimely(elem || el, opt);
 
-                if (etype === 'focusout') {
-                    if (timely === 2 || timely === 8) {
-                        if (field.isValid && !field.showOk) {
+                if ( etype === 'focusout' ) {
+                    if ( timely === 2 || timely === 8 ) {
+                        if ( field.isValid && !field.showOk ) {
                             me.hideMsg(el);
                         }
-                        else if (!opt.focusCleanup && !opt.ignoreBlank || value) {
-                            if (field && field.old.ret) {
+                        else if ( !opt.focusCleanup && !opt.ignoreBlank || value ) {
+                            if ( field && field.old.ret ) {
                                 me._makeMsg(el, field, field.old.ret);
                             }
                         }
@@ -672,16 +687,20 @@
                     }
                 }
                 else {
-                    if (!timely || timely < 2 && !e.data) return;
+                    if ( !timely || timely < 2 && !e.data ) {
+                        return;
+                    }
 
                     // mark timestamp to reduce the frequency of the received event
                     timestamp = +new Date();
-                    if ( timestamp - (el._ts || 0) < 100 || (etype === 'keyup' && el._et === 'input') ) return;
+                    if ( timestamp - (el._ts || 0) < 100 || (etype === 'keyup' && el._et === 'input') ) {
+                        return;
+                    }
                     el._ts = timestamp;
                     el._et = etype;
 
                     // handle keyup
-                    if (etype === 'keyup') {
+                    if ( etype === 'keyup' ) {
                         key = e.keyCode;
                         specialKey = {
                             8: 1,  // Backspace
@@ -692,12 +711,16 @@
                         };
 
                         // only gets focus, no verification
-                        if (key === 9 && !value) return;
+                        if ( key === 9 && !value ) {
+                            return;
+                        }
 
                         // do not validate, if triggered by these keys
-                        if (key < 48 && !specialKey[key]) return;
+                        if ( key < 48 && !specialKey[key] ) {
+                            return;
+                        }
                     }
-                    if (!focusin) {
+                    if ( !focusin ) {
                         // keyboard events, reducing the frequency of verification
                         timer = timely >=100 ? timely : 400;
                     }
@@ -705,12 +728,14 @@
             }
 
             // if the current field is ignored
-            if (opt.ignore && $(el).is(opt.ignore)) return;
+            if ( opt.ignore && $(el).is(opt.ignore) ) {
+                return;
+            }
 
             clearTimeout(field._t);
 
             // not validate field unless fill a value
-            if (!timely || (opt.ignoreBlank && !value && !special && !focusin)) {
+            if ( !timely || (opt.ignoreBlank && !value && !special && !focusin) ) {
                 me.hideMsg(el);
             }
             else {
@@ -735,7 +760,7 @@
             if ( $(el).is(':input') ) {
                 me.showMsg(el, {type: type, msg: msg});
             }
-            else if (type === 'tip') {
+            else if ( type === 'tip' ) {
                 me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
                     me.showMsg(this, {type: type, msg: msg});
                 });
@@ -776,9 +801,11 @@
             field.old.ret = ret;
 
 
-            // trigger callback and event
+            // trigger callback
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             isFunction(opt.validation) && opt.validation.call(me, el, ret);
+
+            // trigger event
             $(el).attr( ARIA_INVALID, isValid ? null : true )
                  .removeClass( isValid ? opt.invalidClass : opt.validClass )
                  .addClass( !ret.skip ? isValid ? opt.validClass : opt.invalidClass : "" )
@@ -792,7 +819,7 @@
 
         _makeMsg: function(el, field, ret) {
             // show or hide the message
-            if (field.msgMaker || this.options.msgMaker) {
+            if ( field.msgMaker || this.options.msgMaker ) {
                 var mustShow = field._e === 'focusin' || (!ret.isValid || field.timely === 8 && field._e !== 'focusout');
                 this[ ret.showOk || ret.msg || mustShow ? 'showMsg' : 'hideMsg' ](el, ret, field);
             }
@@ -937,7 +964,9 @@
                 params = rule.params;
 
             // request has been sent, wait it
-            if (me.submiting && me.deferred[key]) return;
+            if (me.submiting && me.deferred[key]) {
+                return;
+            }
             old = field.old;
             field._r = method;
 
@@ -974,7 +1003,9 @@
 
                         if (!isFunction(dataFilter)) {
                             dataFilter = function(data) {
-                                if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) return data;
+                                if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) {
+                                    return data;
+                                }
                             };
                         }
 
@@ -1012,7 +1043,9 @@
         // Processing the validation
         _validate: function(el, field) {
             // doesn't validate the element that has "disabled" or "novalidate" attribute
-            if ( el.disabled || attr(el, NOVALIDATE) !== null ) return;
+            if ( el.disabled || attr(el, NOVALIDATE) !== null ) {
+                return;
+            }
 
             var me = this;
             field = field || me.getField(el);
@@ -1072,19 +1105,30 @@
 
             if (p.length === 2) {
                 if (a && b) {
-                    if (isNumber && value >= +a && value <= +b) return true;
+                    if (isNumber && value >= +a && value <= +b) {
+                        return true;
+                    }
                     args = args.concat(p);
-                } else if (a && !b) {
-                    if (isNumber && value >= +a) return true;
+                }
+                else if (a && !b) {
+                    if (isNumber && value >= +a) {
+                        return true;
+                    }
                     args.push(a);
                     c = 'gte';
-                } else if (!a && b) {
-                    if (isNumber && value <= +b) return true;
+                }
+                else if (!a && b) {
+                    if (isNumber && value <= +b) {
+                        return true;
+                    }
                     args.push(b);
                     c = 'lte';
                 }
-            } else {
-                if (value === +a) return true;
+            }
+            else {
+                if (value === +a) {
+                    return true;
+                }
                 args.push(a);
                 c = 'eq';
             }
@@ -1126,14 +1170,14 @@
         _getMsgDOM: function(el, msgOpt) {
             var $el = $(el), $msgbox, datafor, tgt, container;
 
-            if ($el.is(':input')) {
+            if ( $el.is(':input') ) {
                 tgt = msgOpt.target || attr(el, DATA_TARGET);
                 if (tgt) {
                     tgt = isFunction(tgt) ? tgt.call(this, el) : this.$el.find(tgt);
                     if (tgt.length) {
-                        if (tgt.is(':input')) {
+                        if ( tgt.is(':input') ) {
                             el = tgt.get(0);
-                        } else if (tgt.hasClass(CLS_MSG_BOX)) {
+                        } else if ( tgt.hasClass(CLS_MSG_BOX) ) {
                             $msgbox = tgt;
                         } else {
                             container = tgt;
@@ -1150,12 +1194,14 @@
 
             if (!$msgbox.length) {
                 $el = this.$el.find(tgt || el);
+
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
                     'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
                     'style': msgOpt.style || '',
                     'for': datafor
                 });
-                if (checkable(el)) {
+
+                if ( checkable(el) ) {
                     var $parent = $el.parent();
                     $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
                 } else {
@@ -1197,7 +1243,9 @@
                 if (temp !== null) msgOpt.msg = temp;
             }
 
-            if (!isString(msgOpt.msg)) return;
+            if ( !isString(msgOpt.msg) ) {
+                return;
+            }
 
             if ($(el).is(INPUT_SELECTOR)) {
                 field = field || me.getField(el);
@@ -1208,7 +1256,9 @@
                     msgOpt.target = field.target || opt.target;
                 }
             }
-            if (!(msgMaker = (field || {}).msgMaker || opt.msgMaker)) return;
+            if (!(msgMaker = (field || {}).msgMaker || opt.msgMaker)) {
+                return;
+            }
             
             $msgbox = me._getMsgDOM(el, msgOpt);
                 
@@ -1230,6 +1280,7 @@
 
             el = $(el).get(0);
             msgOpt = me._getMsgOpt(msgOpt);
+
             if ($(el).is(INPUT_SELECTOR)) {
                 field = field || me.getField(el);
                 if (field) {
@@ -1363,6 +1414,7 @@
         var wrap, k, options;
 
         if (!el || !el.tagName) return;
+
         switch (el.tagName) {
             case 'INPUT':
             case 'SELECT':
@@ -1390,7 +1442,10 @@
 
     function initByInput(e, elem) {
         var el = elem || e.currentTarget, me;
-        if (!el.form || attr(el.form, NOVALIDATE) !== null) return;
+
+        if (!el.form || attr(el.form, NOVALIDATE) !== null) {
+            return;
+        }
 
         me = getInstance(el);
         if (me) {
@@ -1416,8 +1471,8 @@
         var msg = field.msg,
             item = field._r;
 
-        if (isObject(msg)) msg = msg[item];
-        if (!isString(msg)) {
+        if ( isObject(msg) ) msg = msg[item];
+        if ( !isString(msg) ) {
             msg = attr(el, DATA_MSG + '-' + item) || attr(el, DATA_MSG) || ( m ? isString(m) ? m : m[item] : '');
         }
 
@@ -1465,15 +1520,15 @@
         var input = this, name = input.name, attrNode, elem;
         if (!input.form) return;
 
-        if (input.type === 'submit') {
+        if ( input.type === 'submit' ) {
             submitButton = input;
             attrNode = input.getAttributeNode('formnovalidate');
             if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
                 novalidateonce = true;
             }
         }
-        else if (attr(input.form, NOVALIDATE) === null) {
-            if (name && checkable(input)) {
+        else if ( attr(input.form, NOVALIDATE) === null ) {
+            if ( name && checkable(input) ) {
                 elem = input.form.elements[name];
                 if (elem.length) elem = elem[0];
                 if (attr(elem, DATA_RULE)) {
@@ -1486,13 +1541,13 @@
     })
 
     .on('submit validate', 'form', function(e) {
-        if (attr(this, NOVALIDATE) !== null) return;
+        if ( attr(this, NOVALIDATE) !== null ) return;
 
         var $form = $(this), me;
 
-        if (!$form.data(NS)) {
+        if ( !$form.data(NS) ) {
             me = getInstance(this);
-            if (!$.isEmptyObject(me.fields)) {
+            if ( !$.isEmptyObject(me.fields) ) {
                 me._submit(e);
             } else {
                 attr(this, NOVALIDATE, NOVALIDATE);
@@ -1518,14 +1573,14 @@
                 isValid = true;
 
             if (params) {
-                if (params.length === 1) {
-                    if (!checkRuleName(params[0])) {
+                if ( params.length === 1 ) {
+                    if ( !checkRuleName(params[0]) ) {
                         if (!val && !$(params[0], me.$el).length ) {
                             return null;
                         }
                     }
-                    else if (me.rules[params[0]]) {
-                        if (!val && !me.test(element, params[0]) ) {
+                    else if ( me.rules[params[0]] ) {
+                        if ( !val && !me.test(element, params[0]) ) {
                             attr(element, ARIA_REQUIRED, null);
                             return null;
                         } else {
@@ -1533,16 +1588,16 @@
                         }
                     }
                 }
-                else if (params[0] === 'not') {
+                else if ( params[0] === 'not' ) {
                     $.each(params.slice(1), function() {
                         return (isValid = val !== trim(this));
                     });
                 }
-                else if (params[0] === 'from') {
+                else if ( params[0] === 'from' ) {
                     var $elements = me.$el.find(params[1]),
                         VALIDATED = '_validated_',
                         ret;
-                        
+
                     isValid = $elements.filter(function(){
                         return !!trim(elementValue(this));
                     }).length >= (params[2] || 1);
@@ -1553,7 +1608,7 @@
                         ret = getDataMsg($elements[0], field) || false;
                     }
 
-                    if(!$(element).data(VALIDATED)) {
+                    if ( !$(element).data(VALIDATED) ) {
                         $elements.data(VALIDATED, 1).each(function(){
                             if (element !== this) {
                                 me._checkRule(this, me.getField(this));
@@ -1665,7 +1720,7 @@
                 return true;
             }
 
-            msg = me.messages.match[type].replace('{1}', me._getDisplay(element, field2.display || key));
+            msg = me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) );
             
             switch (type) {
                 case 'lt':
@@ -1702,7 +1757,7 @@
             checked[3]     3 items
          **/
         checked: function(element, params, field) {
-            if (!checkable(element)) return;
+            if ( !checkable(element) ) return;
 
             var me = this,
                 elem, count;
@@ -1765,6 +1820,7 @@
                 dataType;
 
             data[element.name] = elementValue(element);
+
             // There are extra fields
             if (params[1]) {
                 $.map(params.slice(1), function(name) {
@@ -1802,6 +1858,7 @@
         validate: function(element, params) {
             var VALIDATED = '_validated_';
             if(!params || $(element).data(VALIDATED)) return;
+
             this.$el.find( 
                 $.map(params, function(key){
                     return key2selector(key);
@@ -1816,6 +1873,7 @@
          */
         filter: function(element, params) {
             var value = elementValue(element), temp;
+
             temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
             if (temp !== value) element.value = temp;
         }
@@ -1830,9 +1888,11 @@
         $.each(obj, function(k, o) {
             if (k === 'rules') {
                 new Rules(o);
-            } else if (k === 'messages') {
+            }
+            else if (k === 'messages') {
                 new Messages(o);
-            } else {
+            }
+            else {
                 defaults[k] = o;
             }
         });
@@ -1844,9 +1904,10 @@
         .setTheme( obj )
      */
     Validator.setTheme = function(name, obj) {
-        if (isObject(name)) {
+        if ( isObject(name) ) {
             $.extend(true, themes, name);
-        } else if (isString(name) && isObject(obj)) {
+        }
+        else if ( isString(name) && isObject(obj) ) {
             themes[name] = $.extend(themes[name], obj);
         }
     };
