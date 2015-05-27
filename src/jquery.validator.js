@@ -636,16 +636,20 @@
         _focusout: function(e, elem) {
             var me = this,
                 opt = me.options,
-                field,
                 el = e.target,
                 etype = e.type,
-                value = elementValue(el),
                 focusin = etype === 'focusin',
                 special = etype === 'validate',
+                field = me.getField(el),
+                value,
                 timestamp,
                 key, specialKey,
                 timely,
                 timer = 0;
+
+            if (!field) return;
+
+            value = elementValue(el);
 
             if (!special) {
                 // Just for checkbox and radio
@@ -656,7 +660,6 @@
 
                 if (etype === 'focusout') {
                     if (timely === 2 || timely === 8) {
-                        field = me.getField(el);
                         if (field.isValid && !field.showOk) {
                             me.hideMsg(el);
                         }
@@ -703,9 +706,6 @@
 
             // if the current field is ignored
             if (opt.ignore && $(el).is(opt.ignore)) return;
-
-            field = me.getField(el);
-            if (!field) return;
 
             clearTimeout(field._t);
 
