@@ -677,13 +677,14 @@
                     if ( timely === 2 || timely === 8 ) {
                         if ( field.isValid && !field.showOk ) {
                             me.hideMsg(el);
+                            return;
                         }
-                        else if ( !opt.focusCleanup && !opt.ignoreBlank || value ) {
+                        else if ( !opt.focusCleanup && !opt.ignoreBlank || value === field.old.value ) {
                             if ( field && field.old.ret ) {
                                 me._makeMsg(el, field, field.old.ret);
                             }
+                            return;
                         }
-                        return;
                     }
                 }
                 else {
