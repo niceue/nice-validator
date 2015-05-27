@@ -1092,35 +1092,37 @@
         },
 
         // Get a range of validation messages
-        getRangeMsg: function(value, params, type, suffix) {
+        getRangeMsg: function(value, params, field, suffix) {
             if (!params) return;
 
             var me = this,
-                msg = me.messages[type] || '',
+                rule = field.rules[field._i],
+                msg = me.messages[rule.method] || '',
+                result,
                 p = params[0].split('~'),
                 a = p[0],
                 b = p[1],
                 c = 'rg',
                 args = [''],
-                isNumber = +value === +value;
+                isNumber = trim(value) && +value === +value;
 
             if (p.length === 2) {
                 if (a && b) {
                     if (isNumber && value >= +a && value <= +b) {
-                        return true;
+                        result = true;
                     }
                     args = args.concat(p);
                 }
                 else if (a && !b) {
                     if (isNumber && value >= +a) {
-                        return true;
+                        result = true;
                     }
                     args.push(a);
                     c = 'gte';
                 }
                 else if (!a && b) {
                     if (isNumber && value <= +b) {
-                        return true;
+                        result = true;
                     }
                     args.push(b);
                     c = 'lte';
@@ -1128,7 +1130,7 @@
             }
             else {
                 if (value === +a) {
-                    return true;
+                    result = true;
                 }
                 args.push(a);
                 c = 'eq';
@@ -1141,7 +1143,7 @@
                 args[0] = msg[c];
             }
 
-            return me.renderMsg.apply(null, args);
+            return result || ( rule.msg = me.renderMsg.apply(null, args) );
         },
 
         /* @interface: renderMsg
@@ -1745,8 +1747,8 @@
             range[0~]      Number greater than or equal to 0
             range[~100]    Number less than or equal to 100
          **/
-        range: function(element, params) {
-            return this.getRangeMsg(+elementValue(element), params, 'range');
+        range: function(element, params, field) {
+            return this.getRangeMsg(elementValue(element), params, field);
         },
 
         /** how many checkbox or radio inputs that checked
@@ -1775,7 +1777,7 @@
             }
 
             if (params) {
-                return me.getRangeMsg(count, params, 'checked');
+                return me.getRangeMsg(count, params, field);
             } else {
                 return !!count || getDataMsg(elem, field, '') || me.messages.required;
             }
@@ -1788,11 +1790,11 @@
             length[~16]         Less than 16 characters
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
-        length: function(element, params) {
+        length: function(element, params, field) {
             var value = elementValue(element),
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
 
-            return this.getRangeMsg(len, params, 'length', (params[1] ? '_2' : ''));
+            return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
         },
 
         /** remote validation
