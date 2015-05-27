@@ -205,7 +205,7 @@
 
     // Validate a field, or an area
     $.fn.isValid = function(callback, hideMsg) {
-        var me = getInstance(this[0]),
+        var me = _getInstance(this[0]),
             hasCallback = isFunction(callback),
             ret, opt;
 
@@ -302,7 +302,7 @@
             // Initialization message parameters
             me.msgOpt = {
                 type: 'error',
-                pos: getPos(opt.msgClass),
+                pos: _getPos(opt.msgClass),
                 wrapper: opt.msgWrapper,
                 cls: opt.msgClass,
                 style: opt.msgStyle,
@@ -668,7 +668,7 @@
 
             if (!special) {
                 // Just for checkbox and radio
-                if (!elem && checkable(el)) {
+                if (!elem && _checkable(el)) {
                     elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
                 }
                 timely = me._getTimely(elem || el, opt);
@@ -895,7 +895,7 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msg = (getDataMsg(el, field, msg || rule.msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
+                    msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
                         return me._getDisplay(el, field.display) || arguments[1];
                     });
                 }
@@ -980,7 +980,7 @@
             }
             else {
                 // get result from current rule
-                fn = getDataRule(el, method) || me.rules[method] || noop;
+                fn = _getDataRule(el, method) || me.rules[method] || noop;
                 ret = fn.call(me, el, params, field);
                 if (fn.msg) rule.msg = fn.msg;
             }
@@ -1000,21 +1000,13 @@
                     function(d, textStatus, jqXHR) {
                         var data = jqXHR.responseText,
                             result,
-                            dataFilter = field.dataFilter || me.options.dataFilter;
-
-                        if (!isFunction(dataFilter)) {
-                            dataFilter = function(data) {
-                                if (isString(data) || (isObject(data) && ('error' in data || 'ok' in data))) {
-                                    return data;
-                                }
-                            };
-                        }
+                            dataFilter = field.dataFilter || me.options.dataFilter || _dataFilter;
 
                         // detect if data is json or jsonp format
                         if (/jsonp?/.test(this.dataType)) {
                             data = d;
                         } else if (trim(data).charAt(0) === '{') {
-                            data = $.parseJSON(data) || {};
+                            data = $.parseJSON(data);
                         }
 
                         // filter data
@@ -1058,7 +1050,7 @@
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !elementValue(el)) {
-                if (!checkable(el)) {
+                if (!_checkable(el)) {
                     me._validatedField(el, field, {isValid: true});
                     return true;
                 }
@@ -1188,7 +1180,7 @@
                     }
                 }
                 if (!$msgbox) {
-                    datafor = (!checkable(el) || !el.name) && el.id ? el.id : el.name;
+                    datafor = (!_checkable(el) || !el.name) && el.id ? el.id : el.name;
                     $msgbox = this.$el.find(msgOpt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
                 }
             } else {
@@ -1204,7 +1196,7 @@
                     'for': datafor
                 });
 
-                if ( checkable(el) ) {
+                if ( _checkable(el) ) {
                     var $parent = $el.parent();
                     $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
                 } else {
@@ -1231,7 +1223,7 @@
 
             if (isObject(el) && !el.jquery && !msgOpt) {
                 $.each(el, function(key, msg) {
-                    var el = me.elements[key] || me.$el.find(key2selector(key))[0];
+                    var el = me.elements[key] || me.$el.find(_key2selector(key))[0];
                     me.showMsg(el, msg);
                 });
                 return;
@@ -1377,8 +1369,8 @@
         var k, that = context ? context === true ? this : context : Rules.prototype;
 
         for (k in obj) {
-            if (checkRuleName(k))
-                that[k] = getRule(obj[k]);
+            if (_checkRuleName(k))
+                that[k] = _getRule(obj[k]);
         }
     }
 
@@ -1394,7 +1386,7 @@
     }
 
     // Rule converted factory
-    function getRule(fn) {
+    function _getRule(fn) {
         switch ($.type(fn)) {
             case 'function':
                 return fn;
@@ -1413,7 +1405,7 @@
     }
 
     // Get instance by an element
-    function getInstance(el) {
+    function _getInstance(el) {
         var wrap, k, options;
 
         if (!el || !el.tagName) return;
@@ -1443,14 +1435,14 @@
         return $(wrap).data(NS) || $(wrap)[NS](options).data(NS);
     }
 
-    function initByInput(e, elem) {
+    function _initByInput(e, elem) {
         var el = elem || e.currentTarget, me;
 
         if (!el.form || attr(el.form, NOVALIDATE) !== null) {
             return;
         }
 
-        me = getInstance(el);
+        me = _getInstance(el);
         if (me) {
             me._parse(el);
             me._focusin(e);
@@ -1461,16 +1453,16 @@
     }
 
     // Get custom rules on the node
-    function getDataRule(el, method) {
+    function _getDataRule(el, method) {
         var fn = trim(attr(el, DATA_RULE + '-' + method));
 
         if (!fn) return;
         fn = (new Function("return " + fn))();
-        if (fn) return getRule(fn);
+        if (fn) return _getRule(fn);
     }
 
     // Get custom messages on the node
-    function getDataMsg(el, field, m) {
+    function _getDataMsg(el, field, m) {
         var msg = field.msg,
             item = field._r;
 
@@ -1483,28 +1475,34 @@
     }
 
     // Get message position
-    function getPos(str) {
+    function _getPos(str) {
         var pos;
 
         if (str) pos = rPos.exec(str);
         return pos && pos[1];
     }
 
+    function _dataFilter(data) {
+        if ( isString(data) || ( isObject(data) && ('error' in data || 'ok' in data) ) ) {
+            return data;
+        }
+    }
+
     // Check whether the element is checkbox or radio
-    function checkable(el) {
+    function _checkable(el) {
         return el.tagName === 'INPUT' && el.type === 'checkbox' || el.type === 'radio';
     }
 
     // parse date string to timestamp
-    function parseDate(str) {
+    function _parseDate(str) {
         return Date.parse(str.replace(/\.|\-/g, '/'));
     }
 
-    function checkRuleName(name) {
+    function _checkRuleName(name) {
         return (/^[\w\d]+$/).test(name);
     }
 
-    function key2selector(key) {
+    function _key2selector(key) {
         return key.charAt(0) === "#" ? key.replace(/(:|\.|\[|\])/g, "\\$1") : '[name="'+ key +'"]:input';
     }
 
@@ -1516,7 +1514,7 @@
     
     $(document)
     .on('focusin', '['+DATA_RULE+']:input', function(e) {
-        initByInput(e);
+        _initByInput(e);
     })
 
     .on('click', 'input,button', function(e){
@@ -1531,14 +1529,14 @@
             }
         }
         else if ( attr(input.form, NOVALIDATE) === null ) {
-            if ( name && checkable(input) ) {
+            if ( name && _checkable(input) ) {
                 elem = input.form.elements[name];
                 if (elem.length) elem = elem[0];
                 if (attr(elem, DATA_RULE)) {
-                    initByInput(e, elem);
+                    _initByInput(e, elem);
                 }
             } else {
-                initByInput(e);
+                _initByInput(e);
             }
         }
     })
@@ -1549,7 +1547,7 @@
         var $form = $(this), me;
 
         if ( !$form.data(NS) ) {
-            me = getInstance(this);
+            me = _getInstance(this);
             if ( !$.isEmptyObject(me.fields) ) {
                 me._submit(e);
             } else {
@@ -1577,7 +1575,7 @@
 
             if (params) {
                 if ( params.length === 1 ) {
-                    if ( !checkRuleName(params[0]) ) {
+                    if ( !_checkRuleName(params[0]) ) {
                         if (!val && !$(params[0], me.$el).length ) {
                             return null;
                         }
@@ -1608,7 +1606,7 @@
                     if (isValid) {
                         if (!val) ret = null;
                     } else {
-                        ret = getDataMsg($elements[0], field) || false;
+                        ret = _getDataMsg($elements[0], field) || false;
                     }
 
                     if ( !$(element).data(VALIDATED) ) {
@@ -1687,7 +1685,7 @@
                 key = params[1];
             }
 
-            selector2 = key2selector(key);
+            selector2 = _key2selector(key);
             elem2 = me.$el.find(selector2)[0];
             // If the compared field is not exist
             if (!elem2) return;
@@ -1710,8 +1708,8 @@
             parser = params[2];
             if (parser) {
                 if (/^date(time)?$/i.test(parser)) {
-                    a = parseDate(a);
-                    b = parseDate(b);
+                    a = _parseDate(a);
+                    b = _parseDate(b);
                 } else if (parser === 'time') {
                     a = +a.replace(/:/g, '');
                     b = +b.replace(/:/g, '');
@@ -1760,7 +1758,7 @@
             checked[3]     3 items
          **/
         checked: function(element, params, field) {
-            if ( !checkable(element) ) return;
+            if ( !_checkable(element) ) return;
 
             var me = this,
                 elem, count;
@@ -1768,7 +1766,7 @@
             if (element.name) {
                 count = me.$el.find('input[name="' + element.name + '"]').filter(function() {
                     var el = this;
-                    if (!elem && checkable(el)) elem = el;
+                    if (!elem && _checkable(el)) elem = el;
                     return !el.disabled && el.checked;
                 }).length;
             } else {
@@ -1779,7 +1777,7 @@
             if (params) {
                 return me.getRangeMsg(count, params, field);
             } else {
-                return !!count || getDataMsg(elem, field, '') || me.messages.required;
+                return !!count || _getDataMsg(elem, field, '') || me.messages.required;
             }
         },
 
@@ -1834,7 +1832,7 @@
                         arr = name.split(':');
                         name = trim(arr[0]);
                         key = trim(arr[1]) || name;
-                        data[ name ] = me.$el.find( key2selector(key) ).val();
+                        data[ name ] = me.$el.find( _key2selector(key) ).val();
                     }
                 });
             }
@@ -1864,7 +1862,7 @@
 
             this.$el.find( 
                 $.map(params, function(key){
-                    return key2selector(key);
+                    return _key2selector(key);
                 }).join(',')
             ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
