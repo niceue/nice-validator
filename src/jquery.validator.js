@@ -736,7 +736,7 @@
             clearTimeout(field._t);
 
             // not validate field unless fill a value
-            if ( !timely || (opt.ignoreBlank && !value && !special && !focusin) ) {
+            if ( !special && ( !timely || (opt.ignoreBlank && !value && !focusin) ) ) {
                 me.hideMsg(el);
             }
             else {
@@ -780,11 +780,12 @@
         _validatedField: function(el, field, ret) {
             var me = this,
                 opt = me.options,
-                isValid = ret.isValid = field.isValid = !!ret.isValid,
+                isValid = field.isValid = ret.isValid = !!ret.isValid,
                 callback = isValid ? 'valid' : 'invalid';
 
             ret.key = field.key;
             ret.rule = field._r;
+
             if (isValid) {
                 ret.type = 'ok';
             } else {
@@ -938,14 +939,18 @@
             // field was invalid, or all fields was valid
             else {
                 field._i = 0;
-                msgOpt.isValid = field.isValid;
+                
                 if (special) {
+                    msgOpt.isValid = field.isValid;
                     msgOpt.result = field._v;
                     msgOpt.msg = field._m || '';
                     if (!field.value && (field._e==='focusin' || (field._e && timely === 8)) || (opt.focusCleanup && field._e==='focusin')) {
                         msgOpt.type = 'tip';
                     }
+                } else {
+                    msgOpt.isValid = isValid;
                 }
+
                 me._validatedField(el, field, msgOpt);
                 delete field._m;
                 delete field._v;
@@ -988,6 +993,9 @@
             // asynchronous validation
             if (isObject(ret) && isFunction(ret.then)) {
                 me.deferred[key] = ret;
+
+                // whether the field valid is unknown
+                field.isValid = undefined;
                 
                 // show loading message
                 !me.checkOnly && me.showMsg(el, {
@@ -1024,8 +1032,6 @@
                 ).always(function(){
                     delete me.deferred[key];
                 });
-                // whether the field valid is unknown
-                field.isValid = undefined;
             }
             // other result
             else {
