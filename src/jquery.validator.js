@@ -542,7 +542,7 @@
                 return;
             }
 
-            opt.debug && debug.log("\n" + e.type);
+            opt.debug && debug.log("\n<<< " + (e.isTrigger ? 'trigger: ':'event: ') + e.type);
             
             me._reset();
             me.submiting = true;
@@ -570,6 +570,8 @@
                     // trigger callback and event
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
+
+                    opt.debug && debug.log('>>> ' + ret);
 
                     if (isValid && autoSubmit) {
                         submitForm();
