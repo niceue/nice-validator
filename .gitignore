@@ -10,10 +10,9 @@ Thumbs.db
 *.diff
 *.bak
 *.log
+*.bat
+*.sh
+*.zip
 
 node_modules
-src/lib
 src/*.html
-/*.bat
-/*.sh
-/*.zip
