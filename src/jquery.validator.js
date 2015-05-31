@@ -580,12 +580,20 @@
             );
             
             function submitForm() {
+                var name, submit;
+
                 novalidateonce = true;
-                // For asp.NET controls
-                if (submitButton && submitButton.name) {
-                    me.$el.append('<input type="hidden" name="'+ submitButton.name +'" value="'+ $(submitButton).val() +'">');
+                if (submitButton && (name = submitButton.name)) {
+                    // If name="submit", we have to set the name empty to get the form.submit method
+                    submitButton.name = "";
+                    submit = form.submit;
+                    // For asp.NET controls
+                    me.$el.append('<input type="hidden" name="'+ name +'" value="'+ submitButton.value +'">');
+                    // call native submit
+                    submit.call(form);
+                } else {
+                    form.submit();
                 }
-                form.submit();
             }
         },
 
