@@ -123,28 +123,30 @@
     /** jQuery Plugin
      * @param {Object} options
         debug         {Boolean}     false     Whether to enable debug mode
-        timely        {Boolean}     true      Whether to enable timely verification
-        theme         {String}     'default'  Using which theme
+        timely        {Number}      1         Whether to enable timely verification
+        theme         {String}     'default'  Theme name
         stopOnError   {Boolean}     false     Whether to stop validate when found an error input
         focusCleanup  {Boolean}     false     Whether to clean up the field message when focus the field
         focusInvalid  {Boolean}     true      Whether to focus the field that is invalid
         ignoreBlank   {Boolean}     false     When the field has no value, whether to ignore verification
         ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
         
-        beforeSubmit  {Function}              Do something before submit the form
-        dataFilter    {Function}              Conversion ajax results
+        beforeSubmit  {Function}              Do something before submit form
+        dataFilter    {Function}              Convert ajax results
         valid         {Function}              Triggered when the form is valid
         invalid       {Function}              Triggered when the form is invalid
-        validClass    {String}                Add the class name to a valid field
-        invalidClass  {String}                Add the class name to a invalid field
+        validClass    {String}                Add this class name to a valid field
+        invalidClass  {String}                Add this class name to a invalid field
 
-        display       {Function}
-        msgShow       {Function}    null      When show a message, will trigger this callback
-        msgHide       {Function}    null      When hide a message, will trigger this callback
+        display       {Function}              Callback function to get dynamic display
+        target        {Function}              Callback function to get dynamic target
+        msgShow       {Function}    null      Trigger this callback when show message
+        msgHide       {Function}    null      Trigger this callback when hide message
         msgWrapper    {String}     'span'     Message wrapper tag name
-        msgMaker      {Function}              Message HTML maker
-        msgIcon       {String}                Icon template
-        msgStyle      {String}                Custom message style
+        msgMaker      {Function}              Callback function to make message HTML
+        msgArrow      {String}                Message arrow template
+        msgIcon       {String}                Message icon template
+        msgStyle      {String}                Custom message css style
         msgClass      {String}                Additional added to the message class names
         formClass     {String}                Additional added to the form class names
 
