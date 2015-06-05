@@ -409,7 +409,6 @@
 
             field = me.fields[key] || {};
             field.key = key;
-            field.old = {};
             field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
 
@@ -679,6 +678,7 @@
                 timer = 0;
 
             if (!field) return;
+            field._e = etype;
             old = field.old;
             value = elementValue(el);
 
@@ -690,14 +690,14 @@
                 timely = me._getTimely(elem || el, opt);
 
                 if ( etype === 'focusout' ) {
-                    console.log(old, field)
-                    if ( timely === 2 || timely === 8 && old) {
-                        if ( field.isValid && !old.showOk ) {
-                            me.hideMsg(el);
-                            return;
-                        }
-                        else if ( !opt.focusCleanup && !opt.ignoreBlank || value === old.value ) {
-                            me._makeMsg(el, field, old);
+                    if ( timely === 2 || timely === 8 ) {
+                        if (value) {
+                            if (field.isValid && !old.showOk) {
+                                me.hideMsg(el);
+                            } else {
+                                me._makeMsg(el, field, old);
+                            }
+                        } else {
                             return;
                         }
                     }
@@ -751,11 +751,10 @@
             clearTimeout(field._t);
 
             // not validate field unless fill a value
-            if ( !special && ( !timely || (opt.ignoreBlank && !value && !focusin) ) ) {
+            if ( !timely || (!special && opt.ignoreBlank && !value && !focusin) ) {
                 me.hideMsg(el);
             }
             else {
-                field._e = etype;
                 field.value = value;
                 if (timely !== undefined) field.timely = timely;
                 if (timer) {
@@ -763,7 +762,7 @@
                         me._validate(el, field);
                     }, timer);
                 } else {
-                    if (special) field.old = {};
+                    if (special) field.old = null;
                     me._validate(el, field);
                 }
             }
@@ -817,7 +816,6 @@
 
             field.old = ret;
 
-
             // trigger callback
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             isFunction(opt.validation) && opt.validation.call(me, el, ret);
@@ -831,14 +829,16 @@
 
             if (me.checkOnly) return;
             me._makeMsg.apply(me, arguments);
-            delete field._e;
         },
 
         _makeMsg: function(el, field, ret) {
             // show or hide the message
             if ( field.msgMaker || this.options.msgMaker ) {
-                var mustShow = field._e === 'focusin' || (!ret.isValid || field.timely === 8 && field._e !== 'focusout');
-                this[ ret.showOk || ret.msg || mustShow ? 'showMsg' : 'hideMsg' ](el, ret, field);
+                ret = $.extend({}, ret);
+                if (field._e === 'focusin') {
+                    ret.type = 'tip';
+                }
+                this[ ret.showOk || ret.msg || ret.type === 'tip' ? 'showMsg' : 'hideMsg' ](el, ret, field);
             }
         },
 
@@ -903,6 +903,18 @@
             }
             // message analysis, and throw rule level event
             else {
+                if (isValid) {
+                    if (field.showOk !== false) {
+                        temp = attr(el, DATA_OK);
+                        msg = temp === null ? isString(field.ok) ? field.ok : msg : temp;
+                        if (!isString(msg) && isString(field.showOk)) {
+                            msg = field.showOk;
+                        }
+                        if (isString(msg)) {
+                            msgOpt.showOk = isValid;
+                        }
+                    }
+                }
                 if (!isValid || special) {
                     /* rule message priority:
                         1. custom DOM message
@@ -914,18 +926,6 @@
                     msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
                         return me._getDisplay(el, field.display) || arguments[1];
                     });
-                }
-                else if (isValid) {
-                    if (field.showOk !== false) {
-                        temp = attr(el, DATA_OK);
-                        msg = temp === null ? isString(field.ok) ? field.ok : msg : temp;
-                        if (!isString(msg) && isString(field.showOk)) {
-                            msg = field.showOk;
-                        }
-                        if (isString(msg)) {
-                            msgOpt.showOk = isValid;
-                        }
-                    }
                 }
                 if (!isValid) field.isValid = isValid;
                 msgOpt.msg = msg;
@@ -959,7 +959,7 @@
                     msgOpt.isValid = field.isValid;
                     msgOpt.result = field._v;
                     msgOpt.msg = field._m || '';
-                    if (!field.value && (field._e==='focusin' || (field._e && timely === 8)) || (opt.focusCleanup && field._e==='focusin')) {
+                    if (!field.value && (field._e === 'focusin')) {
                         msgOpt.type = 'tip';
                     }
                 } else {
@@ -991,7 +991,7 @@
             old = field.old;
             field._r = method;
 
-            if ( !field.must && rule.result !== undefined &&
+            if (old && !field.must && rule.result !== undefined &&
                  old.rule === rule && old.id === el.id &&
                 value && old.value === value )
             {
