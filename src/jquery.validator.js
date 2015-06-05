@@ -690,13 +690,14 @@
                 timely = me._getTimely(elem || el, opt);
 
                 if ( etype === 'focusout' ) {
-                    if ( timely === 2 || timely === 8 && old.ret) {
-                        if ( field.isValid && !old.ret.showOk ) {
+                    console.log(old, field)
+                    if ( timely === 2 || timely === 8 && old) {
+                        if ( field.isValid && !old.showOk ) {
                             me.hideMsg(el);
                             return;
                         }
                         else if ( !opt.focusCleanup && !opt.ignoreBlank || value === old.value ) {
-                            me._makeMsg(el, field, old.ret);
+                            me._makeMsg(el, field, old);
                             return;
                         }
                     }
@@ -798,7 +799,9 @@
                 callback = isValid ? 'valid' : 'invalid';
 
             ret.key = field.key;
-            ret.rule = field._r;
+            ret.ruleName = field._r;
+            ret.id = el.id;
+            ret.value = elementValue(el);
 
             if (isValid) {
                 ret.type = 'ok';
@@ -812,9 +815,7 @@
             me.elements[field.key] = ret.element = el;
             me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
 
-            field.old.value = elementValue(el);
-            field.old.id = el.id;
-            field.old.ret = ret;
+            field.old = ret;
 
 
             // trigger callback
@@ -990,12 +991,12 @@
             old = field.old;
             field._r = method;
 
-            if ( !field.must && rule.ret !== undefined &&
+            if ( !field.must && rule.result !== undefined &&
                  old.rule === rule && old.id === el.id &&
                 value && old.value === value )
             {
                 // get result from cache
-                ret = rule.ret;
+                ret = rule.result;
             }
             else {
                 // get result from current rule
@@ -1037,7 +1038,7 @@
                         if (result === undefined) result = dataFilter.call(jqXHR, data.data, el);
 
                         old.rule = rule;
-                        rule.ret = result;
+                        rule.result = result;
                         me._validatedRule(el, field, result);
                     },
                     function(jqXHR, textStatus){
