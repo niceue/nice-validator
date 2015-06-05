@@ -671,6 +671,7 @@
                 focusin = etype === 'focusin',
                 special = etype === 'validate',
                 field = me.getField(el),
+                old,
                 value,
                 timestamp,
                 key, specialKey,
@@ -678,7 +679,7 @@
                 timer = 0;
 
             if (!field) return;
-
+            old = field.old;
             value = elementValue(el);
 
             if (!special) {
@@ -689,15 +690,13 @@
                 timely = me._getTimely(elem || el, opt);
 
                 if ( etype === 'focusout' ) {
-                    if ( timely === 2 || timely === 8 ) {
-                        if ( field.isValid && !field.showOk ) {
+                    if ( timely === 2 || timely === 8 && old.ret) {
+                        if ( field.isValid && !old.ret.showOk ) {
                             me.hideMsg(el);
                             return;
                         }
-                        else if ( !opt.focusCleanup && !opt.ignoreBlank || value === field.old.value ) {
-                            if ( field && field.old.ret ) {
-                                me._makeMsg(el, field, field.old.ret);
-                            }
+                        else if ( !opt.focusCleanup && !opt.ignoreBlank || value === old.value ) {
+                            me._makeMsg(el, field, old.ret);
                             return;
                         }
                     }
