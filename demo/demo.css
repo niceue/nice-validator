@@ -1,9 +1,8 @@
- body {font: 100%/1.5 "HelveticaNeue", "Helvetica", "Arial", sans-serif;}
-.form {max-width:400px;margin: 20px 0 0 20px;}
-.form-item label {display:block;margin:10px 0 2px; font-size:14px;}
-.form-item input,
-.form-item select,
-.form-item textarea {
+body {font: 100%/1.5 "HelveticaNeue", "Helvetica", "Arial", sans-serif;}
+input[type="text"],
+input[type="password"],
+select,
+textarea {
     width:200px;
     padding: 3px 5px;
     box-sizing: border-box;
@@ -11,7 +10,9 @@
     border-top: 1px solid #c0c0c0;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
+.form {max-width:400px;margin: 20px 0 0 20px;}
+.form-item {margin: .5em 0;}
+.form-item .label {display:block; margin:10px 0 2px; font-size:14px;}
 .form-item .n-invalid {border:1px solid #c00;}
 
-.form-btn {margin-top:30px;}
-.form-btn button {padding:5px 20px;}
+.form-item button {padding:5px 20px; margin-top: 1em;}
