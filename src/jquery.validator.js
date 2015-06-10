@@ -411,6 +411,7 @@
             field.key = key;
             field.rule = field.rule || dataRule || '';
             if (!field.rule) return;
+            field.old = {};
 
             if ( attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule) ) {
                 field.must = true;
@@ -762,7 +763,7 @@
                         me._validate(el, field);
                     }, timer);
                 } else {
-                    if (special) field.old = null;
+                    if (special) field.old = {};
                     me._validate(el, field);
                 }
             }
