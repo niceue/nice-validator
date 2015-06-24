@@ -993,7 +993,7 @@
             field._r = method;
 
             if (old && !field.must && rule.result !== undefined &&
-                 old.rule === rule && old.id === el.id &&
+                 old.ruleName === method && old.id === el.id &&
                 value && old.value === value )
             {
                 // get result from cache
