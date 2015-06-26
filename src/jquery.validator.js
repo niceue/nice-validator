@@ -683,12 +683,13 @@
             old = field.old;
             value = elementValue(el);
 
+            // Just for checkbox and radio
+            if (!elem && _checkable(el)) {
+                elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
+            }
+            timely = me._getTimely(elem || el, opt);
+
             if (!special) {
-                // Just for checkbox and radio
-                if (!elem && _checkable(el)) {
-                    elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
-                }
-                timely = me._getTimely(elem || el, opt);
 
                 if ( etype === 'focusout' ) {
                     if ( timely === 2 || timely === 8 ) {
