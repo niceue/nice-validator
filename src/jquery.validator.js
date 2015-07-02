@@ -1035,12 +1035,10 @@
                         }
 
                         // filter data
-                        jqXHR.settings = this;
-                        result = dataFilter.call(jqXHR, data, el);
-                        if (result === undefined) result = dataFilter.call(jqXHR, data.data, el);
+                        result = dataFilter.call(this, data, field);
+                        if (result === undefined) result = dataFilter.call(this, data.data, field);
 
-                        old.rule = rule;
-                        rule.result = result;
+                        rule.result = field.old ? result : undefined;
                         me._validatedRule(el, field, result);
                     },
                     function(jqXHR, textStatus){
