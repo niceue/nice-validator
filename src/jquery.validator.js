@@ -81,6 +81,7 @@
             //stopOnError: false,
             //focusCleanup: false,
             //ignoreBlank: false,
+            //showOk: true,
             
             //dataFilter: null,
             //valid: null,
@@ -88,9 +89,6 @@
             //display: null,
             //target: null,
             beforeSubmit: noop,
-
-            validClass: 'n-valid',
-            invalidClass: 'n-invalid',
 
             msgWrapper: 'span',
             msgMaker: function(opt) {
@@ -112,9 +110,8 @@
             //msgStyle: null,
             //msgShow: null,
             //msgHide: null,
-            //showOk: true,
-            defaultMsg: "This field is not valid.",
-            loadingMsg: 'Validating...'
+            validClass: 'n-valid',
+            invalidClass: 'n-invalid'
         },
         themes = {
             'default': {
@@ -153,12 +150,8 @@
         msgClass      {String}                Additional added to the message class names
         formClass     {String}                Additional added to the form class names
 
-        defaultMsg    {String}                Default error message
-        loadingMsg    {String}                Tips for asynchronous loading
         messages      {Object}      null      Custom messages for the current instance
-        
         rules         {Object}      null      Custom rules for the current instance
-
         fields        {Object}                Field set to be verified
         {String} key    name|#id
         {String|Object} value                 Rule string, or an object is passed more arguments
@@ -925,7 +918,7 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || defaults.defaultMsg).replace(/\{0\|?([^\}]*)\}/, function(){
+                    msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || me.messages.fallback).replace(/\{0\|?([^\}]*)\}/, function(){
                         return me._getDisplay(el, field.display) || arguments[1];
                     });
                 }
@@ -1017,7 +1010,7 @@
                 // show loading message
                 !me.checkOnly && me.showMsg(el, {
                     type: 'loading',
-                    msg: me.options.loadingMsg
+                    msg: me.messages.loading
                 }, field);
 
                 // waiting to parse the response data
@@ -1578,6 +1571,11 @@
                 $form.off(CLS_NS).removeData(NS);
             }
         }
+    });
+
+    new Messages({ 
+        fallback: "This field is not valid.",
+        loading: 'Validating...'
     });
 
 

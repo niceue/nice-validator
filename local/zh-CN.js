@@ -17,8 +17,6 @@
         //focusCleanup: true,
         //theme: 'yellow_right',
         //timely: 2,
-        defaultMsg: "{0}格式不正确",
-        loadingMsg: "正在验证...",
         
         // Custom rules
         rules: {
@@ -49,6 +47,8 @@
 
         // Default error messages
         messages: {
+            fallback: "{0}格式不正确",
+            loading: "正在验证...",
             error: "网络异常",
             timeout: "请求超时",
             required: "{0}不能为空",

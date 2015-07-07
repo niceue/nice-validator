@@ -19,8 +19,8 @@ exports.rules = {
 };
 
 exports.lang = {
-    defaultMsg: "{0}格式不正確",
-    loadingMsg: "正在驗證...",
+    fallback: "{0}格式不正確",
+    loading: "正在驗證...",
 
     error: "網絡異常",
     timeout: "請求超時",

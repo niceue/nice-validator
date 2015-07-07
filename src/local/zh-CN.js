@@ -27,8 +27,8 @@ exports.rules = {
 };
 
 exports.lang = {
-    defaultMsg: "{0}格式不正确",
-    loadingMsg: "正在验证...",
+    fallback: "{0}格式不正确",
+    loading: "正在验证...",
 
     error: "网络异常",
     timeout: "请求超时",

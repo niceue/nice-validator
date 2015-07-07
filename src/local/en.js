@@ -19,8 +19,8 @@ exports.rules = {
 };
 
 exports.lang = {
-    defaultMsg: "This field is not valid.",
-    loadingMsg: "Validating...",
+    fallback: "This field is not valid.",
+    loading: "Validating...",
 
     error: "Network Error.",
     timeout: "Request timed out.",

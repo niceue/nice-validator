@@ -19,8 +19,8 @@ exports.rules = {
 };
 
 exports.lang = {
-    defaultMsg: "このフィールドは有効ではありません",
-    loadingMsg: "検証プロセス...",
+    fallback: "このフィールドは有効ではありません",
+    loading: "検証プロセス...",
 
     error: "ネットワークエラー",
     timeout: "要求がタイムアウトしました",

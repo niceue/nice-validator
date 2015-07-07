@@ -17,8 +17,6 @@
         //focusCleanup: true,
         //theme: 'yellow_right',
         //timely: 2,
-        defaultMsg: "{0}格式不正確",
-        loadingMsg: "正在驗證...",
         
         // Custom rules
         rules: {
@@ -41,6 +39,8 @@
 
         // Default error messages
         messages: {
+            fallback: "{0}格式不正確",
+            loading: "正在驗證...",
             error: "網絡異常",
             timeout: "請求超時",
             required: "{0}不能為空",

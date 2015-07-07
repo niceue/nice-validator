@@ -17,8 +17,6 @@
         //focusCleanup: true,
         //theme: 'yellow_right',
         //timely: 2,
-        defaultMsg: "<#=defaultMsg#>",
-        loadingMsg: "<#=loadingMsg#>",
         
         // Custom rules
         rules: {
@@ -42,6 +40,8 @@
 
         // Default error messages
         messages: {
+            fallback: "<#=fallback#>",
+            loading: "<#=loading#>",
             error: "<#=error#>",
             timeout: "<#=timeout#>",
             required: "<#=required#>",

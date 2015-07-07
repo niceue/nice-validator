@@ -17,8 +17,6 @@
         //focusCleanup: true,
         //theme: 'yellow_right',
         //timely: 2,
-        defaultMsg: "This field is not valid.",
-        loadingMsg: "Validating...",
         
         // Custom rules
         rules: {
@@ -41,6 +39,8 @@
 
         // Default error messages
         messages: {
+            fallback: "This field is not valid.",
+            loading: "Validating...",
             error: "Network Error.",
             timeout: "Request timed out.",
             required: "This field is required.",

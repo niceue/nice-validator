@@ -17,8 +17,6 @@
         //focusCleanup: true,
         //theme: 'yellow_right',
         //timely: 2,
-        defaultMsg: "このフィールドは有効ではありません",
-        loadingMsg: "検証プロセス...",
         
         // Custom rules
         rules: {
@@ -41,6 +39,8 @@
 
         // Default error messages
         messages: {
+            fallback: "このフィールドは有効ではありません",
+            loading: "検証プロセス...",
             error: "ネットワークエラー",
             timeout: "要求がタイムアウトしました",
             required: "このフィールドは必須です",
