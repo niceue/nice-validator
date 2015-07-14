@@ -3,14 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>Load By Sea.js</title>
+	<link rel="stylesheet" href="demo.css">
 </head>
 
 <body>
 
-<form>
-    <p><input type="text" name="username" data-rule="required"></p>
-    <p><input type="password" name="password" data-rule="required"></p>
-    <p><button type="submit">提交</button></p>
+<form data-validator-option="{timely:2}">
+    <div class="form-item">
+		<input type="text" name="user[email]" data-rule="required;email" placeholder="邮箱">
+	</div>
+    <div class="form-item">
+		<input type="password" name="password" data-rule="required;" placeholder="密码">
+	</div>
+    <div class="form-item">
+        <button type="submit">提交</button>
+    </div>
 </form>
 
 
