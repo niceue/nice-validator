@@ -4,7 +4,7 @@
  *********************************/
 (function(factory) {
     'function' === typeof define && (define.amd || define.cmd) ? define(function(require, exports, module){
-        var $ = require('jquery'); $._VALIDATOR_URI = module.uri;
+        var $ = require('jquery')||jQuery; $._VALIDATOR_URI = module.uri;
         require('../jquery.validator')($);
         factory($);
     }) : factory(jQuery);
