@@ -30,6 +30,7 @@
         DATA_OK = 'data-ok',
         DATA_TIMELY = 'data-timely',
         DATA_TARGET = 'data-target',
+        DATA_DISPLAY = 'data-display',
         DATA_MUST = 'data-must',
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
@@ -386,6 +387,7 @@
         // Parsing a field
         _parse: function(el) {
             var me = this,
+                opt = me.options,
                 field,
                 key = el.name,
                 timely,
@@ -403,27 +405,33 @@
             field = me.fields[key] || {};
             field.key = key;
             field.rule = field.rule || dataRule || '';
-            if (!field.rule) return;
-            field.old = {};
 
-            if ( attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule) ) {
-                field.must = true;
+            if (!field.display) {
+                if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
+                    field.display = opt.display;
+                }
             }
-            if ( ~field.rule.indexOf('required') ) {
-                field.required = true;
-                attr(el, ARIA_REQUIRED, true);
-            }
-            if ( !('showOk' in field) ) {
-                field.showOk = me.options.showOk;
-            }
+            if (field.rule) {
+                if ( attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule) ) {
+                    field.must = true;
+                }
+                if ( ~field.rule.indexOf('required') ) {
+                    field.required = true;
+                    attr(el, ARIA_REQUIRED, true);
+                }
+                if ( !('showOk' in field) ) {
+                    field.showOk = opt.showOk;
+                }
 
-            timely = attr(el, DATA_TIMELY);
-            if (!timely) {
-                if ('timely' in field) attr(el, DATA_TIMELY, +field.timely);
-            } else {
-                field.timely = +timely;
+                timely = attr(el, DATA_TIMELY);
+                if (!timely) {
+                    if ('timely' in field) attr(el, DATA_TIMELY, +field.timely);
+                } else {
+                    field.timely = +timely;
+                }
+                field = me._parseRule(field);
+                field.old = {};
             }
-
             if ( isString(field.target) ) {
                 attr(el, DATA_TARGET, field.target);
             }
@@ -431,22 +439,18 @@
                 attr(el, DATA_TIP, field.tip);
             }
 
-            me.fields[key] = me._parseRule(field);
+            me.fields[key] = field;
         },
 
         // Parsing field rules
         _parseRule: function(field) {
-            var arr = rDisplay.exec(field.rule),
-                opt = this.options;
+            var arr = rDisplay.exec(field.rule);
 
             if (!arr) return;
             // current rule index
             field._i = 0;
             if (arr[1]) {
                 field.display = arr[1];
-            }
-            if (!field.display && opt.display) {
-                field.display = opt.display;
             }
             if (arr[2]) {
                 field.rules = [];
