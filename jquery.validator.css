@@ -67,10 +67,10 @@
 }
 .n-msg {
   display: inline-block;
+  *display: inline;
+  *zoom: 1;
   line-height: 16px;
   margin-left: 1px;
-  *margin-top: -1px;
-  _margin-top: 0;
   font-size: 12px;
   font-family: simsun;
 }
@@ -101,6 +101,8 @@
 .n-bottom,
 .n-left {
   display: inline-block;
+  *display: inline;
+  *zoom: 1;
   line-height: 0;
   vertical-align: top;
   outline: 0;
