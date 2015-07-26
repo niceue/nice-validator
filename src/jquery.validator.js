@@ -1319,12 +1319,16 @@
             var me = this,
                 key;
 
-            if (el.id && '#' + el.id in me.fields || !el.name) {
-                key = '#' + el.id;
+            if (isString(el)) {
+                key = el;
             } else {
-                key = el.name;
+                if (el.id && '#' + el.id in me.fields || !el.name) {
+                    key = '#' + el.id;
+                } else {
+                    key = el.name;
+                }
+                if (attr(el, DATA_RULE)) me._parse(el);
             }
-            if (attr(el, DATA_RULE)) me._parse(el);
 
             return me.fields[key];
         },
@@ -1333,6 +1337,8 @@
          */
         setField: function(key, obj) {
             var fields = {};
+
+            if (!key) return;
 
             // update this field
             if (isString(key)) {
