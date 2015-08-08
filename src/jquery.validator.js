@@ -325,7 +325,7 @@
                       .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
-                if ( opt.timely !== 0 ) {
+                if ( opt.timely ) {
                     me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
                           .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
                           .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
