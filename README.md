@@ -1,10 +1,10 @@
 ## nice Validator
-[![Build Status](https://travis-ci.org/niceue/validator.png)](https://travis-ci.org/niceue/validator)
+[![Build Status](https://travis-ci.org/niceue/nice-validator.png)](https://travis-ci.org/niceue/nice-validator)
 
 Simple, smart and pleasant verification solution.
 
 ### Documention
-[English](https://github.com/niceue/validator/wiki/Getting-Started) (0.8+)  
+[English](https://github.com/niceue/nice-validator/wiki/Getting-Started) (0.8+)  
 [简体中文](http://niceue.com/validator/) (0.7.*)  
 
 ### Dependencies
@@ -23,7 +23,7 @@ $ bower install nice-validator
 ```
 
 ### Bugs / Contributions
-- [Report a bug](https://github.com/niceue/validator/issues)
+- [Report a bug](https://github.com/niceue/nice-validator/issues)
 - To contribute or send an idea, github message me or fork the project
 
 ### Build
