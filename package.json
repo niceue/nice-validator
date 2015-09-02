@@ -5,17 +5,12 @@
     "keywords": ["jquery-plugin", "ecosystem:jquery", "form", "validate", "validation", "validator", "nice-validator"],
     "homepage": "http://niceue.com/validator/",
     "author": "Jony Zhang <zj86@live.cn>",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "https://github.com/niceue/validator.git"
     },
     "bugs": "https://github.com/niceue/validator/issues",
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "http://niceue.com/licenses/MIT-LICENSE.txt"
-        }
-    ],
     "engine": [
         "node >=0.10.0"
     ],
