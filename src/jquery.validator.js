@@ -41,7 +41,7 @@
         rDoubleBytes = /[^\x00-\xff]/g,
         rPos = /^.*(top|right|bottom|left).*$/,
         rAjaxType = /(?:(post|get):)?(.+)/i,
-        rUnsafe = /[<>'"`\\]|(?:&#)(?:0*\d{2,3}|x[A-F0-9]{2});?|%[A-F0-9]{2}/gmi,
+        rUnsafe = /[<>'"`\\]|&#x?\d+[A-F]?;?|%3[A-F]/gmi,
 
         noop = $.noop,
         proxy = $.proxy,
