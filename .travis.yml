@@ -3,6 +3,5 @@ language: node_js
 node_js:
   - "0.12"
 before_install:
-  - "phantomjs --version"
   - "npm install -g gulp mocha-phantomjs"
 script: gulp
