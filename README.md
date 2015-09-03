@@ -38,8 +38,8 @@ seajs.config({
 ```
 
 ### Documention
-[English](https://github.com/niceue/nice-validator/wiki/Getting-Started) (0.8+)  
-[简体中文](http://niceue.com/validator/) (0.7.*)  
+[English](https://github.com/niceue/nice-validator/wiki/Getting-Started)  
+[简体中文](http://niceue.com/validator/)  
 
 ### Browser Support
   * IE6+
