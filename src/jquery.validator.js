@@ -1,5 +1,5 @@
 /*! nice Validator 0.8.0
- * (c) 2012-2014 Jony Zhang <zj86@live.cn>, MIT Licensed
+ * (c) 2012-2015 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
 /*jshint evil:true*/

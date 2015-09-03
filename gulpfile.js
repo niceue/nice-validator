@@ -9,7 +9,7 @@ var fs = require('fs'),
 
 var pkg = require('./package');
 var banner = '/*! nice Validator '+ pkg.version +'\n'+
-          ' * (c) 2012-2014 '+ pkg.author +', MIT Licensed\n'+
+          ' * (c) 2012-2015 '+ pkg.author +', MIT Licensed\n'+
           ' * '+ pkg.homepage +'\n'+
           ' */';
 
