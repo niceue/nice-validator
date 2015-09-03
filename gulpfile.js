@@ -94,7 +94,7 @@ gulp.task('release', ['build', 'i18n'], function () {
             "jquery.validator.css",
             "README.md"
         ], {base: './'})
-        .pipe(zip(pkg.name + '-release-' + pkg.version  + '.zip'))
+        .pipe(zip(pkg.name + '-' + pkg.version  + '.zip'))
         .pipe(gulp.dest('./'));
 });
 
