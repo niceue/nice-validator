@@ -245,7 +245,13 @@
     };
 
 
-    // Constructor for Validator
+    /** 
+     * Creates a new Validator
+     * 
+     * @class
+     * @param {Element} element - form element
+     * @param {Object}  options - options for validator
+     */
     function Validator(element, options) {
         var me = this;
 
@@ -1077,9 +1083,12 @@
             return field.isValid;
         },
 
-        /* Detecting whether the value of an element that matches a rule
-         *
-         * @interface: test
+        /**
+         * Detecting whether the value of an element that matches a rule
+         * 
+         * @method test
+         * @param {Element} el - input element
+         * @param {String} rule - rule name
          */
         test: function(el, rule) {
             var me = this,
@@ -1155,7 +1164,11 @@
             return result || ( rule.msg = me.renderMsg.apply(null, args) );
         },
 
-        /* @interface: renderMsg
+        /** 
+         * Render message template
+         * 
+         * @method renderMsg
+         * @return {String}
          */
         renderMsg: function() {
             var args = arguments,
@@ -1228,7 +1241,12 @@
             return $msgbox;
         },
 
-        /* @interface: showMsg
+        /**
+         * Show validation message
+         * 
+         * @method showMsg
+         * @param {Element} el - input element
+         * @param {Object} msgOpt
          */
         showMsg: function(el, msgOpt, /*INTERNAL*/ field) {
             if (!el) return;
@@ -1283,7 +1301,12 @@
             isFunction(msgOpt.show) && msgOpt.show.call(me, $msgbox, msgOpt.type);
         },
 
-        /* @interface: hideMsg
+        /** 
+         * Hide validation message
+         * 
+         * @method hideMsg
+         * @param {Element} el - input element
+         * @param {Object} msgOpt optional
          */
         hideMsg: function(el, msgOpt, /*INTERNAL*/ field) {
             var me = this,
@@ -1313,7 +1336,13 @@
             }
         },
 
-        // Get field information
+        /** 
+         * Get field information
+         * 
+         * @method getField
+         * @param {Element} - input element
+         * @return {Object} field
+         */
         getField: function(el) {
             var me = this,
                 key;
@@ -1332,7 +1361,12 @@
             return me.fields[key];
         },
 
-        /* @interface: setField
+        /** 
+         * Config a field
+         * 
+         * @method: setField
+         * @param {String} key
+         * @param {Object} obj
          */
         setField: function(key, obj) {
             var fields = {};
@@ -1351,7 +1385,11 @@
             this._initFields(fields);
         },
 
-        /* @interface: isFormValid
+        /** 
+         * Detecting whether the form is valid
+         * 
+         * @method isFormValid
+         * @return {Boolean}
          */
         isFormValid: function() {
             var fields = this.fields, k;
@@ -1363,19 +1401,29 @@
             return true;
         },
 
-        /* @interface: holdSubmit
+        /** 
+         * Prevent submission form
+         * 
+         * @method holdSubmit
+         * @param {Boolean} hold - If set to false, will release the hold
          */
         holdSubmit: function(hold) {
             this.submiting = hold === undefined || hold;
         },
 
-        /* @interface: cleanUp
+        /** 
+         * Clean validation messages
+         * 
+         * @method cleanUp
          */
         cleanUp: function() {
             this._reset(1);
         },
 
-        /* @interface: destroy
+        /** 
+         * Destroy the validation
+         * 
+         * @method destroy
          */
         destroy: function() {
             this._reset(1);
@@ -1385,7 +1433,13 @@
     };
 
 
-    // Rule class
+    /**
+     * Create Rules
+     * 
+     * @class
+     * @param {Object} obj     rules
+     * @param {Object} context context
+     */
     function Rules(obj, context) {
         if (!isObject(obj)) return;
 
@@ -1397,7 +1451,13 @@
         }
     }
 
-    // Message class
+    /**
+     * Create Messages
+     * 
+     * @class
+     * @param {Object} obj     rules
+     * @param {Object} context context
+     */
     function Messages(obj, context) {
         if (!isObject(obj)) return;
 
@@ -1589,7 +1649,9 @@
     // Built-in rules (global)
     new Rules({
 
-        /** required
+        /** 
+         * required
+         * 
          * @example:
             required
             required(anotherRule)
@@ -1652,7 +1714,9 @@
             return isValid && !!val;
         },
 
-        /** integer
+        /** 
+         * integer
+         * 
          * @example:
             integer
             integer[+]
@@ -1686,7 +1750,9 @@
             return new RegExp(re).test(elementValue(element)) || this.messages.integer[key];
         },
 
-        /** match another field
+        /** 
+         * match another field
+         * 
          * @example:
             match[password]    Match the password field (two values ​​must be the same)
             match[eq, password]  Ditto
@@ -1767,7 +1833,9 @@
             }
         },
 
-        /** range numbers
+        /** 
+         * range numbers
+         * 
          * @example:
             range[0~99]    Number 0-99
             range[0~]      Number greater than or equal to 0
@@ -1777,7 +1845,9 @@
             return this.getRangeMsg(elementValue(element), params, field);
         },
 
-        /** how many checkbox or radio inputs that checked
+        /** 
+         * how many checkbox or radio inputs that checked
+         * 
          * @example:
             checked;       no empty, same to required
             checked[1~3]   1-3 items
@@ -1809,7 +1879,9 @@
             }
         },
 
-        /** length of a characters (You can pass the second parameter "true", will calculate the length in bytes)
+        /** 
+         * length of a characters (You can pass the second parameter "true", will calculate the length in bytes)
+         * 
          * @example:
             length[6~16]        6-16 characters
             length[6~]          Greater than 6 characters
@@ -1823,7 +1895,10 @@
             return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
         },
 
-        /** remote validation
+        /** 
+         * remote validation
+         * 
+         * @description
          *  remote([get:]url [, name1, [name2 ...]]);
          *  Adaptation three kinds of results (Front for the successful, followed by a failure):
                 1. text:
@@ -1832,7 +1907,7 @@
                     {"ok": ""}  {"error": "Error Message"}
                 3. json wrapper:
                     {"status": 1, "data": {"ok": ""}}  {"status": 1, "data": {"error": "Error Message"}}
-         * @example:
+         * @example
             The simplest:       remote(path/to/server);
             With parameters:    remote(path/to/server, name1, name2, ...);
             By GET:             remote(get:path/to/server, name1, name2, ...);
@@ -1880,8 +1955,10 @@
             });
         },
 
-        /** validate other fields
-         * @example:
+        /** 
+         * validate other fields
+         * 
+         * @example
          *  validate(name1, #id2)
          */
         validate: function(element, params) {
@@ -1895,9 +1972,11 @@
             ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
-        /** filters, direct filtration without prompting error (support custom regular expressions)
-         * @example:
-         *  filter          filtering "<>"
+        /** 
+         * filter characters, direct filtration without prompting error (support custom regular expressions)
+         * 
+         * @example
+         *  filter          filtering unsafe characters
          *  filter(regexp)  filtering the "regexp" matched characters
          */
         filter: function(element, params) {
@@ -1909,12 +1988,14 @@
     });
 
 
-    /** @interface: config
-     *  @usage:
-        .config( obj )
+    /** 
+     * Config global options
+     * 
+     * @static  config
+     * @param {Object} options
      */
-    Validator.config = function(obj) {
-        $.each(obj, function(k, o) {
+    Validator.config = function(options) {
+        $.each(options, function(k, o) {
             if (k === 'rules') {
                 new Rules(o);
             }
@@ -1927,10 +2008,15 @@
         });
     };
 
-    /** @interface: setTheme
-     *  @usage:
-        .setTheme( name, obj )
-        .setTheme( obj )
+    /** 
+     * Config themes
+     * 
+     * @static setTheme
+     * @param {String|Object} name
+     * @param {Object} obj
+     * @example
+        .setTheme( themeName, themeOptions )
+        .setTheme( multiThemes )
      */
     Validator.setTheme = function(name, obj) {
         if ( isObject(name) ) {
