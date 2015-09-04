@@ -68,7 +68,3 @@ $ gulp
 
 ### License
 nice-validator is available under the terms of the [MIT License](http://niceue.com/licenses/MIT-LICENSE.txt).
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/niceue/nice-validator/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
