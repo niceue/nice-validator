@@ -39,7 +39,7 @@ seajs.config({
 
 ### Documention
 [English](https://github.com/niceue/nice-validator/wiki/Getting-Started)  
-[简体中文](http://niceue.com/validator/)  
+[简体中文](http://validator.niceue.com/)  
 
 ### Browser Support
   * IE6+
