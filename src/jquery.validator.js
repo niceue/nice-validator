@@ -521,6 +521,7 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
+                isDefaultPrevented = e.isDefaultPrevented(),
                 autoSubmit;
 
             e.preventDefault();
@@ -541,7 +542,7 @@
                 me._guessAjax(form);
             }
 
-            autoSubmit = e.type === 'submit' && !e.isDefaultPrevented() && !me.isAjaxSubmit;
+            autoSubmit = e.type === 'submit' && !isDefaultPrevented && !me.isAjaxSubmit;
 
             // Prevent infinite loop and repeated verification
             if (e.isTrigger && me.isValid && autoSubmit) {
