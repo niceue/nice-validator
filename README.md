@@ -1,4 +1,4 @@
-## nice Validator
+## nice-validator
 [![Build Status](https://travis-ci.org/niceue/nice-validator.png)](https://travis-ci.org/niceue/nice-validator)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://niceue.com/licenses/MIT-LICENSE.txt)
 
