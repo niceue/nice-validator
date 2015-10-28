@@ -1,4 +1,4 @@
-/*! nice Validator 0.8.0
+/*! nice Validator 0.8.1
  * (c) 2012-2015 Jony Zhang <zj86@live.cn>, MIT Licensed
  * http://niceue.com/validator/
  */
@@ -83,7 +83,7 @@
             //focusCleanup: false,
             //ignoreBlank: false,
             //showOk: true,
-            
+
             //dataFilter: null,
             //valid: null,
             //invalid: null,
@@ -131,7 +131,7 @@
         focusInvalid  {Boolean}     true      Whether to focus the field that is invalid
         ignoreBlank   {Boolean}     false     When the field has no value, whether to ignore verification
         ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
-        
+
         beforeSubmit  {Function}              Do something before submit form
         dataFilter    {Function}              Convert ajax results
         valid         {Function}              Triggered when the form is valid
@@ -245,9 +245,9 @@
     };
 
 
-    /** 
+    /**
      * Creates a new Validator
-     * 
+     *
      * @class
      * @param {Element} element - form element
      * @param {Object}  options - options for validator
@@ -551,7 +551,7 @@
             }
 
             opt.debug && debug.log("\n<<< " + (e.isTrigger ? 'trigger: ':'event: ') + e.type);
-            
+
             me._reset();
             me.submiting = true;
 
@@ -586,7 +586,7 @@
                     }
                 }
             );
-            
+
             function submitForm() {
                 var name, submit;
 
@@ -959,7 +959,7 @@
             // field was invalid, or all fields was valid
             else {
                 field._i = 0;
-                
+
                 if (special) {
                     msgOpt.isValid = field.isValid;
                     msgOpt.result = field._v;
@@ -1016,7 +1016,7 @@
 
                 // whether the field valid is unknown
                 field.isValid = undefined;
-                
+
                 // show loading message
                 !me.checkOnly && me.showMsg(el, {
                     type: 'loading',
@@ -1086,7 +1086,7 @@
 
         /**
          * Detecting whether the value of an element that matches a rule
-         * 
+         *
          * @method test
          * @param {Element} el - input element
          * @param {String} rule - rule name
@@ -1165,9 +1165,9 @@
             return result || ( rule.msg = me.renderMsg.apply(null, args) );
         },
 
-        /** 
+        /**
          * Render message template
-         * 
+         *
          * @method renderMsg
          * @return {String}
          */
@@ -1244,7 +1244,7 @@
 
         /**
          * Show validation message
-         * 
+         *
          * @method showMsg
          * @param {Element} el - input element
          * @param {Object} msgOpt
@@ -1290,9 +1290,9 @@
             if (!(msgMaker = (field || {}).msgMaker || opt.msgMaker)) {
                 return;
             }
-            
+
             $msgbox = me._getMsgDOM(el, msgOpt);
-                
+
             !rPos.test($msgbox[0].className) && $msgbox.addClass(msgOpt.cls);
             if ( isIE === 6 && msgOpt.pos === 'bottom' ) {
                 $msgbox[0].style.marginTop = $(el).outerHeight() + 'px';
@@ -1302,9 +1302,9 @@
             isFunction(msgOpt.show) && msgOpt.show.call(me, $msgbox, msgOpt.type);
         },
 
-        /** 
+        /**
          * Hide validation message
-         * 
+         *
          * @method hideMsg
          * @param {Element} el - input element
          * @param {Object} msgOpt optional
@@ -1337,9 +1337,9 @@
             }
         },
 
-        /** 
+        /**
          * Get field information
-         * 
+         *
          * @method getField
          * @param {Element} - input element
          * @return {Object} field
@@ -1362,9 +1362,9 @@
             return me.fields[key];
         },
 
-        /** 
+        /**
          * Config a field
-         * 
+         *
          * @method: setField
          * @param {String} key
          * @param {Object} obj
@@ -1386,25 +1386,27 @@
             this._initFields(fields);
         },
 
-        /** 
+        /**
          * Detecting whether the form is valid
-         * 
+         *
          * @method isFormValid
          * @return {Boolean}
          */
         isFormValid: function() {
-            var fields = this.fields, k;
+            var fields = this.fields, k, field;
             for (k in fields) {
-                if (!fields[k].isValid) {
-                    return fields[k].isValid;
+                field = fields[k];
+                if (!field.rules || !field.required && !field.must && !elementValue(_key2selector(k))) continue;
+                if (!field.isValid) {
+                    return field.isValid;
                 }
             }
             return true;
         },
 
-        /** 
+        /**
          * Prevent submission form
-         * 
+         *
          * @method holdSubmit
          * @param {Boolean} hold - If set to false, will release the hold
          */
@@ -1412,18 +1414,18 @@
             this.submiting = hold === undefined || hold;
         },
 
-        /** 
+        /**
          * Clean validation messages
-         * 
+         *
          * @method cleanUp
          */
         cleanUp: function() {
             this._reset(1);
         },
 
-        /** 
+        /**
          * Destroy the validation
-         * 
+         *
          * @method destroy
          */
         destroy: function() {
@@ -1436,7 +1438,7 @@
 
     /**
      * Create Rules
-     * 
+     *
      * @class
      * @param {Object} obj     rules
      * @param {Object} context context
@@ -1454,7 +1456,7 @@
 
     /**
      * Create Messages
-     * 
+     *
      * @class
      * @param {Object} obj     rules
      * @param {Object} context context
@@ -1595,7 +1597,7 @@
     $(window).on('beforeunload', function(){
         this.focus();
     });
-    
+
     $(document)
     .on('focusin', '['+DATA_RULE+']:input', function(e) {
         _initByInput(e);
@@ -1641,7 +1643,7 @@
         }
     });
 
-    new Messages({ 
+    new Messages({
         fallback: "This field is not valid.",
         loading: 'Validating...'
     });
@@ -1650,9 +1652,9 @@
     // Built-in rules (global)
     new Rules({
 
-        /** 
+        /**
          * required
-         * 
+         *
          * @example:
             required
             required(anotherRule)
@@ -1715,9 +1717,9 @@
             return isValid && !!val;
         },
 
-        /** 
+        /**
          * integer
-         * 
+         *
          * @example:
             integer
             integer[+]
@@ -1751,9 +1753,9 @@
             return new RegExp(re).test(elementValue(element)) || this.messages.integer[key];
         },
 
-        /** 
+        /**
          * match another field
-         * 
+         *
          * @example:
             match[password]    Match the password field (two values ​​must be the same)
             match[eq, password]  Ditto
@@ -1817,7 +1819,7 @@
             }
 
             msg = me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) );
-            
+
             switch (type) {
                 case 'lt':
                     return (+a < +b) || msg;
@@ -1834,9 +1836,9 @@
             }
         },
 
-        /** 
+        /**
          * range numbers
-         * 
+         *
          * @example:
             range[0~99]    Number 0-99
             range[0~]      Number greater than or equal to 0
@@ -1846,9 +1848,9 @@
             return this.getRangeMsg(elementValue(element), params, field);
         },
 
-        /** 
+        /**
          * how many checkbox or radio inputs that checked
-         * 
+         *
          * @example:
             checked;       no empty, same to required
             checked[1~3]   1-3 items
@@ -1880,9 +1882,9 @@
             }
         },
 
-        /** 
+        /**
          * length of a characters (You can pass the second parameter "true", will calculate the length in bytes)
-         * 
+         *
          * @example:
             length[6~16]        6-16 characters
             length[6~]          Greater than 6 characters
@@ -1896,9 +1898,9 @@
             return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
         },
 
-        /** 
+        /**
          * remote validation
-         * 
+         *
          * @description
          *  remote([get:]url [, name1, [name2 ...]]);
          *  Adaptation three kinds of results (Front for the successful, followed by a failure):
@@ -1956,9 +1958,9 @@
             });
         },
 
-        /** 
+        /**
          * validate other fields
-         * 
+         *
          * @example
          *  validate(name1, #id2)
          */
@@ -1966,16 +1968,16 @@
             var VALIDATED = '_validated_';
             if(!params || $(element).data(VALIDATED)) return;
 
-            this.$el.find( 
+            this.$el.find(
                 $.map(params, function(key){
                     return _key2selector(key);
                 }).join(',')
             ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
-        /** 
+        /**
          * filter characters, direct filtration without prompting error (support custom regular expressions)
-         * 
+         *
          * @example
          *  filter          filtering unsafe characters
          *  filter(regexp)  filtering the "regexp" matched characters
@@ -1989,9 +1991,9 @@
     });
 
 
-    /** 
+    /**
      * Config global options
-     * 
+     *
      * @static  config
      * @param {Object} options
      */
@@ -2009,9 +2011,9 @@
         });
     };
 
-    /** 
+    /**
      * Config themes
-     * 
+     *
      * @static setTheme
      * @param {String|Object} name
      * @param {Object} obj
