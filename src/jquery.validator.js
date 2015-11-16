@@ -55,7 +55,8 @@
         },
         isIE = document.documentMode || +(navigator.userAgent.match(/MSIE (\d+)/) && RegExp.$1),
         attr = function(el, key, value) {
-            if ( value !== undefined ) {
+            if (!el || !el.tagName) return null;
+            if (value !== undefined) {
                 if (value === null) el.removeAttribute(key);
                 else el.setAttribute(key, '' + value);
             } else {
