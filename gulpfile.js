@@ -23,13 +23,13 @@ gulp.task('lint', function () {
 
 // run unit tests
 gulp.task('test', ['lint'], function (done) {
-    cp.exec('mocha-phantomjs test/index.html', function (error, stdout, stderr){
+    cp.exec('mocha-phantomjs test/index.html?console', function (error, stdout, stderr){
         console.log(stdout);
         if (stderr) console.log(stderr);
         if (error) console.log('exec error: ' + error);
         done();
     });
-    
+
 });
 
 // build main files
@@ -53,7 +53,7 @@ gulp.task('build', ['test'], function () {
 // build local settings
 gulp.task('i18n', function () {
     var compiler = tpl( fs.readFileSync( 'src/local/_lang.tpl' ).toString() );
-    
+
     fs.readdirSync('src/local/').forEach(function(f){
         var name = path.basename(f);
         if ( /^[a-z]{2}(?:-[A-Z]{2})?\.js/.test(name) ) {

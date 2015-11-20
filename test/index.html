@@ -61,7 +61,8 @@
   <script src="unit/core.js"></script>
   <script src="unit/rules.js"></script>
   <script>
-    (window.mochaPhantomJS || mocha).run();
+	window.initMochaPhantomJS && window.initMochaPhantomJS();
+	mocha.run();
   </script>
 </body>
 </html>
