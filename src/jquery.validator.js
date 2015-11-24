@@ -1586,7 +1586,7 @@
     }
 
     function _checkRuleName(name) {
-        return (/^[\w\d]+$/).test(name);
+        return /^\w+$/.test(name);
     }
 
     function _key2selector(key) {
