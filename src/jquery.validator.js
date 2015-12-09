@@ -112,6 +112,7 @@
             //msgStyle: null,
             //msgShow: null,
             //msgHide: null,
+            //bindClassTo: ':input',
             validClass: 'n-valid',
             invalidClass: 'n-invalid'
         },
@@ -620,8 +621,7 @@
         },
 
         _resetElement: function(el, all) {
-            var opt = this.options;
-            $(el).removeClass(opt.validClass + ' ' + opt.invalidClass);
+            this._setClass(el, null);
             this.hideMsg(el);
             if (all) {
                 attr(el, ARIA_REQUIRED, null);
@@ -646,7 +646,7 @@
 
             if (opt.focusCleanup) {
                 if ( attr(el, ARIA_INVALID) === 'true' ) {
-                    $(el).removeClass(opt.invalidClass);
+                    me._setClass(el, null);
                     me.hideMsg(el);
                 }
             }
@@ -774,6 +774,17 @@
             }
         },
 
+        _setClass: function(el, isValid) {
+            var $el = $(el), opt = this.options;
+            if (opt.bindClassTo) {
+                $el = $el.closest(opt.bindClassTo);
+            }
+            $el.removeClass( opt.invalidClass + ' ' + opt.validClass );
+            if (isValid !== null) {
+                $el.addClass( isValid ? opt.validClass : opt.invalidClass );
+            }
+        },
+
         _showmsg: function(e, type, msg) {
             var me = this,
                 el = e.target;
@@ -822,14 +833,15 @@
 
             field.old = ret;
 
+            // set className
+            me._setClass(el, ret.skip ? null : isValid);
+
             // trigger callback
             isFunction(field[callback]) && field[callback].call(me, el, ret);
             isFunction(opt.validation) && opt.validation.call(me, el, ret);
 
             // trigger event
             $(el).attr( ARIA_INVALID, isValid ? null : true )
-                 .removeClass( isValid ? opt.invalidClass : opt.validClass )
-                 .addClass( !ret.skip ? isValid ? opt.validClass : opt.invalidClass : "" )
                  .trigger( callback + CLS_NS_FIELD, [ret, me] );
             me.$el.triggerHandler('validation', [ret, me]);
 
