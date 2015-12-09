@@ -1,6 +1,6 @@
 {
   "name": "nice-validator",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Simple, smart and pleasant verification solution.",
   "moduleType": [
     "amd",
