@@ -23,12 +23,14 @@ gulp.task('lint', function () {
 
 // run unit tests
 gulp.task('test', ['lint'], function () {
-    return gulp.src('test/index.html')
-        .pipe(mochaPhantomJS({
-            reporter: 'spec',
-            useColors: true,
-            webSecurityEnabled: false
-        }));
+    return gulp
+        .src('test/index.html')
+        .pipe(
+            mochaPhantomJS({
+                phantomjs: {useColors: true},
+                webSecurityEnabled: false
+            })
+        );
 });
 
 // build main files
