@@ -1,7 +1,7 @@
 sudo: false
 language: node_js
 node_js:
-  - "4.2"
+  - "5.3"
 before_install:
-  - "npm install -g gulp mocha-phantomjs"
+  - "npm install -g gulp"
 script: gulp
