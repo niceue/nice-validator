@@ -1,29 +1,39 @@
 {
-    "name": "nice-validator",
-    "description": "Simple, smart and pleasant verification solution.",
-    "version": "0.9.0",
-    "keywords": ["jquery-plugin", "ecosystem:jquery", "form", "validate", "validation", "validator", "nice-validator"],
-    "homepage": "http://niceue.com/validator/",
-    "author": "Jony Zhang <zj86@live.cn>",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/niceue/validator.git"
-    },
-    "bugs": "https://github.com/niceue/validator/issues",
-    "engine": [
-        "node >=0.10.0"
-    ],
-    "scripts": {
-        "test": "gulp"
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "gulp": "^3.9.0",
-        "gulp-insert": "^0.5.0",
-        "gulp-jshint": "^2.0.0",
-        "gulp-uglify": "^1.5.0",
-        "gulp-stylus": "^2.1.0",
-        "gulp-zip": "^3.0.0"
-    }
+  "name": "nice-validator",
+  "description": "Simple, smart and pleasant verification solution.",
+  "version": "0.9.0",
+  "keywords": [
+    "jquery-plugin",
+    "ecosystem:jquery",
+    "form",
+    "validate",
+    "validation",
+    "validator",
+    "nice-validator"
+  ],
+  "homepage": "http://niceue.com/validator/",
+  "author": "Jony Zhang <zj86@live.cn>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niceue/validator.git"
+  },
+  "bugs": "https://github.com/niceue/validator/issues",
+  "engine": [
+    "node >=0.10.0"
+  ],
+  "scripts": {
+    "test": "gulp"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-insert": "^0.5.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-stylus": "^2.1.0",
+    "gulp-uglify": "^1.5.0",
+    "gulp-zip": "^3.0.0",
+    "gulp-mocha-phantomjs": "^0.10.1",
+    "jshint": "^2.8.0"
+  }
 }
