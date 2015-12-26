@@ -1,11 +1,11 @@
 var fs = require('fs'),
     path = require('path'),
     gulp = require('gulp'),
-    cp = require('child_process'),
     insert = require('gulp-insert'),
     jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify'),
-    stylus = require('gulp-stylus');
+    stylus = require('gulp-stylus'),
+    mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 var pkg = require('./package');
 var banner = '/*! nice Validator '+ pkg.version +'\n'+
@@ -22,14 +22,13 @@ gulp.task('lint', function () {
 });
 
 // run unit tests
-gulp.task('test', ['lint'], function (done) {
-    cp.exec('mocha-phantomjs test/index.html?console', function (error, stdout, stderr){
-        console.log(stdout);
-        if (stderr) console.log(stderr);
-        if (error) console.log('exec error: ' + error);
-        done();
-    });
-
+gulp.task('test', ['lint'], function () {
+    return gulp.src('test/index.html')
+        .pipe(mochaPhantomJS({
+            reporter: 'spec',
+            useColors: true,
+            webSecurityEnabled: false
+        }));
 });
 
 // build main files
