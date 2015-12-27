@@ -1009,7 +1009,7 @@
             old = field.old;
             field._r = method;
 
-            if (old && !field.must && rule.result !== undefined &&
+            if (old && !field.must && !rule.must && rule.result !== undefined &&
                  old.ruleName === method && old.id === el.id &&
                 value && old.value === value )
             {
@@ -1054,6 +1054,7 @@
                         result = dataFilter.call(this, data, field);
                         if (result === undefined) result = dataFilter.call(this, data.data, field);
 
+                        rule.data = this.data;
                         rule.result = field.old ? result : undefined;
                         me._validatedRule(el, field, result);
                     },
@@ -1930,15 +1931,17 @@
             Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3, ...)
             Query String        remote(path/to/server, foo=1&bar=2, name1, name2, ...)
          */
-        remote: function(element, params) {
+        remote: function(element, params, field) {
             if (!params) return;
 
             var me = this,
                 arr = rAjaxType.exec(params[0]),
+                rule = field.rules[field._i],
                 data = {},
                 queryString = '',
                 dataType;
 
+            rule.must = true;
             data[element.name] = elementValue(element);
 
             // There are extra fields
@@ -1956,6 +1959,11 @@
                 });
             }
 
+            data = $.param(data) + queryString;
+            if (!field.must && rule.data && rule.data === data) {
+                return rule.result;
+            }
+
             // Cross-domain request, force jsonp dataType
             if (/^https?:/.test(arr[2]) && !~arr[2].indexOf(location.host)) {
                 dataType = 'jsonp';
@@ -1965,9 +1973,8 @@
             return $.ajax({
                 url: arr[2],
                 type: arr[1] || 'POST',
-                data: $.param(data) + queryString,
-                dataType: dataType,
-                cache: false
+                data: data,
+                dataType: dataType
             });
         },
 
