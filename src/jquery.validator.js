@@ -404,7 +404,10 @@
             dataRule && attr(el, DATA_RULE, null);
 
             // if the field has passed the key as id mode, or it doesn't has a name
-            if ( el.id && ('#' + el.id in me.fields) || !el.name ) {
+            if ( el.id && ('#' + el.id in me.fields) || 
+                 (dataRule && key && (field = me.fields[key]) && dataRule !== field.rule) || 
+                 !el.name 
+            ) {
                 key = '#' + el.id;
             }
             // doesn't verify a field that has neither id nor name
@@ -447,7 +450,7 @@
                 attr(el, DATA_TIP, field.tip);
             }
 
-            me.fields[key] = field;
+            return me.fields[key] = field;
         },
 
         // Parsing field rules
@@ -1365,12 +1368,14 @@
             if (isString(el)) {
                 key = el;
             } else {
+                if (attr(el, DATA_RULE)) {
+                    return me._parse(el);
+                }
                 if (el.id && '#' + el.id in me.fields || !el.name) {
                     key = '#' + el.id;
                 } else {
                     key = el.name;
                 }
-                if (attr(el, DATA_RULE)) me._parse(el);
             }
 
             return me.fields[key];
