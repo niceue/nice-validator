@@ -334,7 +334,7 @@
                       .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
                 if ( opt.timely ) {
-                    me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
+                    me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
                           .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
                           .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
                 }
@@ -669,7 +669,7 @@
             }
         },
 
-        // Handle "focusout/validate/keyup/click/change/input" events
+        // Handle "focusout/validate/keyup/click/change/input/compositionstart/compositionend" events
         _focusout: function(e, elem) {
             var me = this,
                 opt = me.options,
@@ -677,7 +677,7 @@
                 etype = e.type,
                 focusin = etype === 'focusin',
                 special = etype === 'validate',
-                field = me.getField(el),
+                field,
                 old,
                 value,
                 timestamp,
@@ -685,7 +685,15 @@
                 timely,
                 timer = 0;
 
-            if (!field) return;
+            if (etype === 'compositionstart') {
+                me.pauseValidate = true;
+            }
+            if (etype === 'compositionend') {
+                me.pauseValidate = false;
+            }
+            if (me.pauseValidate || !(field = me.getField(el))) {
+                return;
+            }
             field._e = etype;
             old = field.old;
             value = elementValue(el);
