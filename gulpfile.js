@@ -21,23 +21,9 @@ gulp.task('lint', function () {
         .pipe(jshint.reporter('default'))
 });
 
-// run unit tests
-gulp.task('test', ['lint'], function () {
-    return gulp
-        .src('test/index.html')
-        .pipe(mochaPhantomJS({
-            reporter: 'spec',
-            phantomjs: {
-                useColors:true
-            }
-        }));
-});
-
 // build main files
-gulp.task('build', ['test'], function () {
+gulp.task('build', ['lint'], function () {
     gulp.src('src/jquery.validator.js')
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'))
         .pipe(insert.transform(function(contents) {
             return contents.replace(/\/\*\![\s\S]+?\*\//, banner);
         }))
@@ -77,8 +63,20 @@ gulp.task('i18n', function () {
     }
 });
 
+// run unit tests
+gulp.task('test', ['build', 'i18n'], function () {
+    return gulp
+        .src('test/index.html')
+        .pipe(mochaPhantomJS({
+            reporter: 'spec',
+            phantomjs: {
+                useColors:true
+            }
+        }));
+});
+
 // when release a version
-gulp.task('release', ['build', 'i18n'], function () {
+gulp.task('release', ['test'], function () {
     gulp.src('./niceValidator.jquery.json')
         .pipe(insert.transform(function(contents) {
             return contents.replace(/("version":\s")([^"]*)/, "$1" + pkg.version);
@@ -99,7 +97,7 @@ gulp.task('release', ['build', 'i18n'], function () {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['build', 'i18n']);
+gulp.task('default', ['test']);
 
 
 // tiny template engine
