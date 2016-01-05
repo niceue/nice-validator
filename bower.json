@@ -26,13 +26,14 @@
   "ignore": [
     "**/.*",
     ".*",
-    "node_modules",
-    "bower_components",
-    "test",
+    "*.js",
     "*.md",
     "*.json",
-    "src/**/*",
-    "!src/*.js",
-    "gulpfile.js"
+    "node_modules",
+    "bower_components",
+    "src",
+    "test",
+    "!README.md",
+    "!package.json"
   ]
 }
