@@ -24,7 +24,7 @@ via [Requirejs](http://requirejs.org/)
 ```javascript
 requirejs.config({
     paths: {
-        validator: 'path/to/nice-validator/local/en'
+        validator: 'path/to/nice-validator/jquery.validator.min.js?local=en'
     }
 });
 ```
@@ -32,7 +32,7 @@ via [Sea.js](http://seajs.org/docs/en.html)
 ```javascript
 seajs.config({
     alias: {
-        validator: 'path/to/nice-validator/local/zh-CN'
+        validator: 'path/to/nice-validator/jquery.validator.min.js?local=zh-CN'
     }
 });
 ```
