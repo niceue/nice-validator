@@ -4,11 +4,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <title>Test Core</title>
   <link rel="stylesheet" href="lib/mocha.css" />
-  <script src="lib/mocha.min.js"></script>
-  <script src="lib/assert.js"></script>
-  <script src="lib/jquery-1.11.1.min.js"></script>
-  <script src="../src/jquery.validator.js"></script>
-  <script src="../local/en.js"></script>
 </head>
 <body>
   <div id="mocha"></div>
@@ -57,12 +52,20 @@
     <input type="password" name="password">
     <button type="submit">Submit</button>
   </form>
-    
+
+
+  <script src="lib/jquery-1.11.1.min.js"></script>
+  <script src="../src/jquery.validator.js"></script>
+  <script src="../local/en.js"></script>
+
+  <script src="lib/mocha.js"></script>
+  <script src="lib/assert.js"></script>
+  <script>mocha.setup('bdd')</script>
   <script src="unit/core.js"></script>
   <script src="unit/rules.js"></script>
   <script>
-	window.initMochaPhantomJS && window.initMochaPhantomJS();
-	mocha.run();
+  window.initMochaPhantomJS && window.initMochaPhantomJS();
+  mocha.run();
   </script>
 </body>
 </html>
