@@ -25,7 +25,12 @@ gulp.task('lint', function () {
 gulp.task('test', ['lint'], function () {
     return gulp
         .src('test/index.html')
-        .pipe(mochaPhantomJS());
+        .pipe(mochaPhantomJS({
+            reporter: 'spec',
+            phantomjs: {
+                useColors:true
+            }
+        }));
 });
 
 // build main files
