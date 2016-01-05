@@ -77,12 +77,6 @@ gulp.task('test', ['build', 'i18n'], function () {
 
 // when release a version
 gulp.task('release', ['test'], function () {
-    gulp.src('./niceValidator.jquery.json')
-        .pipe(insert.transform(function(contents) {
-            return contents.replace(/("version":\s")([^"]*)/, "$1" + pkg.version);
-        }))
-        .pipe(gulp.dest('./'));
-
     var zip = require('gulp-zip');
     gulp.src([
             "src/jquery.validator.js",
