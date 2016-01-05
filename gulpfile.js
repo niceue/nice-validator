@@ -1,14 +1,17 @@
 var fs = require('fs'),
+    Stream = require('stream'),
     path = require('path'),
     gulp = require('gulp'),
     insert = require('gulp-insert'),
     jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify'),
     stylus = require('gulp-stylus'),
+    rename = require('gulp-rename'),
     mochaPhantomJS = require('gulp-mocha-phantomjs');
 
-var pkg = require('./package');
-var banner = '/*! nice Validator '+ pkg.version +'\n'+
+var pkg = require('./package'),
+    DIST = 'dist',
+    banner = '/*! nice Validator '+ pkg.version +'\n'+
           ' * (c) 2012-2015 '+ pkg.author +', MIT Licensed\n'+
           ' * '+ pkg.homepage +'\n'+
           ' */';
@@ -22,44 +25,53 @@ gulp.task('lint', function () {
 });
 
 // build main files
-gulp.task('build', ['lint'], function () {
+gulp.task('build', ['lint'], function (done) {
     gulp.src('src/jquery.validator.js')
         .pipe(insert.transform(function(contents) {
             return contents.replace(/\/\*\![\s\S]+?\*\//, banner);
         }))
-        .pipe(gulp.dest('src'))
+        .pipe(gulp.dest(DIST))
         .pipe(uglify())
         .pipe(insert.prepend(banner + '\n'))
-        .pipe(gulp.dest('./'));
+        .pipe(rename({suffix:'.min'}))
+        .pipe(gulp.dest(DIST));
+
+    gulp.src('src/images/*')
+        .pipe(rename({dirname:'images'}))
+        .pipe(gulp.dest(DIST));
 
     gulp.src('src/jquery.validator.styl')
-        .pipe(stylus(/*{compress: true}*/))
-        .pipe(gulp.dest('./'));
+        .pipe(stylus())
+        .pipe(gulp.dest(DIST));
+
+    setTimeout(done, 20);
 });
 
 // build local settings
 gulp.task('i18n', function () {
     var compiler = tpl( fs.readFileSync( 'src/local/_lang.tpl' ).toString() );
 
-    fs.readdirSync('src/local/').forEach(function(f){
-        var name = path.basename(f);
-        if ( /^[a-z]{2}(?:-[A-Z]{2})?\.js/.test(name) ) {
-            i18n( name );
-        }
-    });
+    gulp.src('src/local/*.js')
+        .pipe(i18n())
+        .pipe(rename({dirname:'local'}))
+        .pipe(gulp.dest(DIST));
 
-    function i18n(name) {
-        var obj = require('./src/local/' + name),
-            data = obj.lang,
-            outfile = path.join('./local/', name),
-            str;
+    function i18n() {
+        var stream = new Stream.Transform({objectMode: true});
+        stream._transform = function(chunk, encoding, callback) {
+            var obj = require(chunk.path),
+                data = obj.lang, str;
 
             data.local_string = obj.local;
             data.rules = obj.rules;
             str = compiler.render(data);
 
-            fs.writeFileSync(outfile, str);
-            console.log( 'ok: '+ outfile );
+            chunk._contents = new Buffer(str);
+
+            this.push(chunk);
+            callback();
+        };
+        return stream;
     }
 });
 
