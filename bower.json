@@ -19,7 +19,7 @@
     "Jony Zhang <zj86@live.cn>"
   ],
   "license": "MIT",
-  "homepage": "http://niceue.com/validator/",
+  "homepage": "http://validator.niceue.com/",
   "dependencies": {
     "jquery": "^1.7.0"
   },
