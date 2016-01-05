@@ -18,7 +18,7 @@ $ bower install nice-validator
 ##### Include nice-validator to your project
 width `<script>` tag
 ```html
-<script src="path/to/nice-validator/jquery.validator.js?local=en"></script>
+<script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
 ```
 via [Requirejs](http://requirejs.org/)
 ```javascript
