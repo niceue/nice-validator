@@ -6,8 +6,10 @@
 (function(factory) {
     if ( 'function' === typeof define && (define.amd || define.cmd) ) {
         // Register as an anonymous module.
-        define([], function(){
-            return factory;
+        define(['jquery'], function(require,exports,module){
+            var $ = require.fn ? require : require('jquery') || jQuery;
+            $._VALIDATOR_URI = $._VALIDATOR_URI || module && module.uri;
+            factory($);
         });
     } else {
         factory(jQuery);
@@ -2073,22 +2075,23 @@
 
         if (URI) {
             node = scripts[0];
-            arr = URI.match(/(.*)\/local\/([\w\-]{2,5})\.js/);
+            arr = URI.match(/(.*)(?:\/|\?)local(?:\/|=)([\w\-]{2,5})(?=\.js)?/);
         } else {
             i = scripts.length;
-            re = /(.*validator.js)\?.*local=([\w\-]*)/;
+            re = /(.*validator(?:\.min)?.js)\?.*local=([\w\-]*)/;
             while (i-- && !arr) {
                 node = scripts[i];
                 arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
             }
         }
+
         if (arr) {
-            dir = arr[0].split('/').slice(0, -1).join('/').replace(/\/(local|src)$/,'')+'/';
+            dir = arr[0].split('/').slice(0, -1).join('/')+'/';
             el = doc.createElement('link');
             el.rel = 'stylesheet';
             el.href = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
-            if (!URI) {
+            if (!URI || arr[2]) {
                 Validator.loading = 1;
                 el = doc.createElement('script');
                 el.src = dir + 'local/' + (arr[2] || doc.documentElement.lang || 'en').replace('_','-') + '.js';
