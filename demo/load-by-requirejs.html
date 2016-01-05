@@ -24,9 +24,10 @@
 <script src="http://requirejs.org/docs/release/2.1.17/minified/require.js"></script>
 <script>
 requirejs.config({
+    baseUrl: './',
     paths: {
         jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min',
-        validator: '../local/en'
+        validator: '../dist/jquery.validator.min.js?local=en'
     }
 });
 
