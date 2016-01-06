@@ -1,15 +1,13 @@
-/*! nice Validator 0.9.0
+/*! nice Validator 0.10.0
  * (c) 2012-2015 Jony Zhang <zj86@live.cn>, MIT Licensed
- * http://niceue.com/validator/
+ * http://validator.niceue.com/
  */
 /*jshint evil:true*/
 (function(factory) {
     if ( 'function' === typeof define && (define.amd || define.cmd) ) {
         // Register as an anonymous module.
-        define(['jquery'], function(require,exports,module){
-            var $ = require.fn ? require : require('jquery') || jQuery;
-            $._VALIDATOR_URI = $._VALIDATOR_URI || module && module.uri;
-            factory($);
+        define([], function(){
+            return factory;
         });
     } else {
         factory(jQuery);
@@ -406,9 +404,9 @@
             dataRule && attr(el, DATA_RULE, null);
 
             // if the field has passed the key as id mode, or it doesn't has a name
-            if ( el.id && ('#' + el.id in me.fields) || 
-                 (dataRule && key && (field = me.fields[key]) && dataRule !== field.rule) || 
-                 !el.name 
+            if ( el.id && ('#' + el.id in me.fields) ||
+                 (dataRule && key && (field = me.fields[key]) && dataRule !== field.rule) ||
+                 !el.name
             ) {
                 key = '#' + el.id;
             }
@@ -2075,7 +2073,7 @@
 
         if (URI) {
             node = scripts[0];
-            arr = URI.match(/(.*)(?:\/|\?)local(?:\/|=)([\w\-]{2,5})(?=\.js)?/);
+            arr = URI.match(/(.*(?:\/|\?))local(?:\/|=)([\w\-]{2,5})(?=\.js)?/);
         } else {
             i = scripts.length;
             re = /(.*validator(?:\.min)?.js)\?.*local=([\w\-]*)/;
@@ -2086,12 +2084,12 @@
         }
 
         if (arr) {
-            dir = arr[0].split('/').slice(0, -1).join('/')+'/';
+            dir = arr[1].split('/').slice(0, -1).join('/')+'/';
             el = doc.createElement('link');
             el.rel = 'stylesheet';
             el.href = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
-            if (!URI || arr[2]) {
+            if (!URI) {
                 Validator.loading = 1;
                 el = doc.createElement('script');
                 el.src = dir + 'local/' + (arr[2] || doc.documentElement.lang || 'en').replace('_','-') + '.js';

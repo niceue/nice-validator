@@ -5,7 +5,7 @@
 (function(factory) {
     'function' === typeof define && (define.amd || define.cmd) ? define(function(require, exports, module){
         var $ = require('jquery')||jQuery; $._VALIDATOR_URI = module.uri;
-        require('../jquery.validator');
+        require('../jquery.validator.min')($);
         factory($);
     }) : factory(jQuery);
 }(function($) {
@@ -17,7 +17,7 @@
         //focusCleanup: true,
         //theme: 'yellow_right',
         //timely: 2,
-        
+
         // Custom rules
         rules: {
             digits: [/^\d+$/, "数字だけを入力してください"]
