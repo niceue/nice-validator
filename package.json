@@ -12,19 +12,23 @@
     "nice-validator"
   ],
   "homepage": "http://validator.niceue.com/",
-  "author": "Jony Zhang <zj86@live.cn>",
+  "author": "Jony Zhang <niceue@live.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/niceue/validator.git"
+    "url": "https://github.com/niceue/nice-validator.git"
   },
-  "bugs": "https://github.com/niceue/validator/issues",
+  "bugs": "https://github.com/niceue/nice-validator/issues",
   "engine": [
-    "node >=0.10.0"
+    "node >=0.12.0"
   ],
   "scripts": {
     "test": "gulp"
   },
+  "files": [
+    "demo",
+    "dist"
+  ],
   "dependencies": {},
   "devDependencies": {
     "gulp": "^3.9.0",
