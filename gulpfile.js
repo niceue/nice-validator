@@ -91,12 +91,9 @@ gulp.task('test', ['build', 'i18n'], function () {
 gulp.task('release', ['test'], function () {
     var zip = require('gulp-zip');
     gulp.src([
-            "src/jquery.validator.js",
-            "images/*", "!images/Thumbs.db",
-            "local/*",
+            "dist/*", "!images/Thumbs.db",
             "demo/**/*",
-            "jquery.validator.js",
-            "jquery.validator.css",
+            "package.json",
             "README.md"
         ], {base: './'})
         .pipe(zip(pkg.name + '-' + pkg.version  + '.zip'))
