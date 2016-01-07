@@ -24,27 +24,29 @@ gulp.task('lint', function () {
         .pipe(jshint.reporter('default'))
 });
 
-// build main files
-gulp.task('build', ['lint'], function (done) {
+// build js
+gulp.task('build-js', function () {
     gulp.src('src/jquery.validator.js')
-        .pipe(insert.transform(function(contents) {
-            return contents.replace(/\/\*\![\s\S]+?\*\//, banner);
-        }))
+        .pipe(insert.prepend(banner + '\n'))
         .pipe(gulp.dest(DIST))
         .pipe(uglify())
         .pipe(insert.prepend(banner + '\n'))
         .pipe(rename({suffix:'.min'}))
         .pipe(gulp.dest(DIST));
+});
 
-    gulp.src('src/images/*')
-        .pipe(rename({dirname:'images'}))
-        .pipe(gulp.dest(DIST));
-
+// build css
+gulp.task('build-css', function () {
     gulp.src('src/jquery.validator.styl')
         .pipe(stylus())
         .pipe(gulp.dest(DIST));
+});
 
-    setTimeout(done, 20);
+// copy images
+gulp.task('copy-images', function () {
+    gulp.src('src/images/*')
+        .pipe(rename({dirname:'images'}))
+        .pipe(gulp.dest(DIST));
 });
 
 // build local settings
@@ -76,7 +78,7 @@ gulp.task('i18n', function () {
 });
 
 // run unit tests
-gulp.task('test', ['build', 'i18n'], function () {
+gulp.task('test', function () {
     return gulp
         .src('test/index.html')
         .pipe(mochaPhantomJS({
@@ -88,7 +90,7 @@ gulp.task('test', ['build', 'i18n'], function () {
 });
 
 // when release a version
-gulp.task('release', ['test'], function () {
+gulp.task('release', ['build', 'test'], function () {
     var zip = require('gulp-zip');
     gulp.src([
             "dist/*", "!images/Thumbs.db",
@@ -100,7 +102,9 @@ gulp.task('release', ['test'], function () {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['test']);
+
+gulp.task('build', ['lint', 'build-js', 'build-css', 'copy-images', 'i18n']);
+gulp.task('default', ['build', 'test']);
 
 
 // tiny template engine
