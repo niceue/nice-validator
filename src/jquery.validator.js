@@ -1,7 +1,3 @@
-/*! nice Validator 0.10.0
- * (c) 2012-2015 Jony Zhang <zj86@live.cn>, MIT Licensed
- * http://validator.niceue.com/
- */
 /*jshint evil:true*/
 (function(factory) {
     if ( 'function' === typeof define && (define.amd || define.cmd) ) {
