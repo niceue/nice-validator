@@ -25,10 +25,6 @@
   "scripts": {
     "test": "gulp"
   },
-  "files": [
-    "demo",
-    "dist"
-  ],
   "dependencies": {},
   "devDependencies": {
     "gulp": "^3.9.0",
