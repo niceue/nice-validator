@@ -5,7 +5,7 @@
 Simple, smart and pleasant validation solution.
 
 ### Getting started
-##### Download the [last release](https://github.com/niceue/nice-validator/releases)  
+##### Download the [last release](https://github.com/niceue/nice-validator/releases)
 or installation by package manager via [npm](https://www.npmjs.com/)
 ```bash
 $ npm install nice-validator
@@ -14,7 +14,7 @@ width [Bower](http://bower.io/)
 ```bash
 $ bower install nice-validator
 ```
-##### Include [jQuery 1.7+](http://jquery.com)  
+##### Include [jQuery 1.7+](http://jquery.com)
 ##### Include nice-validator to your project
 width `<script>` tag
 ```html
@@ -22,24 +22,16 @@ width `<script>` tag
 ```
 via [Requirejs](http://requirejs.org/)
 ```javascript
-requirejs.config({
-    paths: {
-        validator: 'path/to/nice-validator/local/en'
-    }
-});
+require(['path/to/nice-validator/local/en']);
 ```
 via [Sea.js](http://seajs.org/docs/en.html)
 ```javascript
-seajs.config({
-    alias: {
-        validator: 'path/to/nice-validator/local/zh-CN'
-    }
-});
+seajs.use('path/to/nice-validator/local/zh-CN');
 ```
 
 ### Documention
-[English](https://github.com/niceue/nice-validator/wiki/Getting-Started)  
-[简体中文](http://validator.niceue.com/)  
+[English](https://github.com/niceue/nice-validator/wiki/Getting-Started)
+[简体中文](http://validator.niceue.com/)
 
 ### Browser Support
   * IE6+
