@@ -24,22 +24,13 @@
 <script src="http://dn-nice.qbox.me/libs/seajs/2.2.1/sea.js" id="seajsnode"></script>
 <script>
 seajs.config({
-    base: './',
+    base: '../',
     alias: {
-        jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min',
-        validator: '../dist/local/zh-CN'
+        jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min'
     }
 });
 
-// define a module
-define('demo', function(require){
-    var $ = require('jquery');
-    require('validator');
-    // do something
-});
-
-// use module
-seajs.use('demo');
+seajs.use('dist/local/zh-CN');
 
 </script>
 </body>
