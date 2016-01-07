@@ -30,8 +30,8 @@ seajs.use('path/to/nice-validator/local/zh-CN');
 ```
 
 ### Documention
-[English](https://github.com/niceue/nice-validator/wiki/Getting-Started)
-[简体中文](http://validator.niceue.com/)
+- [English](https://github.com/niceue/nice-validator/wiki/Getting-Started)
+- [简体中文](http://validator.niceue.com/)
 
 ### Browser Support
   * IE6+
