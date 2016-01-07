@@ -46,13 +46,12 @@ seajs.use('path/to/nice-validator/local/zh-CN');
 - To contribute or send an idea, github message me or fork the project
 
 ### Build
-Make sure [node.js](http://nodejs.org/) v0.10+ have installed.
-Then first run the following command to install dependencies:
+Install dependencies:
 ```bash
 $ npm install -g gulp
 $ npm install
 ```
-Run the unit test and build:
+Run test and build:
 ```bash
 $ gulp
 ```
