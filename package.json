@@ -11,7 +11,7 @@
     "validator",
     "nice-validator"
   ],
-  "homepage": "http://validator.niceue.com/",
+  "homepage": "https://github.com/niceue/nice-validator",
   "author": "Jony Zhang <niceue@live.com>",
   "license": "MIT",
   "repository": {
