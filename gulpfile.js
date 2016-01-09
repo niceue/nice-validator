@@ -9,12 +9,12 @@ var fs = require('fs'),
     rename = require('gulp-rename'),
     mochaPhantomJS = require('gulp-mocha-phantomjs');
 
-var pkg = require('./package'),
+var pkg = require('./package.json'),
     DIST = 'dist',
-    banner = '/*! nice Validator '+ pkg.version +'\n'+
-          ' * (c) 2012-2015 '+ pkg.author +', MIT Licensed\n'+
-          ' * '+ pkg.homepage +'\n'+
-          ' */';
+    banner = '/*! '+ pkg.name +' '+ pkg.version +'\n'+
+             ' * (c) 2012-'+ new Date().getFullYear() +' '+ pkg.author +', MIT Licensed\n'+
+             ' * '+ pkg.homepage +'\n'+
+             ' */';
 
 
 // run jshint
