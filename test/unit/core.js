@@ -74,7 +74,75 @@ describe('Core', function(){
     });
 
     describe('.isValid()', function(){
+        it('$form.isValid() false', function(){
+            $js_way.validator({
+                fields: {
+                    email: 'required;email',
+                    password: 'required'
+                }
+            });
+            assert.ok($js_way.isValid() === false);
+        });
 
+        it('$form.isValid() true', function(){
+            $js_way.validator({
+                fields: {
+                    email: 'required;email',
+                    password: 'required'
+                }
+            });
+            $js_way.find('input').eq(0).val('test@niceue.com').end().eq(1).val('password');
+            assert.ok($js_way.isValid() === true);
+        });
+
+        it('$form.isValid(callback) false', function(done){
+            $js_way.validator({
+                fields: {
+                    email: 'required;email',
+                    password: 'required'
+                }
+            });
+            $js_way.isValid(function(v){
+                assert.ok(v === false);
+                done();
+            });
+        });
+
+        it('$form.isValid(callback) true', function(done){
+            $js_way.validator({
+                fields: {
+                    email: 'required;email',
+                    password: 'required'
+                }
+            });
+            $js_way.find('input').eq(0).val('test@niceue.com').end().eq(1).val('password');
+            $js_way.isValid(function(v){
+                assert.ok(v === true);
+                done();
+            });
+        });
+
+        it('$field.isValid() false', function(){
+            var $input = $js_way.find('input').eq(0);
+            $js_way.validator({
+                fields: {
+                    email: 'required;email',
+                    password: 'required'
+                }
+            });
+            assert.ok($input.val('').isValid() === false);
+        });
+
+        it('$field.isValid() true', function(){
+            var $input = $js_way.find('input').eq(0);
+            $js_way.validator({
+                fields: {
+                    email: 'required;email',
+                    password: 'required'
+                }
+            });
+            assert.ok($input.val('test@niceue.com').isValid() === true);
+        });
     });
 
 });
