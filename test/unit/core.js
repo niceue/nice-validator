@@ -73,7 +73,7 @@ describe('Core', function(){
         });
     });
 
-    describe('.isValid()', function(){
+    describe('$.fn.isValid()', function(){
         it('$form.isValid() false', function(){
             $js_way.validator({
                 fields: {
@@ -142,6 +142,13 @@ describe('Core', function(){
                 }
             });
             assert.ok($input.val('test@niceue.com').isValid() === true);
+        });
+    });
+
+    describe('Selector', function(){
+        it(':filled', function(){
+            var $input = $js_way.find('input').eq(1);
+            assert.ok($input.val('test').is(':filled') === true && $input.val('').is(':filled') === false);
         });
     });
 
