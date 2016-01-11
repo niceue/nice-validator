@@ -30,6 +30,7 @@ describe('Rules', function(){
                 field_novalidate: 'required',
                 field_readonly: 'required',
                 field_hidden: 'required',
+                field_display_none: 'required',
                 field_textarea: 'required',
                 field_select: 'required'
             });
@@ -45,6 +46,9 @@ describe('Rules', function(){
 
             input = elems['field_hidden'];
             assert.ok( !test(input, '') && test(input, 'test'), 'field_hidden' );
+
+            input = elems['field_display_none'];
+            assert.ok( !test(input, '') && test(input, 'test'), 'field_display_none' );
 
             input = elems['field_readonly'];
             assert.ok( !test(input, '') && test(input, 'test'), 'field_readonly' );
