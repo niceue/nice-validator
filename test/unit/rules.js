@@ -575,4 +575,27 @@ describe('Rules', function(){
         });
     });
 
+    describe('filter', function(){
+        it('filter', function(){
+            var input = elems['field1'];
+
+            me.setField({
+                field1: 'filter;required'
+            });
+
+            assert.ok( test(input, '1234') && test(input, '!@#$%^&*()'), 'test normal' );
+            assert.ok( !test(input, '<>"`') && !test(input, '&#20;%3F'), 'test special' );
+        });
+
+        it('filter(<>)', function(){
+            var input = elems['field1'];
+
+            me.setField({
+                field1: 'filter(<>);required'
+            });
+
+            assert.ok( test(input, '1234') && !test(input, '<>'), 'filter(<>)' );
+        });
+    });
+
 });
