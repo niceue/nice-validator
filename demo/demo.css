@@ -4,7 +4,7 @@ input[type="password"],
 select,
 textarea {
     width:200px;
-    padding: 3px 5px;
+    padding: 5px 5px;
     box-sizing: border-box;
     border: 1px solid #d9d9d9;
     border-top: 1px solid #c0c0c0;
@@ -19,7 +19,7 @@ textarea:focus {
     box-shadow: 0 0 4px rgba(30,144,255,.5);
 }
 .form {max-width:400px;margin: 20px 0 0 20px;}
-.form-item {margin: .5em 0;}
+.form-item {margin: .8em 0;}
 .form-item .label {display:block; margin:10px 0 2px; font-size:14px;}
 .form-item .n-invalid {border:1px solid #c00;}
 .form-item .n-invalid:focus {outline: none; border-color:#c00; box-shadow: 0 0 4px rgba(192,0,0,0.5);}
