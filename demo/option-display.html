@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <title>Display</title>
     <link rel="stylesheet" href="demo.css">
+
+    <script src="http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min.js"></script>
+    <script src="../dist/jquery.validator.js?local=en"></script>
 </head>
 
 <body>
@@ -41,8 +44,25 @@
     </div>
 </form>
 
+<form class="form" id="form4">
+    <h3>Dynamic get field display.</h3>
+    <div class="form-item">
+        <label class="label">Name</label>
+        <input type="text" name="name" data-rule="required">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+<script>
+$('#form4').validator({
+    timely:2,
+    display: function(el) {
+        return $(el).closest('.form-item').find('label.label').text();
+    }
+});
+</script>
 
-<script src="http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min.js"></script>
-<script src="../dist/jquery.validator.js?local=en"></script>
+
 </body>
 </html>
