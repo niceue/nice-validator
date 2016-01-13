@@ -3,7 +3,7 @@ input[type="text"],
 input[type="password"],
 select,
 textarea {
-    width:200px;
+    width:250px;
     padding: 5px 5px;
     box-sizing: border-box;
     border: 1px solid #d9d9d9;
