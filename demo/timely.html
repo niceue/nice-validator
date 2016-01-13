@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Timely</title>
+    <link rel="stylesheet" href="demo.css">
+</head>
+
+<body>
+
+<form class="form" data-validator-option="{timely:0}">
+    <h3>timely: 0 <span class="note">(only validation on submit)</span></h3>
+    <div class="form-item">
+        <input type="text" name="user[email]" data-rule="required;email" placeholder="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<form class="form" data-validator-option="{timely:1, focusCleanup:true}">
+    <h3>timely: 1 <span class="note">(default, validation on blur)</span></h3>
+    <div class="form-item">
+        <input type="text" name="user[email]" data-rule="required;email" placeholder="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<form class="form" data-validator-option="{timely:2, focusCleanup:true}">
+    <h3>timely: 2 <span class="note">(validation on input)</span></h3>
+    <div class="form-item">
+        <input type="text" name="user[email]" data-rule="required;email" placeholder="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<form class="form" data-validator-option="{timely:3, focusCleanup:true}">
+    <h3>timely: 3 <span class="note">(validation on input and blur)</span></h3>
+    <div class="form-item">
+        <input type="text" name="user[email]"
+         data-rule="required;email"
+         data-tip="Please fill a email." placeholder="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<form class="form" data-validator-option="{timely:8, focusCleanup:true, theme:'yellow_right'}">
+    <h3>timely: 8 <span class="note">(validation on input, show every rule message)</span></h3>
+    <div class="form-item">
+        <input type="text" name="user[email]" data-rule="required;email" placeholder="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+
+<script src="http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min.js"></script>
+<script src="../dist/jquery.validator.js?local=en"></script>
+</body>
+</html>
