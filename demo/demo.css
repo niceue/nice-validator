@@ -1,4 +1,4 @@
-body {font: 100%/1.5 "HelveticaNeue", "Helvetica", "Arial", sans-serif;}
+body {font: 100%/1.5 "Helvetica", "Arial", "Microsoft Yahei";}
 input[type="text"],
 input[type="password"],
 select,
@@ -18,8 +18,9 @@ textarea:focus {
     border-color: #1E90FF;
     box-shadow: 0 0 4px rgba(30,144,255,.5);
 }
-.form {max-width:400px;margin: 40px 20px;}
+.form {max-width:600px;margin: 40px 20px;}
 .form h3 {font-weight: 400;}
+.form .note {color:#ccc; font-weight:200; font-size: .9em}
 .form-item {margin: .8em 0;}
 .form-item .label {display:block; margin:10px 0 2px; font-size:14px;}
 .form-item .n-invalid {border:1px solid #c00;}
