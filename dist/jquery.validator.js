@@ -705,6 +705,13 @@
             timely = me._getTimely(elem || el, opt);
 
             if (!special) {
+                if (!timely) return;
+
+                // not validate field unless fill a value
+                if ( opt.ignoreBlank && !value && !focusin ) {
+                    me.hideMsg(el);
+                    return;
+                }
 
                 if ( etype === 'focusout' ) {
                     if ( timely === 2 || timely === 8 ) {
@@ -720,7 +727,7 @@
                     }
                 }
                 else {
-                    if ( !timely || timely < 2 && !e.data ) {
+                    if ( timely < 2 && !e.data ) {
                         return;
                     }
 
@@ -767,21 +774,15 @@
 
             clearTimeout(field._t);
 
-            // not validate field unless fill a value
-            if ( !timely || (!special && opt.ignoreBlank && !value && !focusin) ) {
-                me.hideMsg(el);
-            }
-            else {
-                field.value = value;
-                if (timely !== undefined) field.timely = timely;
-                if (timer) {
-                    field._t = setTimeout(function() {
-                        me._validate(el, field);
-                    }, timer);
-                } else {
-                    if (special) field.old = {};
+            field.value = value;
+            if (timely !== undefined) field.timely = timely;
+            if (timer) {
+                field._t = setTimeout(function() {
                     me._validate(el, field);
-                }
+                }, timer);
+            } else {
+                if (special) field.old = {};
+                me._validate(el, field);
             }
         },
 
