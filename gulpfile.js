@@ -61,12 +61,8 @@ gulp.task('i18n', function () {
     function i18n() {
         var stream = new Stream.Transform({objectMode: true});
         stream._transform = function(chunk, encoding, callback) {
-            var obj = require(chunk.path),
-                data = obj.lang, str;
-
-            data.local_string = obj.local;
-            data.rules = obj.rules;
-            str = compiler.render(data);
+            var data = require(chunk.path),
+                str = compiler.render(data);
 
             chunk._contents = new Buffer(str);
 

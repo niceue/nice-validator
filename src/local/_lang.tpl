@@ -1,6 +1,6 @@
 /*********************************
  * Themes, rules, and i18n support
- * Locale: <#=local_string#>
+ * Locale: <#=local#>
  *********************************/
 (function(factory) {
     'function' === typeof define && (define.amd || define.cmd) ? define(function(require, exports, module){
@@ -40,47 +40,48 @@
 
         // Default error messages
         messages: {
-            fallback: "<#=fallback#>",
-            loading: "<#=loading#>",
-            error: "<#=error#>",
-            timeout: "<#=timeout#>",
-            required: "<#=required#>",
-            remote: "<#=remote#>",
+            0: "<#=lang[0]#>",
+            fallback: "<#=lang.fallback#>",
+            loading: "<#=lang.loading#>",
+            error: "<#=lang.error#>",
+            timeout: "<#=lang.timeout#>",
+            required: "<#=lang.required#>",
+            remote: "<#=lang.remote#>",
             integer: {
-                '*': "<#=integer_nzp#>",
-                '+': "<#=integer_p#>",
-                '+0': "<#=integer_pz#>",
-                '-': "<#=integer_n#>",
-                '-0': "<#=integer_nz#>"
+                '*': "<#=lang.integer_nzp#>",
+                '+': "<#=lang.integer_p#>",
+                '+0': "<#=lang.integer_pz#>",
+                '-': "<#=lang.integer_n#>",
+                '-0': "<#=lang.integer_nz#>"
             },
             match: {
-                eq: "<#=match_eq#>",
-                neq: "<#=match_neq#>",
-                lt: "<#=match_lt#>",
-                gt: "<#=match_gt#>",
-                lte: "<#=match_lte#>",
-                gte: "<#=match_gte#>"
+                eq: "<#=lang.match_eq#>",
+                neq: "<#=lang.match_neq#>",
+                lt: "<#=lang.match_lt#>",
+                gt: "<#=lang.match_gt#>",
+                lte: "<#=lang.match_lte#>",
+                gte: "<#=lang.match_gte#>"
             },
             range: {
-                rg: "<#=range_rg#>",
-                gte: "<#=range_gte#>",
-                lte: "<#=range_lte#>"
+                rg: "<#=lang.range_rg#>",
+                gte: "<#=lang.range_gte#>",
+                lte: "<#=lang.range_lte#>"
             },
             checked: {
-                eq: "<#=checked_eq#>",
-                rg: "<#=checked_rg#>",
-                gte: "<#=checked_gte#>",
-                lte: "<#=checked_lte#>"
+                eq: "<#=lang.checked_eq#>",
+                rg: "<#=lang.checked_rg#>",
+                gte: "<#=lang.checked_gte#>",
+                lte: "<#=lang.checked_lte#>"
             },
             length: {
-                eq: "<#=length_eq#>",
-                rg: "<#=length_rg#>",
-                gte: "<#=length_gte#>",
-                lte: "<#=length_lte#>",
-                eq_2: "<#=length_eq_2#>",
-                rg_2: "<#=length_rg_2#>",
-                gte_2: "<#=length_gte_2#>",
-                lte_2: "<#=length_lte_2#>"
+                eq: "<#=lang.length_eq#>",
+                rg: "<#=lang.length_rg#>",
+                gte: "<#=lang.length_gte#>",
+                lte: "<#=lang.length_lte#>",
+                eq_2: "<#=lang.length_eq_2#>",
+                rg_2: "<#=lang.length_rg_2#>",
+                gte_2: "<#=lang.length_gte_2#>",
+                lte_2: "<#=lang.length_lte_2#>"
             }
         }
     });
