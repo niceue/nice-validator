@@ -60,6 +60,16 @@
     </div>
 </form>
 
+<form class="form" data-validator-option="{timely:9, focusCleanup:true, theme:'yellow_right'}">
+    <h3>timely: 9 <span class="note">(validation on input and blur, show every rule message)</span></h3>
+    <div class="form-item">
+        <input type="text" name="user[email]" data-rule="required;email" placeholder="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
 
 <script src="http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min.js"></script>
 <script src="../dist/jquery.validator.js?local=en"></script>
