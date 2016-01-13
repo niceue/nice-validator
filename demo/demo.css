@@ -19,7 +19,8 @@ textarea:focus {
     box-shadow: 0 0 4px rgba(30,144,255,.5);
 }
 .form {max-width:600px;margin: 40px 20px;}
-.form h3 {font-weight: 400;}
+.form h3 {font-weight: 400; margin: 1.2em 0 .8em;}
+.form p {margin: .8em 0;}
 .form .note {color:#ccc; font-weight:200; font-size: .9em}
 .form-item {margin: .8em 0;}
 .form-item .label {display:block; margin:10px 0 2px; font-size:14px;}
