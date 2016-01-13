@@ -842,10 +842,8 @@
             me.elements[field.key] = ret.element = el;
             me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
 
+            // cache result
             field.old = ret;
-
-            // set className
-            me._setClass(el, ret.skip ? null : isValid);
 
             // trigger callback
             isFunction(field[callback]) && field[callback].call(me, el, ret);
@@ -857,6 +855,8 @@
             me.$el.triggerHandler('validation', [ret, me]);
 
             if (me.checkOnly) return;
+            // set className
+            me._setClass(el, ret.skip || ret.type === 'tip' ? null : isValid);
             me._makeMsg.apply(me, arguments);
         },
 
