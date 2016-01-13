@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Display</title>
+    <link rel="stylesheet" href="demo.css">
+</head>
+
+<body>
+
+<form class="form" data-validator-option="{timely:2}">
+    <h3>Default behavior</h3>
+    <p class="note">data-rule="required"</p>
+    <div class="form-item">
+        <input type="text" name="name" data-rule="required">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<form class="form" data-validator-option="{timely:2}">
+    <h3>Set the field display by rule string</h3>
+    <p class="note">data-rule="Email: required"</p>
+    <div class="form-item">
+        <input type="text" name="name" data-rule="Email:required">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<form class="form" data-validator-option="{timely:2}">
+    <h3>Set the field display by bind display</h3>
+    <p class="note">data-rule="required" data-display="Email"</p>
+    <div class="form-item">
+        <input type="text" name="name" data-rule="required" data-display="Email">
+    </div>
+    <div class="form-item">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+
+<script src="http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min.js"></script>
+<script src="../dist/jquery.validator.js?local=en"></script>
+</body>
+</html>
