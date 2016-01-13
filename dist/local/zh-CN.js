@@ -47,6 +47,7 @@
 
         // Default error messages
         messages: {
+            0: "",
             fallback: "{0}格式不正确",
             loading: "正在验证...",
             error: "网络异常",

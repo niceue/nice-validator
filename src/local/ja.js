@@ -19,7 +19,8 @@ exports.rules = {
 };
 
 exports.lang = {
-    fallback: "このフィールドは有効ではありません",
+    0: "このフィールド",
+    fallback: "{0}は有効ではありません",
     loading: "検証プロセス...",
 
     error: "ネットワークエラー",
@@ -27,7 +28,7 @@ exports.lang = {
 
     digits: "番号を入力してください",
 
-    required: "このフィールドは必須です",
+    required: "{0}は必須です",
     remote: "この値が使用されている",
 
     integer_nzp: "整数を入力してください",

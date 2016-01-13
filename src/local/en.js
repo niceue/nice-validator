@@ -19,13 +19,14 @@ exports.rules = {
 };
 
 exports.lang = {
-    fallback: "This field is not valid.",
+    0: 'This field',
+    fallback: "{0} is not valid.",
     loading: "Validating...",
 
     error: "Network Error.",
     timeout: "Request timed out.",
 
-    required: "This field is required.",
+    required: "{0} is required.",
     remote: "Please try another name.",
 
     integer_nzp: "Please enter an integer.",

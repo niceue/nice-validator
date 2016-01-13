@@ -954,7 +954,7 @@
                         5. default message;
                     */
                     msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || me.messages.fallback).replace(/\{0\|?([^\}]*)\}/, function(){
-                        return me._getDisplay(el, field.display) || arguments[1];
+                        return me._getDisplay(el, field.display) || arguments[1] || me.messages[0];
                     });
                 }
                 if (!isValid) field.isValid = isValid;

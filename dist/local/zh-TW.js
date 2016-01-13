@@ -39,6 +39,7 @@
 
         // Default error messages
         messages: {
+            0: "",
             fallback: "{0}格式不正確",
             loading: "正在驗證...",
             error: "網絡異常",

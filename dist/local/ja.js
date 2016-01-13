@@ -39,11 +39,12 @@
 
         // Default error messages
         messages: {
-            fallback: "このフィールドは有効ではありません",
+            0: "このフィールド",
+            fallback: "{0}は有効ではありません",
             loading: "検証プロセス...",
             error: "ネットワークエラー",
             timeout: "要求がタイムアウトしました",
-            required: "このフィールドは必須です",
+            required: "{0}は必須です",
             remote: "この値が使用されている",
             integer: {
                 '*': "整数を入力してください",
