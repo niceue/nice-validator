@@ -27,4 +27,6 @@ textarea:focus {
 .form-item .n-invalid {border:1px solid #c00;}
 .form-item .n-invalid:focus {outline: none; border-color:#c00; box-shadow: 0 0 4px rgba(192,0,0,0.5);}
 
-.form-item button {padding:5px 20px; margin-top: 1em;}
+.form-item button {padding:5px 20px;}
+
+.form-item .input-sm {width:120px;}
