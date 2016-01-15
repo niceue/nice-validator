@@ -35,7 +35,7 @@
         rRule = /(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
-        rPos = /^.*(top|right|bottom|left).*$/,
+        rPos = /top|right|bottom|left/,
         rAjaxType = /(?:(post|get):)?(.+)/i,
         rUnsafe = /[<>'"`\\]|&#x?\d+[A-F]?;?|%3[A-F]/gmi,
 
@@ -1589,7 +1589,7 @@
         var pos;
 
         if (str) pos = rPos.exec(str);
-        return pos && pos[1];
+        return pos && pos[0];
     }
 
     function _dataFilter(data) {
