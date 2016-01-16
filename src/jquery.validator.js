@@ -121,55 +121,56 @@
 
     /** jQuery Plugin
      * @param {Object} options
-        debug         {Boolean}     false     Whether to enable debug mode
-        timely        {Number}      1         Whether to enable timely verification
-        theme         {String}     'default'  Theme name
-        stopOnError   {Boolean}     false     Whether to stop validate when found an error input
-        focusCleanup  {Boolean}     false     Whether to clean up the field message when focus the field
-        focusInvalid  {Boolean}     true      Whether to focus the field that is invalid
-        ignoreBlank   {Boolean}     false     When the field has no value, whether to ignore verification
-        ignore        {jqSelector}    ''      Ignored fields (Using jQuery selector)
+        debug         {Boolean}     0               Whether to enable debug mode
+        timely        {Number}      1               Whether to enable timely verification
+        theme         {String}     'default'        Theme name
+        stopOnError   {Boolean}     false           Whether to stop validate when found an error input
+        focusCleanup  {Boolean}     false           Whether to clean up the field message when focus the field
+        focusInvalid  {Boolean}     true            Whether to focus the field that is invalid
+        ignoreBlank   {Boolean}     false           When the field has no value, whether to ignore verification
+        ignore        {jqSelector}    ''            Ignored fields (Using jQuery selector)
 
-        beforeSubmit  {Function}              Do something before submit form
-        dataFilter    {Function}              Convert ajax results
-        valid         {Function}              Triggered when the form is valid
-        invalid       {Function}              Triggered when the form is invalid
-        validClass    {String}                Add this class name to a valid field
-        invalidClass  {String}                Add this class name to a invalid field
+        beforeSubmit  {Function}                    Do something before submit form
+        dataFilter    {Function}                    Convert ajax results
+        valid         {Function}                    Triggered when the form is valid
+        invalid       {Function}                    Triggered when the form is invalid
+        validClass    {String}      'n-valid'       Add this class name to a valid field
+        invalidClass  {String}      'n-invalid'     Add this class name to a invalid field
+        bindClassTo   {jqSelector}  ':input'        Which element should the className binding to
 
-        display       {Function}              Callback function to get dynamic display
-        target        {Function}              Callback function to get dynamic target
-        msgShow       {Function}    null      Trigger this callback when show message
-        msgHide       {Function}    null      Trigger this callback when hide message
-        msgWrapper    {String}     'span'     Message wrapper tag name
-        msgMaker      {Function}              Callback function to make message HTML
-        msgArrow      {String}                Message arrow template
-        msgIcon       {String}                Message icon template
-        msgStyle      {String}                Custom message css style
-        msgClass      {String}                Additional added to the message class names
-        formClass     {String}                Additional added to the form class names
+        display       {Function}                    Callback function to get dynamic display
+        target        {Function}                    Callback function to get dynamic target
+        msgShow       {Function}                    Trigger this callback when show message
+        msgHide       {Function}                    Trigger this callback when hide message
+        msgWrapper    {String}      'span'          Message wrapper tag name
+        msgMaker      {Function}                    Callback function to make message HTML
+        msgArrow      {String}                      Message arrow template
+        msgIcon       {String}                      Message icon template
+        msgStyle      {String}                      Custom message css style
+        msgClass      {String}                      Additional added to the message class names
+        formClass     {String}                      Additional added to the form class names
 
-        messages      {Object}      null      Custom messages for the current instance
-        rules         {Object}      null      Custom rules for the current instance
-        fields        {Object}                Field set to be verified
-        {String} key    name|#id
-        {String|Object} value                 Rule string, or an object is passed more arguments
+        messages      {Object}                      Custom messages for the current instance
+        rules         {Object}                      Custom rules for the current instance
+        fields        {Object}                      Field set to be verified
+        {String}        key    name|#id
+        {String|Object} value                       Rule string, or an object is passed more arguments
 
-        fields[key][rule]       {String}      Rule string
+        fields[key][rule]       {String}            Rule string
         fields[key][display]    {String|Function}
-        fields[key][tip]        {String}      Custom friendly message when focus the input
-        fields[key][ok]         {String}      Custom success message
-        fields[key][msg]        {Object}      Custom error message
-        fields[key][msgStyle]   {String}      Custom message style
-        fields[key][msgClass]   {String}      Additional added to the message class names
-        fields[key][msgWrapper] {String}      Message wrapper tag name
-        fields[key][msgMaker]   {Function}    Custom message HTML maker
-        fields[key][dataFilter] {Function}    Conversion ajax results
-        fields[key][valid]      {Function}    Triggered when this field is valid
-        fields[key][invalid]    {Function}    Triggered when this field is invalid
-        fields[key][must]       {Boolean}     If set true, we always check the field even has remote checking
-        fields[key][timely]     {Boolean}     Whether to enable timely verification
-        fields[key][target]     {jqSelector}  Verify the current field, but the message can be displayed on target element
+        fields[key][tip]        {String}            Custom friendly message when focus the input
+        fields[key][ok]         {String}            Custom success message
+        fields[key][msg]        {Object}            Custom error message
+        fields[key][msgStyle]   {String}            Custom message style
+        fields[key][msgClass]   {String}            Additional added to the message class names
+        fields[key][msgWrapper] {String}            Message wrapper tag name
+        fields[key][msgMaker]   {Function}          Custom message HTML maker
+        fields[key][dataFilter] {Function}          Conversion ajax results
+        fields[key][valid]      {Function}          Triggered when this field is valid
+        fields[key][invalid]    {Function}          Triggered when this field is invalid
+        fields[key][must]       {Boolean}           If set true, we always check the field even has remote checking
+        fields[key][timely]     {Boolean}           Whether to enable timely verification
+        fields[key][target]     {jqSelector}        Verify the current field, but the message can be displayed on target element
      */
     $.fn[NS] = function(options) {
         var that = this,
