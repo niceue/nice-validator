@@ -1,5 +1,5 @@
 /*jshint evil:true*/
-(function(factory) {
+;(function(factory) {
     if ( 'function' === typeof define && (define.amd || define.cmd) ) {
         // Register as an anonymous module.
         define([], function(){
