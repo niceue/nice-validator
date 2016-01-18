@@ -89,8 +89,8 @@ gulp.task('test', function () {
 gulp.task('release', ['build', 'test'], function () {
     var zip = require('gulp-zip');
     gulp.src([
-            "dist/*", "!images/Thumbs.db",
-            "demo/**/*",
+            "dist/**", "!images/Thumbs.db",
+            "demo/**",
             "package.json",
             "README.md"
         ], {base: './'})
