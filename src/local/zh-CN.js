@@ -27,7 +27,7 @@ exports.rules = {
 };
 
 exports.lang = {
-    0: "",
+    0: "此处",
     fallback: "{0}格式不正确",
     loading: "正在验证...",
 

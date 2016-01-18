@@ -19,7 +19,7 @@ exports.rules = {
 };
 
 exports.lang = {
-    0: "",
+    0: "此處",
     fallback: "{0}格式不正確",
     loading: "正在驗證...",
 
