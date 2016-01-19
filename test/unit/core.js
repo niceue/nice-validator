@@ -146,6 +146,31 @@ describe('Core', function(){
     });
 
     describe('Selector', function(){
+        it(':verifiable', function(){
+            var result = true;
+            var otherTypes = {submit: 1, button: 1, reset: 1, image: 1};
+            $('#form').find(':verifiable').each(function(){
+                var input = this;
+                if (input.disabled) {
+                    result = false;
+                }
+                switch (input.tagName.toLowerCase()) {
+                    case 'input':
+                        if (otherTypes[input.type]) {
+                            result = false;
+                        }
+                        break;
+                    case 'select':
+                    case 'textarea':
+                        break;
+                    default:
+                        result = false;
+                }
+                return result;
+            });
+            assert.ok(result === true);
+        });
+
         it(':filled', function(){
             var $input = $js_way.find('input').eq(1);
             assert.ok($input.val('test').is(':filled') === true && $input.val('').is(':filled') === false);
