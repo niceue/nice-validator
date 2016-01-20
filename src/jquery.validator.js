@@ -481,7 +481,7 @@
         },
 
         // Verify a zone
-        _multiValidate: function($inputs, doneCallbacks){
+        _multiValidate: function($inputs, doneCallback){
             var me = this,
                 opt = me.options;
 
@@ -498,20 +498,20 @@
                 }
             });
 
-            // Need to wait for the completion of all field validation (especially asynchronous verification)
-            if (doneCallbacks) {
+            // Need to wait for all fields validation complete, especially asynchronous verification
+            if (doneCallback) {
                 me.verifying = true;
                 $.when.apply(
                     null,
                     $.map(me.deferred, function(v){return v;})
                 ).done(function(){
-                    doneCallbacks.call(me, !me.hasError);
+                    doneCallback.call(me, !me.hasError);
                     me.verifying = false;
                 });
             }
 
             // If the form does not contain asynchronous validation, the return value is correct.
-            // Otherwise, you should detect whether a form valid through "doneCallbacks".
+            // Otherwise, you should detect form validation result through "doneCallback".
             return !$.isEmptyObject(me.deferred) ? undefined : !me.hasError;
         },
 
