@@ -216,7 +216,7 @@
             function(isValid){
                 if (!isValid && opt.focusInvalid && !me.checkOnly) {
                     // navigate to the error element
-                    me.$el.find('[' + ARIA_INVALID + ']:input:first').focus();
+                    me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                 }
                 hasCallback && callback.call(null, isValid);
                 me.checkOnly = false;
@@ -566,7 +566,7 @@
                     if (!isValid) {
                         if (opt.focusInvalid) {
                             // navigate to the error element
-                            me.$el.find('[' + ARIA_INVALID + '="true"]:input:first').focus();
+                            me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
