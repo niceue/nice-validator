@@ -529,7 +529,7 @@
             e.preventDefault();
 
             if (
-                novalidateonce && !!~(novalidateonce = false) ||
+                novalidateonce && ~(novalidateonce = false) ||
                 // Prevent duplicate submission
                 me.submiting ||
                 // Receive the "validate" event only from the form.
