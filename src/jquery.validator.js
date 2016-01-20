@@ -490,14 +490,11 @@
                 $inputs = $inputs.not(opt.ignore);
             }
 
-            $inputs.each(function(i, el) {
-                var field = me.getField(el);
-                if (field) {
-                    me._validate(el, field);
-                    if (me.hasError && opt.stopOnError) {
-                        // stop the verification
-                        return false;
-                    }
+            $inputs.each(function() {
+                me._validate(this);
+                if (me.hasError && opt.stopOnError) {
+                    // stop the verification
+                    return false;
                 }
             });
 
