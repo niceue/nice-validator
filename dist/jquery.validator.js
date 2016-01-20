@@ -220,7 +220,7 @@
             function(isValid){
                 if (!isValid && opt.focusInvalid && !me.checkOnly) {
                     // navigate to the error element
-                    me.$el.find('[' + ARIA_INVALID + ']:input:first').focus();
+                    me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                 }
                 hasCallback && callback.call(null, isValid);
                 me.checkOnly = false;
@@ -494,14 +494,11 @@
                 $inputs = $inputs.not(opt.ignore);
             }
 
-            $inputs.each(function(i, el) {
-                var field = me.getField(el);
-                if (field) {
-                    me._validate(el, field);
-                    if (me.hasError && opt.stopOnError) {
-                        // stop the verification
-                        return false;
-                    }
+            $inputs.each(function() {
+                me._validate(this);
+                if (me.hasError && opt.stopOnError) {
+                    // stop the verification
+                    return false;
                 }
             });
 
@@ -533,7 +530,7 @@
             e.preventDefault();
 
             if (
-                novalidateonce && !!~(novalidateonce = false) ||
+                novalidateonce && ~(novalidateonce = false) ||
                 // Prevent duplicate submission
                 me.submiting ||
                 // Receive the "validate" event only from the form.
@@ -570,7 +567,7 @@
                     if (!isValid) {
                         if (opt.focusInvalid) {
                             // navigate to the error element
-                            me.$el.find('[' + ARIA_INVALID + '="true"]:input:first').focus();
+                            me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                         }
                         errors = $.map(me.errors, function(err){
                             return err;
