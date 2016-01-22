@@ -1083,18 +1083,21 @@
 
         // Processing the validation
         _validate: function(el, field) {
+            var me = this;
+
             // doesn't validate the element that has "disabled" or "novalidate" attribute
             if ( el.disabled || attr(el, NOVALIDATE) !== null ) {
                 return;
             }
 
-            var me = this;
             field = field || me.getField(el);
-            field.isValid = true;
-
+            if (!field) return;
             if (!field.rules) me._parse(el);
             if (!field.rules) return;
+
             if (me.options.debug) debug.info(field.key);
+
+            field.isValid = true;
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !elementValue(el)) {
