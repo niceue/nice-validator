@@ -504,13 +504,13 @@
 
             // Need to wait for all fields validation complete, especially asynchronous verification
             if (doneCallback) {
-                me.verifying = true;
+                me.validating = true;
                 $.when.apply(
                     null,
                     $.map(me.deferred, function(v){return v;})
                 ).done(function(){
                     doneCallback.call(me, !me.hasError);
-                    me.verifying = false;
+                    me.validating = false;
                 });
             }
 
@@ -641,7 +641,7 @@
                 timely,
                 msg;
 
-            if ( me.verifying || ( e.type==='click' && document.activeElement === el ) ) {
+            if ( me.validating || ( e.type==='click' && document.activeElement === el ) ) {
                 return;
             }
 
@@ -1550,6 +1550,7 @@
         return $(wrap).data(NS) || $(wrap)[NS](options).data(NS);
     }
 
+    // Automatic initialization
     function _initByInput(e, elem) {
         var el = elem || e.currentTarget, me;
 
@@ -1608,21 +1609,24 @@
         return el.tagName === 'INPUT' && el.type === 'checkbox' || el.type === 'radio';
     }
 
-    // parse date string to timestamp
+    // Parse date string to timestamp
     function _parseDate(str) {
         return Date.parse(str.replace(/\.|\-/g, '/'));
     }
 
+    // Rule name only allows alphanumeric characters and underscores
     function _checkRuleName(name) {
         return /^\w+$/.test(name);
     }
 
+    // Translate field key to jQuery selector.
     function _key2selector(key) {
         return key.charAt(0) === "#" ? key.replace(/(:|\.|\[|\])/g, "\\$1") : '[name="'+ key +'"]:input';
     }
 
 
     // Global events
+    // Fixed a issue cause by refresh page in IE.
     $(window).on('beforeunload', function(){
         this.focus();
     });
