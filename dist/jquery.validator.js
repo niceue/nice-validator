@@ -1647,15 +1647,11 @@
                 novalidateonce = true;
             }
         }
-        else if ( attr(input.form, NOVALIDATE) === null ) {
-            if ( name && _checkable(input) ) {
-                elem = input.form.elements[name];
-                if (elem.length) elem = elem[0];
-                if (attr(elem, DATA_RULE)) {
-                    _initByInput(e, elem);
-                }
-            } else {
-                _initByInput(e);
+        else if ( name && _checkable(input) ) {
+            elem = input.form.elements[name];
+            if (elem.length) elem = elem[0];
+            if (attr(elem, DATA_RULE)) {
+                _initByInput(e, elem);
             }
         }
     })
