@@ -500,13 +500,13 @@
 
             // Need to wait for all fields validation complete, especially asynchronous verification
             if (doneCallback) {
-                me.verifying = true;
+                me.validating = true;
                 $.when.apply(
                     null,
                     $.map(me.deferred, function(v){return v;})
                 ).done(function(){
                     doneCallback.call(me, !me.hasError);
-                    me.verifying = false;
+                    me.validating = false;
                 });
             }
 
@@ -637,7 +637,7 @@
                 timely,
                 msg;
 
-            if ( me.verifying || ( e.type==='click' && document.activeElement === el ) ) {
+            if ( me.validating || ( e.type==='click' && document.activeElement === el ) ) {
                 return;
             }
 
