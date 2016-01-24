@@ -14,8 +14,8 @@ $ bower install nice-validator
 ```
 
 ## Getting started
-##### Include [jQuery 1.7+](http://jquery.com)
-##### Include nice-validator to your project
+#### 1. Include [jQuery 1.7+](http://jquery.com)
+#### 2. Include nice-validator to your project
 width `<script>` tag
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
@@ -26,6 +26,36 @@ require(['path/to/nice-validator/local/en']);
 ```
 ```javascript
 seajs.use('path/to/nice-validator/local/zh-CN');
+```
+#### 3. Config rules
+```html
+<form id="form1">
+...
+<input type="text" name="field1" data-rule="required;email;remote(checkEmail.php)">
+<input type="text" name="field2" data-rule="required;length(6~16)">
+<input type="text" name="field3" data-rule="match(field2)">
+<input type="text" name="field4" data-rule="range(0~100)" id="field4">
+<input type="text" name="field5" data-rule="required(#field4:filled)">
+<input type="text" name="field6" data-rule="required; mobile|email;" data-msg="Please fill mobile or email">
+<input type="text" name="field7" 
+    data-rule="required; !digits; length(6~)" 
+    data-msg-digits="Please not fill pure digits"
+    data-msg-length="Please fill at least {1} characters.">
+<input type="checkbox" name="field8" data-rule="checked">
+...
+</form>
+```
+#### 4. Handle submit
+```javascript
+$("#form1").on('valid.form', function(){
+    // native submit
+    // this.submit();
+    // or ajax submit
+    $.post("path/to/server", $(this).serialize())
+        .done(function(d){
+            // do something
+        });
+});
 ```
 
 ## Documention
