@@ -30,7 +30,6 @@ seajs.use('path/to/nice-validator/local/zh-CN');
 #### 3. Config rules
 ```html
 <form id="form1">
-...
 <input type="text" name="field1" data-rule="required;email;remote(checkEmail.php)">
 <input type="text" name="field2" data-rule="required;length(6~16)">
 <input type="text" name="field3" data-rule="match(field2)">
@@ -42,15 +41,15 @@ seajs.use('path/to/nice-validator/local/zh-CN');
     data-msg-digits="Please not fill pure digits"
     data-msg-length="Please fill at least {1} characters.">
 <input type="checkbox" name="field8" data-rule="checked">
-...
+... yadda yadda ...
 </form>
 ```
-#### 4. Handle submit
+#### 4. Handle submit (Optional)
 ```javascript
 $("#form1").on('valid.form', function(){
-    // native submit
+    // You can do something, then submit form by native
     // this.submit();
-    // or ajax submit
+    // or use ajax submit
     $.post("path/to/server", $(this).serialize())
         .done(function(d){
             // do something
