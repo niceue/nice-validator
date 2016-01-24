@@ -4,16 +4,16 @@
 
 Simple, smart and pleasant validation solution.
 
-### Getting started
-##### Download the [last release](https://github.com/niceue/nice-validator/releases)
-or installation by package manager via [npm](https://www.npmjs.com/)
+Download the [last release](https://github.com/niceue/nice-validator/releases)
+or installation by package manager via [npm](https://www.npmjs.com/) or [Bower](http://bower.io/)
 ```bash
 $ npm install nice-validator
 ```
-width [Bower](http://bower.io/)
 ```bash
 $ bower install nice-validator
 ```
+
+### Getting started
 ##### Include [jQuery 1.7+](http://jquery.com)
 ##### Include nice-validator to your project
 width `<script>` tag
