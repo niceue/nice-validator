@@ -1,4 +1,4 @@
-## nice-validator
+# nice-validator
 [![Build Status](https://travis-ci.org/niceue/nice-validator.svg)](https://travis-ci.org/niceue/nice-validator)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://niceue.com/licenses/MIT-LICENSE.txt)
 
@@ -13,27 +13,26 @@ $ npm install nice-validator
 $ bower install nice-validator
 ```
 
-### Getting started
+## Getting started
 ##### Include [jQuery 1.7+](http://jquery.com)
 ##### Include nice-validator to your project
 width `<script>` tag
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
 ```
-via [Requirejs](http://requirejs.org/)
+via module loader [Requirejs](http://requirejs.org/) or [Sea.js](http://seajs.org/docs/en.html)
 ```javascript
 require(['path/to/nice-validator/local/en']);
 ```
-via [Sea.js](http://seajs.org/docs/en.html)
 ```javascript
 seajs.use('path/to/nice-validator/local/zh-CN');
 ```
 
-### Documention
+## Documention
 - [English](https://github.com/niceue/nice-validator/wiki/Getting-Started)
 - [简体中文](http://validator.niceue.com/)
 
-### Browser Support
+## Browser Support
   * IE6+
   * Chrome
   * Safari 4+
@@ -41,11 +40,11 @@ seajs.use('path/to/nice-validator/local/zh-CN');
   * Opera
 
 
-### Bugs / Contributions
+## Bugs / Contributions
 - [Report a bug](https://github.com/niceue/nice-validator/issues)
 - To contribute or send an idea, github message me or fork the project
 
-### Build
+## Build
 Install dependencies:
 ```bash
 $ npm install -g gulp
@@ -57,5 +56,5 @@ $ gulp
 ```
 
 
-### License
+## License
 nice-validator is available under the terms of the [MIT License](http://niceue.com/licenses/MIT-LICENSE.txt).
