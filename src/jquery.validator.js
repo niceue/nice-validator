@@ -122,12 +122,12 @@
     /** jQuery Plugin
      * @param {Object} options
         debug         {Boolean}     0               Whether to enable debug mode
-        timely        {Number}      1               Whether to enable timely verification
+        timely        {Number}      1               Whether to enable timely validation
         theme         {String}     'default'        Theme name
         stopOnError   {Boolean}     false           Whether to stop validate when found an error input
         focusCleanup  {Boolean}     false           Whether to clean up the field message when focus the field
         focusInvalid  {Boolean}     true            Whether to focus the field that is invalid
-        ignoreBlank   {Boolean}     false           When the field has no value, whether to ignore verification
+        ignoreBlank   {Boolean}     false           When the field has no value, whether to ignore validation
         ignore        {jqSelector}    ''            Ignored fields (Using jQuery selector)
 
         beforeSubmit  {Function}                    Do something before submit form
@@ -169,7 +169,7 @@
         fields[key][valid]      {Function}          Triggered when this field is valid
         fields[key][invalid]    {Function}          Triggered when this field is invalid
         fields[key][must]       {Boolean}           If set true, we always check the field even has remote checking
-        fields[key][timely]     {Boolean}           Whether to enable timely verification
+        fields[key][timely]     {Boolean}           Whether to enable timely validation
         fields[key][target]     {jqSelector}        Verify the current field, but the message can be displayed on target element
      */
     $.fn[NS] = function(options) {
@@ -493,12 +493,12 @@
             $inputs.each(function() {
                 me._validate(this);
                 if (me.hasError && opt.stopOnError) {
-                    // stop the verification
+                    // stop the validation
                     return false;
                 }
             });
 
-            // Need to wait for all fields validation complete, especially asynchronous verification
+            // Need to wait for all fields validation complete, especially asynchronous validation
             if (doneCallback) {
                 me.validating = true;
                 $.when.apply(
@@ -515,7 +515,7 @@
             return !$.isEmptyObject(me.deferred) ? undefined : !me.hasError;
         },
 
-        // Verify the whole form
+        // Validate the whole form
         _submit: function(e) {
             var me = this,
                 opt = me.options,
@@ -543,7 +543,7 @@
 
             autoSubmit = e.type === 'submit' && !isDefaultPrevented && !me.isAjaxSubmit;
 
-            // Prevent infinite loop and repeated verification
+            // Prevent infinite loop and repeated validation
             if (e.isTrigger && me.isValid && autoSubmit) {
                 submitForm();
                 return;
@@ -630,6 +630,7 @@
             return timely !== null ? +timely : +opt.timely;
         },
 
+        // Handle events: "focusin/click"
         _focusin: function(e) {
             var me = this,
                 opt = me.options,
@@ -666,7 +667,7 @@
             }
         },
 
-        // Handle "focusout/validate/keyup/click/change/input/compositionstart/compositionend" events
+        // Handle events: "focusout/validate/keyup/click/change/input/compositionstart/compositionend"
         _focusout: function(e, elem) {
             var me = this,
                 opt = me.options,
@@ -747,7 +748,7 @@
                             46: 1  // Delete
                         };
 
-                        // only gets focus, no verification
+                        // only gets focus, no validation
                         if ( key === 9 && !value ) {
                             return;
                         }
@@ -758,7 +759,7 @@
                         }
                     }
                     if ( !focusin ) {
-                        // keyboard events, reducing the frequency of verification
+                        // keyboard events, reducing the frequency of validation
                         timer = timely >=100 ? timely : 400;
                     }
                 }
