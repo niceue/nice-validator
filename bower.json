@@ -7,12 +7,13 @@
     "globals"
   ],
   "keywords": [
-    "jquery-plugin",
-    "form",
-    "validate",
+    "jquery",
     "validation",
+    "form",
     "validator",
-    "nice-validator"
+    "validate",
+    "nice-validator",
+    "jquery-plugin"
   ],
   "authors": [
     "Jony Zhang <niceue@live.com>"
