@@ -656,6 +656,9 @@
                     msg: msg
                 });
             } else {
+                if (attr(el, DATA_RULE)) {
+                    me._parse(el);
+                }
                 timely = me._getTimely(el, opt);
                 if ( timely === 8 || timely === 9 ) {
                     me._focusout(e);
@@ -1546,24 +1549,6 @@
         return $(wrap).data(NS) || $(wrap)[NS](options).data(NS);
     }
 
-    // Automatic initialization
-    function _initByInput(e, elem) {
-        var el = elem || e.currentTarget, me;
-
-        if (!el.form || attr(el.form, NOVALIDATE) !== null) {
-            return;
-        }
-
-        me = _getInstance(el);
-        if (me) {
-            me._parse(el);
-            me._focusin(e);
-            if (elem) me._focusout(e, elem);
-        } else {
-            attr(el, DATA_RULE, null);
-        }
-    }
-
     // Get custom rules on the node
     function _getDataRule(el, method) {
         var fn = trim(attr(el, DATA_RULE + '-' + method));
@@ -1594,6 +1579,7 @@
         return pos && pos[0];
     }
 
+    // Translate ajax response to validation result
     function _dataFilter(data) {
         if ( isString(data) || ( isObject(data) && ('error' in data || 'ok' in data) ) ) {
             return data;
@@ -1621,46 +1607,37 @@
     }
 
 
-    // Global events
     // Fixed a issue cause by refresh page in IE.
     $(window).on('beforeunload', function(){
         this.focus();
     });
 
     $(document)
-    .on('focusin', '['+DATA_RULE+']:input', function(e) {
-        _initByInput(e);
-    })
-
-    .on('click', 'input,button', function(e){
-        var input = this, name = input.name, attrNode, elem;
+    .on('click', ':submit', function(){
+        var input = this, attrNode;
         if (!input.form) return;
-
-        if ( input.type === 'submit' ) {
-            submitButton = input;
-            attrNode = input.getAttributeNode('formnovalidate');
-            if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
-                novalidateonce = true;
-            }
-        }
-        else if ( name && _checkable(input) ) {
-            elem = input.form.elements[name];
-            if (elem.length) elem = elem[0];
-            if (attr(elem, DATA_RULE)) {
-                _initByInput(e, elem);
-            }
+        // Remember the submit button which is clicked
+        submitButton = input;
+        // Shim for "formnovalidate"
+        attrNode = input.getAttributeNode('formnovalidate');
+        if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
+            novalidateonce = true;
         }
     })
-
-    .on('submit validate', 'form', function(e) {
+    // Automatic initializing form validation
+    .on('focusin submit validate', 'form,.'+CLS_WRAPPER, function(e) {
         if ( attr(this, NOVALIDATE) !== null ) return;
-
         var $form = $(this), me;
 
         if ( !$form.data(NS) ) {
             me = _getInstance(this);
             if ( !$.isEmptyObject(me.fields) ) {
-                me._submit(e);
+                // Execute event handler
+                if (e.type === 'focusin') {
+                    me._focusin(e);
+                } else {
+                    me._submit(e);
+                }
             } else {
                 attr(this, NOVALIDATE, NOVALIDATE);
                 $form.off(CLS_NS).removeData(NS);
