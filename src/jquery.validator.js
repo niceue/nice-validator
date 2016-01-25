@@ -402,8 +402,8 @@
 
             // if the field has passed the key as id mode, or it doesn't has a name
             if ( el.id && ('#' + el.id in me.fields) ||
-                 (dataRule && key && (field = me.fields[key]) && dataRule !== field.rule) ||
-                 !el.name
+                 !key ||
+                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule)
             ) {
                 key = '#' + el.id;
             }
