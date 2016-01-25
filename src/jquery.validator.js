@@ -413,7 +413,7 @@
 
             field = me.fields[key] || {};
             field.key = key;
-            // The priority of pass parameter by DOM is higher than by JS.
+            // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
 
             if (!field.display) {
