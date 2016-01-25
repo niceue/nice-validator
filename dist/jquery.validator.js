@@ -404,10 +404,11 @@
 
             dataRule && attr(el, DATA_RULE, null);
 
-            // if the field has passed the key as id mode, or it doesn't has a name
+            // If the field has passed the key as id mode, or it doesn't has a name
             if ( el.id && ('#' + el.id in me.fields) ||
                  !key ||
-                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule)
+                 // If dataRule and element are diffrent from old's, we use ID mode.
+                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && field.key !== el.id)
             ) {
                 key = '#' + el.id;
             }
@@ -416,7 +417,8 @@
 
             field = me.fields[key] || {};
             field.key = key;
-            field.rule = field.rule || dataRule || '';
+            // The priority of pass parameter by DOM is higher than by JS.
+            field.rule = dataRule || field.rule || '';
 
             if (!field.display) {
                 if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
