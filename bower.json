@@ -19,6 +19,10 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/niceue/nice-validator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niceue/nice-validator.git"
+  },
   "dependencies": {
     "jquery": "^1.7.0"
   },
