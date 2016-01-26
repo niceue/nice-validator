@@ -445,7 +445,7 @@
                 } else {
                     field.timely = +timely;
                 }
-                field = me._parseRule(field);
+                me._parseRule(field);
                 field.old = {};
             }
             if ( isString(field.target) ) {
@@ -484,8 +484,6 @@
                     });
                 });
             }
-
-            return field;
         },
 
         // Verify a zone
