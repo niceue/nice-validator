@@ -305,7 +305,7 @@
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
-            me.Field = FieldFactory(me);
+            me.Field = _fieldFactory(me);
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
@@ -424,6 +424,7 @@
             field = me.fields[key] || new me.Field(key);
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
+            field.get = field.get || elementValue;
 
             if (!field.display) {
                 if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
@@ -703,7 +704,7 @@
             }
             field._e = etype;
             old = field.old;
-            value = elementValue(el);
+            value = field.get(el);
 
             // Just for checkbox and radio
             if (!elem && _checkable(el)) {
@@ -836,7 +837,7 @@
             ret.key = field.key;
             ret.ruleName = field._r;
             ret.id = el.id;
-            ret.value = elementValue(el);
+            ret.value = field.get(el);
 
             if (isValid) {
                 ret.type = 'ok';
@@ -1018,7 +1019,6 @@
                 key = field.key,
                 rule = field._rules[field._i],
                 method = rule.method,
-                value = elementValue(el),
                 params = rule.params;
 
             // request has been sent, wait it
@@ -1030,7 +1030,7 @@
 
             if (old && !field.must && !rule.must && rule.result !== undefined &&
                  old.ruleName === method && old.id === el.id &&
-                value && old.value === value )
+                field.value && old.value === field.value )
             {
                 // get result from cache
                 ret = rule.result;
@@ -1107,9 +1107,10 @@
             if (me.options.debug) debug.info(field.key);
 
             field.isValid = true;
+            field.value = field.get(el);
 
             // if the field is not required, and that has a blank value
-            if (!field.required && !field.must && !elementValue(el)) {
+            if (!field.required && !field.must && !field.value) {
                 if (!_checkable(el)) {
                     me._validatedField(el, field, {isValid: true});
                     return true;
@@ -1434,7 +1435,7 @@
             var fields = this.fields, k, field;
             for (k in fields) {
                 field = fields[k];
-                if (!field._rules || !field.required && !field.must && !elementValue(_key2selector(k))) continue;
+                if (!field._rules || !field.required && !field.must && !field.get(_key2selector(k))) continue;
                 if (!field.isValid) {
                     return field.isValid;
                 }
@@ -1481,7 +1482,7 @@
      * @param  {Object}     context
      * @return {Function}   Factory
      */
-    function FieldFactory(context) {
+    function _fieldFactory(context) {
         var Fn = function(key) {
             this.key = key;
         };
@@ -1530,15 +1531,15 @@
             case 'function':
                 return fn;
             case 'array':
-                var f = function(el) {
+                var f = function() {
                     fn.msg = fn[1];
-                    return fn[0].test(elementValue(el)) || fn[1] || false;
+                    return fn[0].test(this.value) || fn[1] || false;
                 };
                 f.msg = fn[1];
                 return f;
             case 'regexp':
-                return function(el) {
-                    return fn.test(elementValue(el));
+                return function() {
+                    return fn.test(this.value);
                 };
         }
     }
@@ -1690,7 +1691,7 @@
          */
         required: function(element, params, field) {
             var me = this,
-                val = trim(elementValue(element)),
+                val = trim(me.value),
                 isValid = true;
 
             if (params) {
@@ -1720,7 +1721,8 @@
                         ret;
 
                     isValid = $elements.filter(function(){
-                        return !!trim(elementValue(this));
+                        var field = me.getField(this);
+                        return field && !!trim(field.get(this));
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
@@ -1777,7 +1779,7 @@
             }
             re = '^(?:' + re + ')$';
 
-            return new RegExp(re).test(elementValue(element)) || this.messages.integer[key];
+            return new RegExp(re).test(this.value) || this.messages.integer[key];
         },
 
         /**
@@ -1814,8 +1816,8 @@
             // If the compared field is not exist
             if (!elem2) return;
             field2 = me.getField(elem2);
-            a = elementValue(element);
-            b = elementValue(elem2);
+            a = me.value;
+            b = field2.get(elem2);
 
             if (!field._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
@@ -1872,7 +1874,7 @@
             range[~100]    Number less than or equal to 100
          **/
         range: function(element, params, field) {
-            return this.getRangeMsg(elementValue(element), params, field);
+            return this.getRangeMsg(this.value, params, field);
         },
 
         /**
@@ -1919,7 +1921,7 @@
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
         length: function(element, params, field) {
-            var value = elementValue(element),
+            var value = this.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
 
             return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
@@ -1955,7 +1957,7 @@
                 dataType;
 
             rule.must = true;
-            data[element.name] = elementValue(element);
+            data[element.name] = me.value;
 
             // There are extra fields
             if (params[1]) {
@@ -2016,7 +2018,7 @@
          *  filter(regexp)  filtering the "regexp" matched characters
          */
         filter: function(element, params) {
-            var value = elementValue(element), temp;
+            var value = this.value, temp;
 
             temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
             if (temp !== value) element.value = temp;
