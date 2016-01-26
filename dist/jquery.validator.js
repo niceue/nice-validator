@@ -222,7 +222,13 @@
                     // navigate to the error element
                     me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                 }
-                hasCallback && callback.call(null, isValid);
+                if (hasCallback) {
+                    if (callback.length) {
+                        callback(isValid);
+                    } else if (isValid) {
+                        callback();
+                    }
+                }
                 me.checkOnly = false;
             }
         );
