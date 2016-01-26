@@ -392,18 +392,6 @@
             });
         },
 
-        getValue: function(element) {
-            return $(element).val();
-        },
-
-        setValue: function(element, value) {
-            var field = this.getField(element);
-            if (field) {
-                field.value = value;
-            }
-            $(element).val(value);
-        },
-
         // Parsing a field
         _parse: function(el) {
             var me = this,
@@ -419,7 +407,7 @@
             if ( el.id && ('#' + el.id in me.fields) ||
                  !key ||
                  // If dataRule and element are diffrent from old's, we use ID mode.
-                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && field.key !== el.id)
+                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && el.id && field.key !== el.id)
             ) {
                 key = '#' + el.id;
             }
@@ -429,6 +417,7 @@
             field = me.fields[key] || new me.Field(key);
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
+            field.element = el;
 
             if (!field.display) {
                 if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
@@ -704,8 +693,9 @@
                 return;
             }
             field._e = etype;
+            field.element = el;
             old = field.old;
-            value = field.getValue(el);
+            value = field.get();
 
             // Just for checkbox and radio
             if (!elem && _checkable(el)) {
@@ -838,7 +828,7 @@
             ret.key = field.key;
             ret.ruleName = field._r;
             ret.id = el.id;
-            ret.value = field.getValue(el);
+            ret.value = field.value;
 
             if (isValid) {
                 ret.type = 'ok';
@@ -1108,7 +1098,8 @@
             if (me.options.debug) debug.info(field.key);
 
             field.isValid = true;
-            field.value = field.getValue(el);
+            field.element = el;
+            field.value = field.get();
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !field.value) {
@@ -1436,7 +1427,7 @@
             var fields = this.fields, k, field;
             for (k in fields) {
                 field = fields[k];
-                if (!field._rules || !field.required && !field.must && !field.getValue(_key2selector(k))) continue;
+                if (!field._rules || !field.required && !field.must && !field.value) continue;
                 if (!field.isValid) {
                     return field.isValid;
                 }
@@ -1488,8 +1479,16 @@
             this.key = key;
         };
         Fn.prototype = context;
+        Fn.prototype.get =  function() {
+            return $(this.element).val();
+        };
+        Fn.prototype.set = function(value) {
+            this.value = value;
+            $(this.element).val(value);
+        };
         return Fn;
     }
+
 
     /**
      * Create Rules
@@ -1723,7 +1722,7 @@
 
                     isValid = $elements.filter(function(){
                         var field = me.getField(this);
-                        return field && !!trim(field.getValue(this));
+                        return field && !!trim(field.get());
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
@@ -1735,7 +1734,7 @@
                     if ( !$(element).data(VALIDATED) ) {
                         $elements.data(VALIDATED, 1).each(function(){
                             if (element !== this) {
-                                me._checkRule(this, me.getField(this));
+                                me._validate(this);
                             }
                         }).removeData(VALIDATED);
                     }
@@ -1818,7 +1817,7 @@
             if (!elem2) return;
             field2 = me.getField(elem2);
             a = me.value;
-            b = field2.getValue(elem2);
+            b = field2.get();
 
             if (!field._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
@@ -2022,7 +2021,7 @@
             var value = this.value, temp;
 
             temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
-            if (temp !== value) this.setValue(element, temp);
+            if (temp !== value) this.set(temp);
         }
     });
 
