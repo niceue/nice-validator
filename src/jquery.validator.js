@@ -301,6 +301,7 @@
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
+            me.Field = FieldFactory(me);
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
@@ -382,9 +383,8 @@
                         if (el) me._resetElement(el, true);
                         delete me.fields[k];
                     } else {
-                        me.fields[k] = isString(v) ? {
-                            rule: v
-                        } : v;
+                        me.fields[k] = me.fields[k] || new me.Field(k);
+                        $.extend(me.fields[k], isString(v) ? {rule: v} : v);
                     }
                 });
             }
@@ -417,8 +417,7 @@
             // doesn't verify a field that has neither id nor name
             if (!key) return;
 
-            field = me.fields[key] || {};
-            field.key = key;
+            field = me.fields[key] || new me.Field(key);
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
 
@@ -469,11 +468,11 @@
                 field.display = arr[1];
             }
             if (arr[2]) {
-                field.rules = [];
+                field._rules = [];
                 arr[2].replace(rRules, function(){
                     var args = arguments;
                     args[4] = args[4] || args[5];
-                    field.rules.push({
+                    field._rules.push({
                         and: args[1] === "&",
                         not: args[2] === "!",
                         or: args[6] === "|",
@@ -915,14 +914,14 @@
                 }
             }
 
-            rule = field.rules[field._i];
+            rule = field._rules[field._i];
             if (rule.not) {
                 msg = undefined;
                 isValid = method === "required" || !isValid;
             }
             if (rule.or) {
                 if (isValid) {
-                    while ( field._i < field.rules.length && field.rules[field._i].or ) {
+                    while ( field._i < field._rules.length && field._rules[field._i].or ) {
                         field._i++;
                     }
                 } else {
@@ -981,7 +980,7 @@
             }
 
             // the current rule has passed, continue to validate
-            if ( (isValid || special) && field._i < field.rules.length - 1) {
+            if ( (isValid || special) && field._i < field._rules.length - 1) {
                 field._i++;
                 me._checkRule(el, field);
             }
@@ -1013,7 +1012,7 @@
                 fn,
                 old,
                 key = field.key,
-                rule = field.rules[field._i],
+                rule = field._rules[field._i],
                 method = rule.method,
                 value = elementValue(el),
                 params = rule.params;
@@ -1035,7 +1034,7 @@
             else {
                 // get result from current rule
                 fn = _getDataRule(el, method) || me.rules[method] || noop;
-                ret = fn.call(me, el, params, field);
+                ret = fn.call(field, el, params, field);
                 if (fn.msg) rule.msg = fn.msg;
             }
 
@@ -1098,8 +1097,8 @@
 
             field = field || me.getField(el);
             if (!field) return;
-            if (!field.rules) me._parse(el);
-            if (!field.rules) return;
+            if (!field._rules) me._parse(el);
+            if (!field._rules) return;
 
             if (me.options.debug) debug.info(field.key);
 
@@ -1148,7 +1147,7 @@
             if (!params) return;
 
             var me = this,
-                rule = field.rules[field._i],
+                rule = field._rules[field._i],
                 msg = me.messages[rule.method] || '',
                 result,
                 p = params[0].split('~'),
@@ -1431,7 +1430,7 @@
             var fields = this.fields, k, field;
             for (k in fields) {
                 field = fields[k];
-                if (!field.rules || !field.required && !field.must && !elementValue(_key2selector(k))) continue;
+                if (!field._rules || !field.required && !field.must && !elementValue(_key2selector(k))) continue;
                 if (!field.isValid) {
                     return field.isValid;
                 }
@@ -1470,6 +1469,21 @@
         }
     };
 
+
+    /**
+     * Create Field Factory
+     *
+     * @class
+     * @param  {Object}     context
+     * @return {Function}   Factory
+     */
+    function FieldFactory(context) {
+        var Fn = function(key) {
+            this.key = key;
+        };
+        Fn.prototype = context;
+        return Fn;
+    }
 
     /**
      * Create Rules
@@ -1931,7 +1945,7 @@
 
             var me = this,
                 arr = rAjaxType.exec(params[0]),
-                rule = field.rules[field._i],
+                rule = field._rules[field._i],
                 data = {},
                 queryString = '',
                 dataType;
