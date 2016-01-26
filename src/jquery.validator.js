@@ -59,9 +59,6 @@
                 return el.getAttribute(key);
             }
         },
-        elementValue = function(element) {
-            return $(element).val();
-        },
         debug = window.console || {
             log: noop,
             info: noop
@@ -246,7 +243,7 @@
 
     // any value, but not only whitespace
     $.expr[":"].filled = function(elem) {
-        return !!trim(elementValue(elem));
+        return !!trim($(elem).val());
     };
 
 
@@ -395,6 +392,18 @@
             });
         },
 
+        getValue: function(element) {
+            return $(element).val();
+        },
+
+        setValue: function(element, value) {
+            var field = this.getField(element);
+            if (field) {
+                field.value = value;
+            }
+            $(element).val(value);
+        },
+
         // Parsing a field
         _parse: function(el) {
             var me = this,
@@ -420,7 +429,6 @@
             field = me.fields[key] || new me.Field(key);
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
-            field.get = field.get || elementValue;
 
             if (!field.display) {
                 if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
@@ -700,7 +708,7 @@
             }
             field._e = etype;
             old = field.old;
-            value = field.get(el);
+            value = field.getValue(el);
 
             // Just for checkbox and radio
             if (!elem && _checkable(el)) {
@@ -833,7 +841,7 @@
             ret.key = field.key;
             ret.ruleName = field._r;
             ret.id = el.id;
-            ret.value = field.get(el);
+            ret.value = field.getValue(el);
 
             if (isValid) {
                 ret.type = 'ok';
@@ -1103,7 +1111,7 @@
             if (me.options.debug) debug.info(field.key);
 
             field.isValid = true;
-            field.value = field.get(el);
+            field.value = field.getValue(el);
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !field.value) {
@@ -1431,7 +1439,7 @@
             var fields = this.fields, k, field;
             for (k in fields) {
                 field = fields[k];
-                if (!field._rules || !field.required && !field.must && !field.get(_key2selector(k))) continue;
+                if (!field._rules || !field.required && !field.must && !field.getValue(_key2selector(k))) continue;
                 if (!field.isValid) {
                     return field.isValid;
                 }
@@ -1718,7 +1726,7 @@
 
                     isValid = $elements.filter(function(){
                         var field = me.getField(this);
-                        return field && !!trim(field.get(this));
+                        return field && !!trim(field.getValue(this));
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
@@ -1813,7 +1821,7 @@
             if (!elem2) return;
             field2 = me.getField(elem2);
             a = me.value;
-            b = field2.get(elem2);
+            b = field2.getValue(elem2);
 
             if (!field._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
@@ -2017,7 +2025,7 @@
             var value = this.value, temp;
 
             temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
-            if (temp !== value) element.value = temp;
+            if (temp !== value) this.setValue(element, temp);
         }
     });
 
