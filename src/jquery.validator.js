@@ -522,8 +522,7 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                isDefaultPrevented = e.isDefaultPrevented(),
-                autoSubmit;
+                canSubmit = e.type === 'submit' && !e.isDefaultPrevented();
 
             e.preventDefault();
 
@@ -543,10 +542,8 @@
                 me._guessAjax(form);
             }
 
-            autoSubmit = e.type === 'submit' && !isDefaultPrevented && !me.isAjaxSubmit;
-
-            // Prevent infinite loop and repeated validation
-            if (e.isTrigger && me.isValid && autoSubmit) {
+            // Prevent infinite loop validation
+            if (canSubmit && e.isTrigger && me.isValid) {
                 submitForm();
                 return;
             }
@@ -582,7 +579,7 @@
 
                     opt.debug && debug.log('>>> ' + ret);
 
-                    if (isValid && autoSubmit) {
+                    if (isValid && canSubmit && !me.isAjaxSubmit) {
                         submitForm();
                     }
                 }
