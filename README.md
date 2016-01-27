@@ -4,8 +4,8 @@
 
 Simple, smart and pleasant validation solution.
 
-[Download](https://github.com/niceue/nice-validator/releases) the last release
-or installation by package manager via [npm](https://www.npmjs.com/) or [bower](http://bower.io/)
+[Download](https://github.com/niceue/nice-validator/releases) the latest release
+or install package via [npm](https://www.npmjs.com/) or [bower](http://bower.io/)
 ```bash
 $ npm install nice-validator
 ```
