@@ -1,4 +1,4 @@
-/*! nice-validator 0.10.3
+/*! nice-validator 0.10.5
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -222,7 +222,13 @@
                     // navigate to the error element
                     me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                 }
-                hasCallback && callback.call(null, isValid);
+                if (hasCallback) {
+                    if (callback.length) {
+                        callback(isValid);
+                    } else if (isValid) {
+                        callback();
+                    }
+                }
                 me.checkOnly = false;
             }
         );
