@@ -3,13 +3,14 @@
   "description": "Simple, smart and pleasant verification solution.",
   "version": "0.10.5",
   "keywords": [
-    "jquery-plugin",
-    "ecosystem:jquery",
-    "form",
-    "validate",
+    "jquery",
     "validation",
+    "form",
     "validator",
-    "nice-validator"
+    "validate",
+    "nice-validator",
+    "jquery-plugin",
+    "ecosystem:jquery"
   ],
   "homepage": "https://github.com/niceue/nice-validator",
   "author": "Jony Zhang <niceue@live.com>",
