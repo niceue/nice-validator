@@ -2031,8 +2031,15 @@
      * @static  config
      * @param {Object} options
      */
-    Validator.config = function(options) {
-        $.each(options, function(k, o) {
+    Validator.config = function(key, value) {
+        if (isObject(key)) {
+            $.each(key, _config);
+        }
+        else if (isString(key)) {
+            _config(key, value);
+        }
+
+        function _config(k, o) {
             if (k === 'rules') {
                 new Rules(o);
             }
@@ -2042,7 +2049,7 @@
             else {
                 defaults[k] = o;
             }
-        });
+        }
     };
 
     /**
