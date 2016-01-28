@@ -1689,7 +1689,7 @@
             required(not, -1)
             required(from, .contact)
          */
-        required: function(element, params, field) {
+        required: function(element, params) {
             var me = this,
                 val = trim(me.value),
                 isValid = true;
@@ -1728,7 +1728,7 @@
                     if (isValid) {
                         if (!val) ret = null;
                     } else {
-                        ret = _getDataMsg($elements[0], field) || false;
+                        ret = _getDataMsg($elements[0], me) || false;
                     }
 
                     if ( !$(element).data(VALIDATED) ) {
@@ -1796,7 +1796,7 @@
             match[gte, startDate, date]
             match[gte, startTime, time]
          **/
-        match: function(element, params, field) {
+        match: function(element, params) {
             if (!params) return;
 
             var me = this,
@@ -1819,15 +1819,15 @@
             a = me.value;
             b = field2.get();
 
-            if (!field._match) {
+            if (!me._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
                     $(element).trigger('validate');
                 });
-                field._match = field2._match = 1;
+                me._match = field2._match = 1;
             }
 
             // If both fields are blank
-            if (!field.required && a === "" && b === "") {
+            if (!me.required && a === "" && b === "") {
                 return null;
             }
 
@@ -1873,8 +1873,8 @@
             range[0~]      Number greater than or equal to 0
             range[~100]    Number less than or equal to 100
          **/
-        range: function(element, params, field) {
-            return this.getRangeMsg(this.value, params, field);
+        range: function(element, params) {
+            return this.getRangeMsg(this.value, params, this);
         },
 
         /**
@@ -1887,7 +1887,7 @@
             checked[~3]    less than 3 items
             checked[3]     3 items
          **/
-        checked: function(element, params, field) {
+        checked: function(element, params) {
             if ( !_checkable(element) ) return;
 
             var me = this,
@@ -1905,9 +1905,9 @@
             }
 
             if (params) {
-                return me.getRangeMsg(count, params, field);
+                return me.getRangeMsg(count, params, me);
             } else {
-                return !!count || _getDataMsg(elem, field, '') || me.messages.required;
+                return !!count || _getDataMsg(elem, me, '') || me.messages.required;
             }
         },
 
@@ -1920,11 +1920,11 @@
             length[~16]         Less than 16 characters
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
-        length: function(element, params, field) {
+        length: function(element, params) {
             var value = this.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
 
-            return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
+            return this.getRangeMsg(len, params, this, (params[1] ? '_2' : ''));
         },
 
         /**
@@ -1946,12 +1946,12 @@
             Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3, ...)
             Query String        remote(path/to/server, foo=1&bar=2, name1, name2, ...)
          */
-        remote: function(element, params, field) {
+        remote: function(element, params) {
             if (!params) return;
 
             var me = this,
                 arr = rAjaxType.exec(params[0]),
-                rule = field._rules[field._i],
+                rule = me._rules[me._i],
                 data = {},
                 queryString = '',
                 dataType;
@@ -1975,7 +1975,7 @@
             }
 
             data = $.param(data) + queryString;
-            if (!field.must && rule.data && rule.data === data) {
+            if (!me.must && rule.data && rule.data === data) {
                 return rule.result;
             }
 
