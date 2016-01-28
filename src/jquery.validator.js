@@ -298,7 +298,7 @@
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
-            me.Field = _fieldFactory(me);
+            me.Field = _FieldFactory(me);
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
@@ -1474,7 +1474,7 @@
      * @param  {Object}     context
      * @return {Function}   Factory
      */
-    function _fieldFactory(context) {
+    function _FieldFactory(context) {
         var Fn = function(key) {
             this.key = key;
         };
