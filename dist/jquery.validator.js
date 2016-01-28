@@ -2022,9 +2022,8 @@
          *  filter(regexp)  filtering the "regexp" matched characters
          */
         filter: function(element, params) {
-            var value = this.value, temp;
-
-            temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
+            var value = this.value,
+                temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
             if (temp !== value) this.set(temp);
         }
     });
