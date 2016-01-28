@@ -302,7 +302,7 @@
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
-            me.Field = _fieldFactory(me);
+            me.Field = _FieldFactory(me);
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
@@ -1478,19 +1478,24 @@
      * @param  {Object}     context
      * @return {Function}   Factory
      */
-    function _fieldFactory(context) {
-        var Fn = function(key) {
+    function _FieldFactory(context) {
+        function FieldValue() {
+            this.get = function() {
+                return $(this.element).val();
+            };
+            this.set = function(value) {
+                this.value = value;
+                $(this.element).val(value);
+            };
+        }
+        function Field(key) {
             this.key = key;
-        };
-        Fn.prototype = context;
-        Fn.prototype.get =  function() {
-            return $(this.element).val();
-        };
-        Fn.prototype.set = function(value) {
-            this.value = value;
-            $(this.element).val(value);
-        };
-        return Fn;
+        }
+
+        FieldValue.prototype = context;
+        Field.prototype = new FieldValue();
+
+        return Field;
     }
 
 
