@@ -414,10 +414,9 @@
             // doesn't verify a field that has neither id nor name
             if (!key) return;
 
-            field = me.fields[key] || new me.Field(key);
+            field = me.getField(key, true);
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
-            field.element = el;
 
             if (!field.display) {
                 if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
@@ -889,6 +888,7 @@
             // use null to break validation from a field
             if (ret === null) {
                 me._validatedField(el, field, {isValid: true, skip: true});
+                field._i = 0;
                 return;
             }
             else if (ret === undefined) {
@@ -1124,6 +1124,7 @@
             var me = this,
                 ret,
                 parts = rRule.exec(rule),
+                field,
                 method,
                 params;
 
@@ -1132,7 +1133,10 @@
                 if (method in me.rules) {
                     params = parts[2] || parts[3];
                     params = params ? params.split(', ') : undefined;
-                    ret = me.rules[method].call(me, el, params);
+                    field = me.getField(el, true);
+                    field._r = method;
+                    field.value = field.getValue();
+                    ret = me.rules[method].call(field, el, params);
                 }
             }
 
@@ -1144,8 +1148,7 @@
             if (!params) return;
 
             var me = this,
-                rule = field._rules[field._i],
-                msg = me.messages[rule.method] || '',
+                msg = me.messages[field._r] || '',
                 result,
                 p = params[0].split('~'),
                 a = p[0],
@@ -1191,7 +1194,7 @@
                 args[0] = msg[c];
             }
 
-            return result || ( rule.msg = me.renderMsg.apply(null, args) );
+            return result || field._rules && ( field._rules[field._i].msg = me.renderMsg.apply(null, args) );
         },
 
         /**
@@ -1373,9 +1376,10 @@
          * @param {Element} - input element
          * @return {Object} field
          */
-        getField: function(el) {
+        getField: function(el, must) {
             var me = this,
-                key;
+                key,
+                field;
 
             if (isString(el)) {
                 key = el;
@@ -1390,7 +1394,11 @@
                 }
             }
 
-            return me.fields[key];
+            if ( (field = me.fields[key]) || must && (field = new me.Field(key)) ) {
+                field.element = el;
+            }
+
+            return field;
         },
 
         /**
@@ -1995,6 +2003,10 @@
                 data: data,
                 dataType: dataType
             });
+        },
+
+        depends: function(element, params) {
+            if (!this.test(element, params[0])) return null;
         },
 
         /**
