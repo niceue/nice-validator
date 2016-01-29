@@ -695,7 +695,7 @@
             field._e = etype;
             field.element = el;
             old = field.old;
-            value = field.get();
+            value = field.getValue();
 
             // Just for checkbox and radio
             if (!elem && _checkable(el)) {
@@ -773,7 +773,6 @@
 
             clearTimeout(field._t);
 
-            field.value = value;
             if (timely !== undefined) field.timely = timely;
             if (timer) {
                 field._t = setTimeout(function() {
@@ -1099,7 +1098,8 @@
 
             field.isValid = true;
             field.element = el;
-            field.get();
+            // Cache the value
+            field.value = field.getValue();
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !field.value) {
@@ -1476,12 +1476,11 @@
      */
     function _FieldFactory(context) {
         function FieldValue() {
-            this.get = function() {
-                return this.value = $(this.element).val();
+            this.getValue = function() {
+                return $(this.element).val();
             };
-            this.set = function(value) {
-                this.value = value;
-                $(this.element).val(value);
+            this.setValue = function(value) {
+                $(this.element).val(this.value = value);
             };
         }
         function Field(key) {
@@ -1727,7 +1726,7 @@
 
                     isValid = $elements.filter(function(){
                         var field = me.getField(this);
-                        return field && !!trim(field.get());
+                        return field && !!trim(field.getValue());
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
@@ -1822,7 +1821,7 @@
             if (!elem2) return;
             field2 = me.getField(elem2);
             a = me.value;
-            b = field2.get();
+            b = field2.getValue();
 
             if (!me._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
@@ -2025,7 +2024,7 @@
         filter: function(element, params) {
             var value = this.value,
                 temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
-            if (temp !== value) this.set(temp);
+            if (temp !== value) this.setValue(temp);
         }
     });
 
