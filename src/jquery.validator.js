@@ -1099,7 +1099,7 @@
 
             field.isValid = true;
             field.element = el;
-            field.value = field.get();
+            field.get();
 
             // if the field is not required, and that has a blank value
             if (!field.required && !field.must && !field.value) {
@@ -1477,7 +1477,7 @@
     function _FieldFactory(context) {
         function FieldValue() {
             this.get = function() {
-                return $(this.element).val();
+                return this.value = $(this.element).val();
             };
             this.set = function(value) {
                 this.value = value;
