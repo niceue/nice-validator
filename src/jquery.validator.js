@@ -31,7 +31,7 @@
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
-        rRules = /(&)?(!)?\s?(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||&)?/g,
+        rRules = /(&)?(!)?\b(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||\?)?/g,
         rRule = /(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
@@ -473,6 +473,7 @@
                         and: args[1] === "&",
                         not: args[2] === "!",
                         or: args[6] === "|",
+                        ef: args[6] === "?",
                         method: args[3],
                         params: args[4] ?
                             $.map( args[4].split(', '), function(i){return trim(i)} ) :
@@ -922,8 +923,15 @@
                 } else {
                     transfer = true;
                 }
-            } else if (rule.and) {
+            }
+            else if (rule.and) {
                 if (!field.isValid) transfer = true;
+            }
+            else if (rule.ef) {
+                if (!isValid && (!field._rules[field._i+1].and || !me.submiting)) {
+                    field._i++;
+                }
+                transfer = true;
             }
 
             if (transfer) {
