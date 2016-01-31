@@ -44,7 +44,7 @@ seajs.use('path/to/nice-validator/local/zh-CN');
 ... yadda yadda ...
 </form>
 ```
-If you use native submit, and that's all.
+It has started to work when you use native submitting.
 #### 4. Handle submit (Optional)
 ```javascript
 $("#form1").on('valid.form', function(){
