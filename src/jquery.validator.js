@@ -2005,10 +2005,6 @@
             });
         },
 
-        depends: function(element, params) {
-            if (!this.test(element, params[0])) return null;
-        },
-
         /**
          * validate other fields
          *
