@@ -16,11 +16,11 @@ $ bower install nice-validator
 ## Getting started
 #### 1. Include [jQuery 1.7+](http://jquery.com)
 #### 2. Include nice-validator to your project
-width `<script>` tag
+width `<script>` tag:
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
 ```
-via module loader [Requirejs](http://requirejs.org/) or [Sea.js](http://seajs.org/docs/en.html)
+via module loader [Requirejs](http://requirejs.org/) or [Sea.js](http://seajs.org/docs/en.html): 
 ```javascript
 require(['path/to/nice-validator/local/en']);
 ```
@@ -50,7 +50,7 @@ It has started to work when you use native submitting.
 $("#form1").on('valid.form', function(){
     // You can do something, then submit form by native
     // this.submit();
-    // or use ajax submit
+    // or submit form by ajax
     $.post("path/to/server", $(this).serialize())
         .done(function(d){
             // do something
