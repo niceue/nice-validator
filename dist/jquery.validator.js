@@ -153,25 +153,25 @@
 
         messages      {Object}                      Custom messages for the current instance
         rules         {Object}                      Custom rules for the current instance
-        fields        {Object}                      Field set to be verified
+        fields        {Object}                      Field validation configuration
         {String}        key    name|#id
-        {String|Object} value                       Rule string, or an object is passed more arguments
+        {String|Object} value                       Rule string or an object which can pass more arguments
 
         fields[key][rule]       {String}            Rule string
         fields[key][display]    {String|Function}
-        fields[key][tip]        {String}            Custom friendly message when focus the input
+        fields[key][tip]        {String}            Custom tip message
         fields[key][ok]         {String}            Custom success message
         fields[key][msg]        {Object}            Custom error message
         fields[key][msgStyle]   {String}            Custom message style
-        fields[key][msgClass]   {String}            Additional added to the message class names
-        fields[key][msgWrapper] {String}            Message wrapper tag name
-        fields[key][msgMaker]   {Function}          Custom message HTML maker
-        fields[key][dataFilter] {Function}          Conversion ajax results
-        fields[key][valid]      {Function}          Triggered when this field is valid
-        fields[key][invalid]    {Function}          Triggered when this field is invalid
+        fields[key][msgClass]   {String}            A className which added to message placeholder element
+        fields[key][msgWrapper] {String}            Tag name of the message placeholder element
+        fields[key][msgMaker]   {Function}          A function to custom message HTML
+        fields[key][dataFilter] {Function}          A function to convert ajax results
+        fields[key][valid]      {Function}          A function triggered when field is valid
+        fields[key][invalid]    {Function}          A function triggered when field is invalid
         fields[key][must]       {Boolean}           If set true, we always check the field even has remote checking
         fields[key][timely]     {Boolean}           Whether to enable timely validation
-        fields[key][target]     {jqSelector}        Verify the current field, but the message can be displayed on target element
+        fields[key][target]     {jqSelector}        Define placement of a message
      */
     $.fn[NS] = function(options) {
         var that = this,
