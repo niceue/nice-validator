@@ -761,7 +761,7 @@
                     }
                     if ( !focusin ) {
                         // keyboard events, reducing the frequency of validation
-                        timer = timely >=100 ? timely : 400;
+                        timer = timely <100 ?  (etype === 'click' || el.tagName === 'SELECT') ? 0 : 400 : timely;
                     }
                 }
             }
