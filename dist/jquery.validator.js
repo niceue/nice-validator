@@ -331,17 +331,18 @@
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
-                      .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
-                      .on('reset'+ CLS_NS, proxy(me, '_reset'))
-                      .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
-                      .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
-                      .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
-                      .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
+                    .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
+                    .on('reset'+ CLS_NS, proxy(me, '_reset'))
+                    .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
+                    .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
+                    .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
+                    .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
 
                 if ( opt.timely ) {
-                    me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
-                          .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
-                          .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
+                    me.$el
+                    .on('input'+ CLS_NS + ' keyup'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
+                    .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
+                    .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
                 }
 
                 // cache the novalidate attribute value
@@ -765,7 +766,7 @@
                     }
                     if ( !focusin ) {
                         // keyboard events, reducing the frequency of validation
-                        timer = timely >=100 ? timely : 400;
+                        timer = timely <100 ?  (etype === 'click' || el.tagName === 'SELECT') ? 0 : 400 : timely;
                     }
                 }
             }
