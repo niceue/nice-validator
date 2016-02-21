@@ -673,13 +673,15 @@
         },
 
         // Handle events: "focusout/validate/keyup/click/change/input/compositionstart/compositionend"
-        _focusout: function(e, elem) {
+        _focusout: function(e) {
             var me = this,
                 opt = me.options,
                 el = e.target,
                 etype = e.type,
+                etype0,
                 focusin = etype === 'focusin',
                 special = etype === 'validate',
+                elem,
                 field,
                 old,
                 value,
@@ -694,22 +696,31 @@
             if (etype === 'compositionend') {
                 me.pauseValidate = false;
             }
-            if (me.pauseValidate || !(field = me.getField(el))) {
+            if (me.pauseValidate) {
                 return;
             }
+
+            // For checkbox and radio
+            elem = el.name && _checkable(el) ? me.$el.find('input[name="'+ el.name +'"]').get(0) : el;
+            // Get field
+            if (!(field = me.getField(elem))) {
+                return;
+            }
+            etype0 = elem._et;
+            elem._et = etype;
             field._e = etype;
-            field.element = el;
             old = field.old;
             value = field.getValue();
-
-            // Just for checkbox and radio
-            if (!elem && _checkable(el)) {
-                elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
-            }
-            timely = me._getTimely(elem || el, opt);
+            timely = me._getTimely(elem, opt);
 
             if (!special) {
-                if (!timely) return;
+                if (!timely) {
+                    return;
+                }
+
+                if (_checkable(el) && etype !== 'click') {
+                    return;
+                }
 
                 // not validate field unless fill a value
                 if ( opt.ignoreBlank && !value && !focusin ) {
@@ -718,6 +729,9 @@
                 }
 
                 if ( etype === 'focusout' ) {
+                    if (etype0 === 'change') {
+                        return;
+                    }
                     if ( timely === 2 || timely === 8 ) {
                         if (value) {
                             if (field.isValid && !old.showOk) {
@@ -737,14 +751,16 @@
 
                     // mark timestamp to reduce the frequency of the received event
                     timestamp = +new Date();
-                    if ( timestamp - (el._ts || 0) < 100 || (etype === 'keyup' && el._et === 'input') ) {
+                    if ( timestamp - (el._ts || 0) < 100 ) {
                         return;
                     }
                     el._ts = timestamp;
-                    el._et = etype;
 
                     // handle keyup
                     if ( etype === 'keyup' ) {
+                        if (etype0 === 'input') {
+                            return;
+                        }
                         key = e.keyCode;
                         specialKey = {
                             8: 1,  // Backspace
