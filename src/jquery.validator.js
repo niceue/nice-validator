@@ -702,21 +702,17 @@
             if (!(field = me.getField(elem))) {
                 return;
             }
-            etype0 = elem._et;
-            elem._et = etype;
+            // Cache event type
+            etype0 = field._e;
             field._e = etype;
-            old = field.old;
-            value = field.getValue();
             timely = me._getTimely(elem, opt);
 
             if (!special) {
-                if (!timely) {
+                if (!timely || (_checkable(el) && etype !== 'click')) {
                     return;
                 }
 
-                if (_checkable(el) && etype !== 'click') {
-                    return;
-                }
+                value = field.getValue();
 
                 // not validate field unless fill a value
                 if ( opt.ignoreBlank && !value && !focusin ) {
@@ -730,6 +726,7 @@
                     }
                     if ( timely === 2 || timely === 8 ) {
                         if (value) {
+                            old = field.old;
                             if (field.isValid && !old.showOk) {
                                 me.hideMsg(el);
                             } else {
