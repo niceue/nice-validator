@@ -36,7 +36,7 @@
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
         rPos = /top|right|bottom|left/,
-        rAjaxType = /(?:(post|get):)?(.+)/i,
+        rAjaxType = /(?:(post|get|jsonp):)?(.+)/i,
         rUnsafe = /[<>'"`\\]|&#x?\d+[A-F]?;?|%3[A-F]/gmi,
 
         noop = $.noop,
@@ -1933,6 +1933,7 @@
                 rule = field.rules[field._i],
                 data = {},
                 queryString = '',
+                type = (arr[1] || 'POST').toLowerCase(),
                 dataType;
 
             rule.must = true;
@@ -1958,15 +1959,16 @@
                 return rule.result;
             }
 
-            // Cross-domain request, force jsonp dataType
-            if (/^https?:/.test(arr[2]) && !~arr[2].indexOf(location.host)) {
-                dataType = 'jsonp';
+            // jsonp dataType
+            if (type === 'jsonp') {
+                dataType = type;
+                type = 'GET';
             }
 
             // Asynchronous validation need return jqXHR objects
             return $.ajax({
                 url: arr[2],
-                type: arr[1] || 'POST',
+                type: type,
                 data: data,
                 dataType: dataType
             });
