@@ -1,7 +1,7 @@
 {
   "name": "nice-validator",
   "description": "Simple, smart and pleasant verification solution.",
-  "version": "0.10.6",
+  "version": "0.10.8",
   "keywords": [
     "jquery",
     "validation",
