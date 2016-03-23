@@ -29,9 +29,12 @@
   },
   "ignore": [
     ".*",
+    "src",
     "test",
+    "gulpfile.js",
     "*.json",
     "*.md",
-    "*.yml"
+    "*.yml",
+    "!README.md"
   ]
 }
