@@ -28,16 +28,10 @@
     "jquery": "^1.7.0"
   },
   "ignore": [
-    "**/.*",
     ".*",
-    "*.js",
-    "*.md",
-    "*.json",
-    "node_modules",
-    "bower_components",
-    "src",
     "test",
-    "!README.md",
-    "!package.json"
+    "*.json",
+    "*.md",
+    "*.yml"
   ]
 }
