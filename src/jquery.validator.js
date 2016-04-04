@@ -329,6 +329,10 @@
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
+                      .on('form-submit-validate', function(e, a, $form, opts, veto) {
+                            me.vetoed = veto.veto = !me.isValid;
+                            me.ajaxFormOptions = opts;
+                       })
                       .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
                       .on('reset'+ CLS_NS, proxy(me, '_reset'))
                       .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
@@ -357,13 +361,18 @@
             if ( !(me.isAjaxSubmit = !!me.options.valid) ) {
                 // if there is a "valid.form" event
                 var events = ($._data || $.data)(form, "events");
-                if ( events && events.valid &&
-                    $.map(events.valid, function(e){
-                        return ~e.namespace.indexOf('form') ? 1 : null;
-                    }).length
+                me.isAjaxSubmit = issetEvent(events, 'valid', 'form') || issetEvent(events, 'submit', 'form-plugin');
+            }
+
+            function issetEvent(events, name, namespace) {
+                if ( events && events[name] &&
+                     $.map(events[name], function(e){
+                        return ~e.namespace.indexOf(namespace) ? 1 : null
+                     }).length
                 ) {
-                    me.isAjaxSubmit = true;
+                    return true;
                 }
+                return false;
             }
         },
 
@@ -549,8 +558,8 @@
             }
 
             // Prevent infinite loop validation
-            if (canSubmit && e.isTrigger && me.isValid) {
-                submitForm();
+            if (canSubmit && me.isValid && e.isTrigger) {
+                if (!me.isAjaxSubmit) submitForm();
                 return;
             }
 
@@ -585,7 +594,11 @@
 
                     opt.debug && debug.log('>>> ' + ret);
 
-                    if (isValid && canSubmit && !me.isAjaxSubmit) {
+                    if (!isValid) return;
+                    if (me.vetoed) {
+                        $(form).ajaxSubmit(me.ajaxFormOptions);
+                    }
+                    else if (canSubmit && !me.isAjaxSubmit) {
                         submitForm();
                     }
                 }
