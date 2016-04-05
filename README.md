@@ -1,5 +1,7 @@
 # nice-validator
 [![Build Status](https://travis-ci.org/niceue/nice-validator.svg)](https://travis-ci.org/niceue/nice-validator)
+[![Downloads](https://img.shields.io/github/downloads/niceue/nice-validator/total.svg)](https://github.com/niceue/nice-validator/releases)
+[![Version](https://img.shields.io/npm/v/nice-validator.svg)](https://www.npmjs.com/package/nice-validator)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://niceue.com/licenses/MIT-LICENSE.txt)
 
 Simple, smart and pleasant validation solution.
@@ -20,7 +22,7 @@ width `<script>` tag:
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
 ```
-via module loader [Requirejs](http://requirejs.org/) or [Sea.js](http://seajs.org/docs/en.html): 
+via module loader [Requirejs](http://requirejs.org/) or [Sea.js](http://seajs.org/docs/en.html):
 ```javascript
 require(['path/to/nice-validator/local/en']);
 ```
@@ -36,8 +38,8 @@ seajs.use('path/to/nice-validator/local/zh-CN');
 <input type="text" name="field4" data-rule="range(0~100)" id="field4">
 <input type="text" name="field5" data-rule="required(#field4:filled)">
 <input type="text" name="field6" data-rule="required; mobile|email;" data-msg="Please fill mobile or email">
-<input type="text" name="field7" 
-    data-rule="required; !digits; length(6~)" 
+<input type="text" name="field7"
+    data-rule="required; !digits; length(6~)"
     data-msg-digits="Please not fill pure digits"
     data-msg-length="Please fill at least {1} characters.">
 <input type="checkbox" name="field8" data-rule="checked">
