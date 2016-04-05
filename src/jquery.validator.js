@@ -66,7 +66,6 @@
             log: noop,
             info: noop
         },
-        submitButton,
         novalidateonce,
         preinitialized = {},
 
@@ -1623,8 +1622,6 @@
     .on('click', ':submit', function(){
         var input = this, attrNode;
         if (!input.form) return;
-        // Remember the submit button which is clicked
-        submitButton = input;
         // Shim for "formnovalidate"
         attrNode = input.getAttributeNode('formnovalidate');
         if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
