@@ -35,7 +35,7 @@
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
-        rRules = /(&)?(!)?\s?(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||&)?/g,
+        rRules = /(&)?(!)?\b(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||\?)?/g,
         rRule = /(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
@@ -63,14 +63,10 @@
                 return el.getAttribute(key);
             }
         },
-        elementValue = function(element) {
-            return $(element).val();
-        },
         debug = window.console || {
             log: noop,
             info: noop
         },
-        submitButton,
         novalidateonce,
         preinitialized = {},
 
@@ -156,25 +152,25 @@
 
         messages      {Object}                      Custom messages for the current instance
         rules         {Object}                      Custom rules for the current instance
-        fields        {Object}                      Field set to be verified
+        fields        {Object}                      Field validation configuration
         {String}        key    name|#id
-        {String|Object} value                       Rule string, or an object is passed more arguments
+        {String|Object} value                       Rule string or an object which can pass more arguments
 
         fields[key][rule]       {String}            Rule string
         fields[key][display]    {String|Function}
-        fields[key][tip]        {String}            Custom friendly message when focus the input
+        fields[key][tip]        {String}            Custom tip message
         fields[key][ok]         {String}            Custom success message
         fields[key][msg]        {Object}            Custom error message
         fields[key][msgStyle]   {String}            Custom message style
-        fields[key][msgClass]   {String}            Additional added to the message class names
-        fields[key][msgWrapper] {String}            Message wrapper tag name
-        fields[key][msgMaker]   {Function}          Custom message HTML maker
-        fields[key][dataFilter] {Function}          Conversion ajax results
-        fields[key][valid]      {Function}          Triggered when this field is valid
-        fields[key][invalid]    {Function}          Triggered when this field is invalid
+        fields[key][msgClass]   {String}            A className which added to message placeholder element
+        fields[key][msgWrapper] {String}            Tag name of the message placeholder element
+        fields[key][msgMaker]   {Function}          A function to custom message HTML
+        fields[key][dataFilter] {Function}          A function to convert ajax results
+        fields[key][valid]      {Function}          A function triggered when field is valid
+        fields[key][invalid]    {Function}          A function triggered when field is invalid
         fields[key][must]       {Boolean}           If set true, we always check the field even has remote checking
         fields[key][timely]     {Boolean}           Whether to enable timely validation
-        fields[key][target]     {jqSelector}        Verify the current field, but the message can be displayed on target element
+        fields[key][target]     {jqSelector}        Define placement of a message
      */
     $.fn[NS] = function(options) {
         var that = this,
@@ -250,7 +246,7 @@
 
     // any value, but not only whitespace
     $.expr[":"].filled = function(elem) {
-        return !!trim(elementValue(elem));
+        return !!trim($(elem).val());
     };
 
 
@@ -305,6 +301,7 @@
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
+            me.Field = _FieldFactory(me);
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
@@ -333,6 +330,10 @@
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
+                      .on('form-submit-validate', function(e, a, $form, opts, veto) {
+                            me.vetoed = veto.veto = !me.isValid;
+                            me.ajaxFormOptions = opts;
+                       })
                       .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
                       .on('reset'+ CLS_NS, proxy(me, '_reset'))
                       .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
@@ -361,13 +362,18 @@
             if ( !(me.isAjaxSubmit = !!me.options.valid) ) {
                 // if there is a "valid.form" event
                 var events = ($._data || $.data)(form, "events");
-                if ( events && events.valid &&
-                    $.map(events.valid, function(e){
-                        return ~e.namespace.indexOf('form') ? 1 : null;
-                    }).length
+                me.isAjaxSubmit = issetEvent(events, 'valid', 'form') || issetEvent(events, 'submit', 'form-plugin');
+            }
+
+            function issetEvent(events, name, namespace) {
+                if ( events && events[name] &&
+                     $.map(events[name], function(e){
+                        return ~e.namespace.indexOf(namespace) ? 1 : null;
+                     }).length
                 ) {
-                    me.isAjaxSubmit = true;
+                    return true;
                 }
+                return false;
             }
         },
 
@@ -386,9 +392,8 @@
                         if (el) me._resetElement(el, true);
                         delete me.fields[k];
                     } else {
-                        me.fields[k] = isString(v) ? {
-                            rule: v
-                        } : v;
+                        me.fields[k] = me.fields[k] || new me.Field(k);
+                        $.extend(me.fields[k], isString(v) ? {rule: v} : v);
                     }
                 });
             }
@@ -414,15 +419,14 @@
             if ( el.id && ('#' + el.id in me.fields) ||
                  !key ||
                  // If dataRule and element are diffrent from old's, we use ID mode.
-                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && field.key !== el.id)
+                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && el.id && field.key !== el.id)
             ) {
                 key = '#' + el.id;
             }
             // doesn't verify a field that has neither id nor name
             if (!key) return;
 
-            field = me.fields[key] || {};
-            field.key = key;
+            field = me.getField(key, true);
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
 
@@ -449,7 +453,7 @@
                 } else {
                     field.timely = +timely;
                 }
-                field = me._parseRule(field);
+                me._parseRule(field);
                 field.old = {};
             }
             if ( isString(field.target) ) {
@@ -473,14 +477,15 @@
                 field.display = arr[1];
             }
             if (arr[2]) {
-                field.rules = [];
+                field._rules = [];
                 arr[2].replace(rRules, function(){
                     var args = arguments;
                     args[4] = args[4] || args[5];
-                    field.rules.push({
+                    field._rules.push({
                         and: args[1] === "&",
                         not: args[2] === "!",
                         or: args[6] === "|",
+                        ef: args[6] === "?",
                         method: args[3],
                         params: args[4] ?
                             $.map( args[4].split(', '), function(i){return trim(i)} ) :
@@ -488,8 +493,6 @@
                     });
                 });
             }
-
-            return field;
         },
 
         // Verify a zone
@@ -553,7 +556,7 @@
             }
 
             // Prevent infinite loop validation
-            if (canSubmit && e.isTrigger && me.isValid) {
+            if (canSubmit && me.isValid && e.isTrigger) {
                 submitForm();
                 return;
             }
@@ -589,27 +592,19 @@
 
                     opt.debug && debug.log('>>> ' + ret);
 
-                    if (isValid && canSubmit && !me.isAjaxSubmit) {
+                    if (!isValid) return;
+                    if (me.vetoed) {
+                        $(form).ajaxSubmit(me.ajaxFormOptions);
+                    }
+                    else if (canSubmit && !me.isAjaxSubmit) {
                         submitForm();
                     }
                 }
             );
 
             function submitForm() {
-                var name, submit;
-
-                novalidateonce = true;
-                if (submitButton && (name = submitButton.name)) {
-                    // If name="submit", we have to set the name empty to get the form.submit method
-                    submitButton.name = "";
-                    submit = form.submit;
-                    // For asp.NET controls
-                    me.$el.append('<input type="hidden" name="'+ name +'" value="'+ submitButton.value +'">');
-                    // call native submit
-                    submit.call(form);
-                } else {
-                    form.submit();
-                }
+                var submit = document.createElement('form').submit;
+                submit.call(form);
             }
         },
 
@@ -677,13 +672,15 @@
         },
 
         // Handle events: "focusout/validate/keyup/click/change/input/compositionstart/compositionend"
-        _focusout: function(e, elem) {
+        _focusout: function(e) {
             var me = this,
                 opt = me.options,
                 el = e.target,
                 etype = e.type,
+                etype0,
                 focusin = etype === 'focusin',
                 special = etype === 'validate',
+                elem,
                 field,
                 old,
                 value,
@@ -698,21 +695,27 @@
             if (etype === 'compositionend') {
                 me.pauseValidate = false;
             }
-            if (me.pauseValidate || !(field = me.getField(el))) {
+            if (me.pauseValidate) {
                 return;
             }
-            field._e = etype;
-            old = field.old;
-            value = elementValue(el);
 
-            // Just for checkbox and radio
-            if (!elem && _checkable(el)) {
-                elem = me.$el.find('input[name="'+ el.name +'"]').get(0);
+            // For checkbox and radio
+            elem = el.name && _checkable(el) ? me.$el.find('input[name="'+ el.name +'"]').get(0) : el;
+            // Get field
+            if (!(field = me.getField(elem))) {
+                return;
             }
-            timely = me._getTimely(elem || el, opt);
+            // Cache event type
+            etype0 = field._e;
+            field._e = etype;
+            timely = me._getTimely(elem, opt);
 
             if (!special) {
-                if (!timely) return;
+                if (!timely || (_checkable(el) && etype !== 'click')) {
+                    return;
+                }
+
+                value = field.getValue();
 
                 // not validate field unless fill a value
                 if ( opt.ignoreBlank && !value && !focusin ) {
@@ -721,8 +724,12 @@
                 }
 
                 if ( etype === 'focusout' ) {
+                    if (etype0 === 'change') {
+                        return;
+                    }
                     if ( timely === 2 || timely === 8 ) {
                         if (value) {
+                            old = field.old;
                             if (field.isValid && !old.showOk) {
                                 me.hideMsg(el);
                             } else {
@@ -740,14 +747,16 @@
 
                     // mark timestamp to reduce the frequency of the received event
                     timestamp = +new Date();
-                    if ( timestamp - (el._ts || 0) < 100 || (etype === 'keyup' && el._et === 'input') ) {
+                    if ( timestamp - (el._ts || 0) < 100 ) {
                         return;
                     }
                     el._ts = timestamp;
-                    el._et = etype;
 
                     // handle keyup
                     if ( etype === 'keyup' ) {
+                        if (etype0 === 'input') {
+                            return;
+                        }
                         key = e.keyCode;
                         specialKey = {
                             8: 1,  // Backspace
@@ -769,7 +778,7 @@
                     }
                     if ( !focusin ) {
                         // keyboard events, reducing the frequency of validation
-                        timer = timely >=100 ? timely : 400;
+                        timer = timely <100 ?  (etype === 'click' || el.tagName === 'SELECT') ? 0 : 400 : timely;
                     }
                 }
             }
@@ -781,7 +790,6 @@
 
             clearTimeout(field._t);
 
-            field.value = value;
             if (timely !== undefined) field.timely = timely;
             if (timer) {
                 field._t = setTimeout(function() {
@@ -836,7 +844,7 @@
             ret.key = field.key;
             ret.ruleName = field._r;
             ret.id = el.id;
-            ret.value = elementValue(el);
+            ret.value = field.value;
 
             if (isValid) {
                 ret.type = 'ok';
@@ -898,6 +906,7 @@
             // use null to break validation from a field
             if (ret === null) {
                 me._validatedField(el, field, {isValid: true, skip: true});
+                field._i = 0;
                 return;
             }
             else if (ret === undefined) {
@@ -918,21 +927,28 @@
                 }
             }
 
-            rule = field.rules[field._i];
+            rule = field._rules[field._i];
             if (rule.not) {
                 msg = undefined;
                 isValid = method === "required" || !isValid;
             }
             if (rule.or) {
                 if (isValid) {
-                    while ( field._i < field.rules.length && field.rules[field._i].or ) {
+                    while ( field._i < field._rules.length && field._rules[field._i].or ) {
                         field._i++;
                     }
                 } else {
                     transfer = true;
                 }
-            } else if (rule.and) {
+            }
+            else if (rule.and) {
                 if (!field.isValid) transfer = true;
+            }
+            else if (rule.ef) {
+                if (!isValid && (!field._rules[field._i+1].and || !me.submiting)) {
+                    field._i++;
+                }
+                transfer = true;
             }
 
             if (transfer) {
@@ -984,7 +1000,7 @@
             }
 
             // the current rule has passed, continue to validate
-            if ( (isValid || special) && field._i < field.rules.length - 1) {
+            if ( (isValid || special) && field._i < field._rules.length - 1) {
                 field._i++;
                 me._checkRule(el, field);
             }
@@ -1016,9 +1032,8 @@
                 fn,
                 old,
                 key = field.key,
-                rule = field.rules[field._i],
+                rule = field._rules[field._i],
                 method = rule.method,
-                value = elementValue(el),
                 params = rule.params;
 
             // request has been sent, wait it
@@ -1030,7 +1045,7 @@
 
             if (old && !field.must && !rule.must && rule.result !== undefined &&
                  old.ruleName === method && old.id === el.id &&
-                value && old.value === value )
+                field.value && old.value === field.value )
             {
                 // get result from cache
                 ret = rule.result;
@@ -1038,7 +1053,7 @@
             else {
                 // get result from current rule
                 fn = _getDataRule(el, method) || me.rules[method] || noop;
-                ret = fn.call(me, el, params, field);
+                ret = fn.call(field, el, params, field);
                 if (fn.msg) rule.msg = fn.msg;
             }
 
@@ -1101,15 +1116,18 @@
 
             field = field || me.getField(el);
             if (!field) return;
-            if (!field.rules) me._parse(el);
-            if (!field.rules) return;
+            if (!field._rules) me._parse(el);
+            if (!field._rules) return;
 
             if (me.options.debug) debug.info(field.key);
 
             field.isValid = true;
+            field.element = el;
+            // Cache the value
+            field.value = field.getValue();
 
             // if the field is not required, and that has a blank value
-            if (!field.required && !field.must && !elementValue(el)) {
+            if (!field.required && !field.must && !field.value) {
                 if (!_checkable(el)) {
                     me._validatedField(el, field, {isValid: true});
                     return true;
@@ -1131,6 +1149,7 @@
             var me = this,
                 ret,
                 parts = rRule.exec(rule),
+                field,
                 method,
                 params;
 
@@ -1139,7 +1158,10 @@
                 if (method in me.rules) {
                     params = parts[2] || parts[3];
                     params = params ? params.split(', ') : undefined;
-                    ret = me.rules[method].call(me, el, params);
+                    field = me.getField(el, true);
+                    field._r = method;
+                    field.value = field.getValue();
+                    ret = me.rules[method].call(field, el, params);
                 }
             }
 
@@ -1151,8 +1173,7 @@
             if (!params) return;
 
             var me = this,
-                rule = field.rules[field._i],
-                msg = me.messages[rule.method] || '',
+                msg = me.messages[field._r] || '',
                 result,
                 p = params[0].split('~'),
                 a = p[0],
@@ -1198,7 +1219,7 @@
                 args[0] = msg[c];
             }
 
-            return result || ( rule.msg = me.renderMsg.apply(null, args) );
+            return result || field._rules && ( field._rules[field._i].msg = me.renderMsg.apply(null, args) );
         },
 
         /**
@@ -1380,9 +1401,10 @@
          * @param {Element} - input element
          * @return {Object} field
          */
-        getField: function(el) {
+        getField: function(el, must) {
             var me = this,
-                key;
+                key,
+                field;
 
             if (isString(el)) {
                 key = el;
@@ -1397,7 +1419,11 @@
                 }
             }
 
-            return me.fields[key];
+            if ( (field = me.fields[key]) || must && (field = new me.Field(key)) ) {
+                field.element = el;
+            }
+
+            return field;
         },
 
         /**
@@ -1434,7 +1460,7 @@
             var fields = this.fields, k, field;
             for (k in fields) {
                 field = fields[k];
-                if (!field.rules || !field.required && !field.must && !elementValue(_key2selector(k))) continue;
+                if (!field._rules || !field.required && !field.must && !field.value) continue;
                 if (!field.isValid) {
                     return field.isValid;
                 }
@@ -1472,6 +1498,33 @@
             attr(this.$el[0], NOVALIDATE, this._novalidate);
         }
     };
+
+
+    /**
+     * Create Field Factory
+     *
+     * @class
+     * @param  {Object}     context
+     * @return {Function}   Factory
+     */
+    function _FieldFactory(context) {
+        function FieldValue() {
+            this.getValue = function() {
+                return $(this.element).val();
+            };
+            this.setValue = function(value) {
+                $(this.element).val(this.value = value);
+            };
+        }
+        function Field(key) {
+            this.key = key;
+        }
+
+        FieldValue.prototype = context;
+        Field.prototype = new FieldValue();
+
+        return Field;
+    }
 
 
     /**
@@ -1515,15 +1568,15 @@
             case 'function':
                 return fn;
             case 'array':
-                var f = function(el) {
+                var f = function() {
                     fn.msg = fn[1];
-                    return fn[0].test(elementValue(el)) || fn[1] || false;
+                    return fn[0].test(this.value) || fn[1] || false;
                 };
                 f.msg = fn[1];
                 return f;
             case 'regexp':
-                return function(el) {
-                    return fn.test(elementValue(el));
+                return function() {
+                    return fn.test(this.value);
                 };
         }
     }
@@ -1626,8 +1679,6 @@
     .on('click', ':submit', function(){
         var input = this, attrNode;
         if (!input.form) return;
-        // Remember the submit button which is clicked
-        submitButton = input;
         // Shim for "formnovalidate"
         attrNode = input.getAttributeNode('formnovalidate');
         if (attrNode && attrNode.nodeValue !== null || attr(input, NOVALIDATE)!== null) {
@@ -1673,9 +1724,9 @@
             required(not, -1)
             required(from, .contact)
          */
-        required: function(element, params, field) {
+        required: function(element, params) {
             var me = this,
-                val = trim(elementValue(element)),
+                val = trim(me.value),
                 isValid = true;
 
             if (params) {
@@ -1705,19 +1756,20 @@
                         ret;
 
                     isValid = $elements.filter(function(){
-                        return !!trim(elementValue(this));
+                        var field = me.getField(this);
+                        return field && !!trim(field.getValue());
                     }).length >= (params[2] || 1);
 
                     if (isValid) {
                         if (!val) ret = null;
                     } else {
-                        ret = _getDataMsg($elements[0], field) || false;
+                        ret = _getDataMsg($elements[0], me) || false;
                     }
 
                     if ( !$(element).data(VALIDATED) ) {
                         $elements.data(VALIDATED, 1).each(function(){
                             if (element !== this) {
-                                me._checkRule(this, me.getField(this));
+                                me._validate(this);
                             }
                         }).removeData(VALIDATED);
                     }
@@ -1762,7 +1814,7 @@
             }
             re = '^(?:' + re + ')$';
 
-            return new RegExp(re).test(elementValue(element)) || this.messages.integer[key];
+            return new RegExp(re).test(this.value) || this.messages.integer[key];
         },
 
         /**
@@ -1779,7 +1831,7 @@
             match[gte, startDate, date]
             match[gte, startTime, time]
          **/
-        match: function(element, params, field) {
+        match: function(element, params) {
             if (!params) return;
 
             var me = this,
@@ -1799,18 +1851,18 @@
             // If the compared field is not exist
             if (!elem2) return;
             field2 = me.getField(elem2);
-            a = elementValue(element);
-            b = elementValue(elem2);
+            a = me.value;
+            b = field2.getValue();
 
-            if (!field._match) {
+            if (!me._match) {
                 me.$el.on('valid'+CLS_NS_FIELD+CLS_NS, selector2, function(){
                     $(element).trigger('validate');
                 });
-                field._match = field2._match = 1;
+                me._match = field2._match = 1;
             }
 
             // If both fields are blank
-            if (!field.required && a === "" && b === "") {
+            if (!me.required && a === "" && b === "") {
                 return null;
             }
 
@@ -1856,8 +1908,8 @@
             range[0~]      Number greater than or equal to 0
             range[~100]    Number less than or equal to 100
          **/
-        range: function(element, params, field) {
-            return this.getRangeMsg(elementValue(element), params, field);
+        range: function(element, params) {
+            return this.getRangeMsg(this.value, params, this);
         },
 
         /**
@@ -1870,7 +1922,7 @@
             checked[~3]    less than 3 items
             checked[3]     3 items
          **/
-        checked: function(element, params, field) {
+        checked: function(element, params) {
             if ( !_checkable(element) ) return;
 
             var me = this,
@@ -1888,9 +1940,9 @@
             }
 
             if (params) {
-                return me.getRangeMsg(count, params, field);
+                return me.getRangeMsg(count, params, me);
             } else {
-                return !!count || _getDataMsg(elem, field, '') || me.messages.required;
+                return !!count || _getDataMsg(elem, me, '') || me.messages.required;
             }
         },
 
@@ -1903,11 +1955,11 @@
             length[~16]         Less than 16 characters
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
-        length: function(element, params, field) {
-            var value = elementValue(element),
+        length: function(element, params) {
+            var value = this.value,
                 len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
 
-            return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
+            return this.getRangeMsg(len, params, this, (params[1] ? '_2' : ''));
         },
 
         /**
@@ -1929,12 +1981,12 @@
             Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3, ...)
             Query String        remote(path/to/server, foo=1&bar=2, name1, name2, ...)
          */
-        remote: function(element, params, field) {
+        remote: function(element, params) {
             if (!params) return;
 
             var me = this,
                 arr = rAjaxType.exec(params[0]),
-                rule = field.rules[field._i],
+                rule = me._rules[me._i],
                 data = {},
                 queryString = '',
                 url = arr[3],
@@ -1943,7 +1995,7 @@
                 dataType;
 
             rule.must = true;
-            data[element.name] = elementValue(element);
+            data[element.name] = me.value;
 
             // There are extra fields
             if (params[1]) {
@@ -1961,7 +2013,7 @@
             }
 
             data = $.param(data) + queryString;
-            if (!field.must && rule.data && rule.data === data) {
+            if (!me.must && rule.data && rule.data === data) {
                 return rule.result;
             }
 
@@ -2004,10 +2056,9 @@
          *  filter(regexp)  filtering the "regexp" matched characters
          */
         filter: function(element, params) {
-            var value = elementValue(element), temp;
-
-            temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
-            if (temp !== value) element.value = temp;
+            var value = this.value,
+                temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
+            if (temp !== value) this.setValue(temp);
         }
     });
 
@@ -2018,8 +2069,15 @@
      * @static  config
      * @param {Object} options
      */
-    Validator.config = function(options) {
-        $.each(options, function(k, o) {
+    Validator.config = function(key, value) {
+        if (isObject(key)) {
+            $.each(key, _config);
+        }
+        else if (isString(key)) {
+            _config(key, value);
+        }
+
+        function _config(k, o) {
             if (k === 'rules') {
                 new Rules(o);
             }
@@ -2029,7 +2087,7 @@
             else {
                 defaults[k] = o;
             }
-        });
+        }
     };
 
     /**
