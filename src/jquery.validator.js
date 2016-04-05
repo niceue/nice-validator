@@ -366,7 +366,7 @@
             function issetEvent(events, name, namespace) {
                 if ( events && events[name] &&
                      $.map(events[name], function(e){
-                        return ~e.namespace.indexOf(namespace) ? 1 : null
+                        return ~e.namespace.indexOf(namespace) ? 1 : null;
                      }).length
                 ) {
                     return true;
