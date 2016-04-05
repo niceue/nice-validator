@@ -559,7 +559,7 @@
 
             // Prevent infinite loop validation
             if (canSubmit && me.isValid && e.isTrigger) {
-                if (!me.isAjaxSubmit) submitForm();
+                submitForm();
                 return;
             }
 
@@ -605,20 +605,8 @@
             );
 
             function submitForm() {
-                var name, submit;
-
-                novalidateonce = true;
-                if (submitButton && (name = submitButton.name)) {
-                    // If name="submit", we have to set the name empty to get the form.submit method
-                    submitButton.name = "";
-                    submit = form.submit;
-                    // For asp.NET controls
-                    me.$el.append('<input type="hidden" name="'+ name +'" value="'+ submitButton.value +'">');
-                    // call native submit
-                    submit.call(form);
-                } else {
-                    form.submit();
-                }
+                var submit = document.createElement('form').submit;
+                submit.call(form);
             }
         },
 
