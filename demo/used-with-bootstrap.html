@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Used With Bootstrap</title>
     <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+    .n-bootstrap .msg-wrap {font-size: 14px; margin-top: 3px}
+    </style>
 </head>
 
 <body>
@@ -12,7 +15,7 @@
 <div class="container" style="margin-top:30px">
     <div class="col-md-5 col-md-offset-2">
 
-<form id="form1">
+<form id="form1" data-validator-option="{theme:'bootstrap', timely:2, stopOnError:true}">
 
     <div class="form-group">
         <label class="control-label">Username</label>
@@ -77,14 +80,13 @@
 <script src="../dist/jquery.validator.js?local=en"></script>
 <script>
 $(function(){
-    $('#form1').validator({
-        theme: 'yellow_right',
-        timely: 2,
-        stopOnError: true,
-        // settings for bootstrap
+    // Custom theme
+    $.validator.setTheme('bootstrap', {
         validClass: 'has-success',
         invalidClass: 'has-error',
-        bindClassTo: '.form-group'
+        bindClassTo: '.form-group',
+        formClass: 'n-default n-bootstrap',
+        msgClass: 'n-right'
     });
 });
 </script>
