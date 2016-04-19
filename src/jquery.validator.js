@@ -1957,8 +1957,8 @@
             length[~16]         Less than 16 characters
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
-        length: function(element, params, field) {
-            var value = elementValue(element),
+        length: function(element, params) {
+            var value = this.value,
                 len = (params[1] === 'true' ? value.replace(rDoubleBytes, 'xx') : value).length;
 
             return this.getRangeMsg(len, params, this, (params[1] ? '_2' : ''));
