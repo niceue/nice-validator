@@ -45,6 +45,9 @@ exports.lang = {
     range_rg: "請填寫{1}到{2}的數",
     range_gte: "請填寫不小於{1}的數",
     range_lte: "請填寫最大{1}的數",
+    range_gtlt: "請填寫{1}到{2}之間的數",
+    range_gt: "請填寫大於{1}的數",
+    range_lt: "請填寫小於{1}的數",
     
     checked_eq: "請選擇{1}項",
     checked_rg: "請選擇{1}到{2}項",

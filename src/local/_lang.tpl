@@ -65,7 +65,10 @@
             range: {
                 rg: "<#=lang.range_rg#>",
                 gte: "<#=lang.range_gte#>",
-                lte: "<#=lang.range_lte#>"
+                lte: "<#=lang.range_lte#>",
+                gtlt: "<#=lang.range_gtlt#>",
+                gt: "<#=lang.range_gt#>",
+                lt: "<#=lang.range_lt#>",
             },
             checked: {
                 eq: "<#=lang.checked_eq#>",

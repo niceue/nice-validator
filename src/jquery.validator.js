@@ -1172,32 +1172,38 @@
                 msg = me.messages[field._r] || '',
                 result,
                 p = params[0].split('~'),
+                e = params[1] === 'false',
                 a = p[0],
                 b = p[1],
                 c = 'rg',
                 args = [''],
                 isNumber = trim(value) && +value === +value;
 
+            function compare(large, small) {
+                return !e ? large >= small : large > small;
+            }
+
             if (p.length === 2) {
                 if (a && b) {
-                    if (isNumber && value >= +a && value <= +b) {
+                    if (isNumber && compare(value, +a) && compare(+b, value)) {
                         result = true;
                     }
                     args = args.concat(p);
+                    c = e ? 'gtlt' : 'rg';
                 }
                 else if (a && !b) {
-                    if (isNumber && value >= +a) {
+                    if (isNumber && compare(value, +a)) {
                         result = true;
                     }
                     args.push(a);
-                    c = 'gte';
+                    c = e ? 'gt' : 'gte';
                 }
                 else if (!a && b) {
-                    if (isNumber && value <= +b) {
+                    if (isNumber && compare(+b, value)) {
                         result = true;
                     }
                     args.push(b);
-                    c = 'lte';
+                    c = e ? 'lt' : 'lte';
                 }
             }
             else {
@@ -1951,9 +1957,9 @@
             length[~16]         Less than 16 characters
             length[~16, true]   Less than 16 characters, non-ASCII characters calculating two-character
          **/
-        length: function(element, params) {
-            var value = this.value,
-                len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
+        length: function(element, params, field) {
+            var value = elementValue(element),
+                len = (params[1] === 'true' ? value.replace(rDoubleBytes, 'xx') : value).length;
 
             return this.getRangeMsg(len, params, this, (params[1] ? '_2' : ''));
         },
