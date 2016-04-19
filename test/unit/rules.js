@@ -349,32 +349,32 @@ describe('Rules', function(){
     });
 
     describe('range', function(){
-        it('range[0~99]', function(){
+        it('range[1~99]', function(){
             var input;
 
             me.setField({
-                field1: 'range[0~99]'
+                field1: 'range[1~99]'
             });
 
             input = elems['field1'];
             assert.ok(
-                !test(input, 'abc') && !test(input, '-1') && !test(input, '100') &&
-                 test(input, '0') && test(input, '0.5') && test(input, '99'),
+                !test(input, 'abc') && !test(input, '0') && !test(input, '100') &&
+                 test(input, '1') && test(input, '99'),
                 'field1'
             );
         });
 
-        it('range[0~]', function(){
+        it('range[1~]', function(){
             var input;
 
             me.setField({
-                field1: 'range[0~]'
+                field1: 'range[1~]'
             });
 
             input = elems['field1'];
             assert.ok(
-                !test(input, 'abc') && !test(input, '-1') &&
-                 test(input, '0') && test(input, '0.5') && test(input, '100'),
+                !test(input, '-1') && !test(input, '0') &&
+                 test(input, '1') && test(input, '100'),
                 'field1'
             );
         });
@@ -388,8 +388,53 @@ describe('Rules', function(){
 
             input = elems['field1'];
             assert.ok(
-                !test(input, 'abc') && !test(input, '100') &&
-                 test(input, '-1') && test(input, '0') && test(input, '0.5') && test(input, '99'),
+                !test(input, '100') &&
+                 test(input, '-1') && test(input, '0') && test(input, '99'),
+                'field1'
+            );
+        });
+
+        it('range[0~100, false]', function(){
+            var input;
+
+            me.setField({
+                field1: 'range[0~100, false]'
+            });
+
+            input = elems['field1'];
+            assert.ok(
+                !test(input, '0') && !test(input, '100') &&
+                 test(input, '1') && test(input, '99'),
+                'field1'
+            );
+        });
+
+        it('range[0~, false]', function(){
+            var input;
+
+            me.setField({
+                field1: 'range[0~, false]'
+            });
+
+            input = elems['field1'];
+            assert.ok(
+                !test(input, '0') && !test(input, '-1') &&
+                 test(input, '1') && test(input, '100'),
+                'field1'
+            );
+        });
+
+        it('range[~100, false]', function(){
+            var input;
+
+            me.setField({
+                field1: 'range[~100, false]'
+            });
+
+            input = elems['field1'];
+            assert.ok(
+                !test(input, '100') &&
+                 test(input, '99') && test(input, '0') && test(input, '-1'),
                 'field1'
             );
         });
