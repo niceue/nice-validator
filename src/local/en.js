@@ -45,6 +45,9 @@ exports.lang = {
     range_rg: "Please enter a number between {1} and {2}.",
     range_gte: "Please enter a number greater than or equal to {1}.",
     range_lte: "Please enter a number less than or equal to {1}.",
+    range_gtlt: "Please fill in the number of {1} to {2}.",
+    range_gt: "Please enter a number greater than {1}.",
+    range_lt: "Please enter a number less than {1}.",
 
     checked_eq: "Please check {1} items.",
     checked_rg: "Please check between {1} and {2} items.",
