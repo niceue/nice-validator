@@ -1901,7 +1901,7 @@
          **/
         length: function(element, params, field) {
             var value = elementValue(element),
-                len = (params[1] ? value.replace(rDoubleBytes, 'xx') : value).length;
+                len = (params[1] === 'true' ? value.replace(rDoubleBytes, 'xx') : value).length;
 
             return this.getRangeMsg(len, params, field, (params[1] ? '_2' : ''));
         },
