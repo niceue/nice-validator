@@ -551,13 +551,7 @@
                 me._guessAjax(form);
             }
 
-            // Prevent infinite loop validation
-            if (canSubmit && me.isValid && e.isTrigger) {
-                submitForm();
-                return;
-            }
-
-            opt.debug && debug.log("\n<<< " + (e.isTrigger ? 'trigger: ':'event: ') + e.type);
+            opt.debug && debug.log("\n<<< event: " + e.type);
 
             me._reset();
             me.submiting = true;
