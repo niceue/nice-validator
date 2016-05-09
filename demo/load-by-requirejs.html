@@ -26,11 +26,12 @@
 requirejs.config({
     baseUrl: '../',
     paths: {
-        jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min'
+        jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min',
+		validator: 'dist/jquery.validator.js?local=en'
     }
 });
 
-require(['dist/local/en']);
+require(['validator']);
 
 </script>
 </body>

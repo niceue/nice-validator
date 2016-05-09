@@ -26,11 +26,14 @@
 seajs.config({
     base: '../',
     alias: {
-        jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min'
+        jquery: 'http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min',
+		validator: 'dist/jquery.validator.js?local=en'
     }
 });
 
-seajs.use('dist/local/zh-CN');
+seajs.use(['jquery','validator'], function($){
+	// some code
+});
 
 </script>
 </body>
