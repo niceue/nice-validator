@@ -1502,7 +1502,11 @@
                 return this.element.getAttribute('contenteditable') !== null ? 'text' : 'val';
             };
             this.getValue = function() {
-                return $(this.element)[this._valHandler()]();
+                var elem = this.element;
+                if (elem.type === "number" && elem.validity && elem.validity.badInput) {
+                    return 'NaN';
+                }
+                return  $(elem)[this._valHandler()]();
             };
             this.setValue = function(value) {
                 $(this.element)[this._valHandler()](this.value = value);
