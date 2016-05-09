@@ -2101,7 +2101,7 @@
     };
 
     /**
-     * Load resource
+     * Resource loader
      *
      * @static load
      * @param {String} str
