@@ -4,16 +4,12 @@
  */
 /*jshint evil:true*/
 ;(function(factory) {
-    if ( 'function' === typeof define && (define.amd || define.cmd) ) {
-        // Register as an anonymous module.
-        define([], function(){
-            return factory;
-        });
-    } else {
-        factory(jQuery);
-    }
+    typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
+    typeof define === 'function' && (define.amd || define.cmd) ? define(['jquery'], factory) :
+    factory(jQuery);
 }(function($, undefined) {
     "use strict";
+    if (!$.fn) $ = window.jQuery;
 
     var NS = 'validator',
         CLS_NS = '.' + NS,
@@ -2109,47 +2105,83 @@
         }
     };
 
-    $[NS] = Validator;
+    /**
+     * Load resource
+     *
+     * @static load
+     * @param {String} str
+     * @example
+        .load('local=zh-CN')        // load: local/zh-CN.js and jquery.validator.css
+        .load('local=zh-CN&css=')   // load: local/zh-CN.js
+        .load('local&css')          // load: local/en.js (set <html lang="en">) and jquery.validator.css
+        .load('local')              // dito
+     */
+    Validator.load = function(str) {
+        if (!str) return;
+        var doc = document,
+            params = {},
+            node = doc.scripts[0],
+            dir, el, ONLOAD;
 
-    // Resource loader
-    (function(URI){
-        var arr, node, i, re, dir, el,
-            doc = document,
-            scripts = doc.getElementsByTagName('script');
+        str.replace(/([^?=&]+)=([^&#]*)/g, function(m, key, value){
+            params[key] = value;
+        });
 
-        if (URI) {
-            node = scripts[0];
-            arr = URI.match(/(.*(?:\/|\?))local(?:\/|=)([\w\-]{2,5})(?=\.js)?/);
-        } else {
-            i = scripts.length;
-            re = /(.*validator(?:\.min)?.js)\?.*local=([\w\-]*)/;
-            while (i-- && !arr) {
-                node = scripts[i];
-                arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
-            }
-        }
+        dir = params.dir || Validator.dir;
 
-        if (arr) {
-            dir = arr[1].split('/').slice(0, -1).join('/')+'/';
+        if (!Validator.css && params.css !== '') {
             el = doc.createElement('link');
             el.rel = 'stylesheet';
-            el.href = dir + 'jquery.validator.css';
+            el.href = Validator.css = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
-            if (!URI) {
-                Validator.loading = 1;
-                el = doc.createElement('script');
-                el.src = dir + 'local/' + (arr[2] || doc.documentElement.lang || 'en').replace('_','-') + '.js';
-                i = 'onload' in el ? 'onload' : 'onreadystatechange';
-                el[i] = function() {
-                    if (!el.readyState || /loaded|complete/.test(el.readyState)) {
-                        $(window).trigger('validatorready');
-                        delete Validator.loading;
-                        el = el[i] = null;
-                    }
-                };
-                node.parentNode.insertBefore(el, node);
-            }
         }
-    })($._VALIDATOR_URI);
+        if (!Validator.local && params.local !== '') {
+            Validator.local = (params.local || doc.documentElement.lang || 'en').replace('_','-');
+            Validator.loading = 1;
+            el = doc.createElement('script');
+            el.src = dir + 'local/' + Validator.local + '.js';
+            ONLOAD = 'onload' in el ? 'onload' : 'onreadystatechange';
+            el[ONLOAD] = function() {
+                if (!el.readyState || /loaded|complete/.test(el.readyState)) {
+                    $(window).trigger('validatorready');
+                    el = el[ONLOAD] = null;
+                    delete Validator.loading;
+                }
+            };
+            node.parentNode.insertBefore(el, node);
+        }
+    };
 
+    // Auto loading resources
+    (function(){
+        var scripts = document.scripts,
+            i = scripts.length, node, arr,
+            re = /(.*validator(?:\.min)?.js)(\?.*(?:local|css|dir)(?:=[\w\-]*)?)?/;
+
+        while (i--) {
+            console.log(scripts[i].src)
+          if (scripts[i] && scripts[i].readyState === "interactive") {
+            console.log(scripts[i].src);
+          }
+        }
+console.log(123)
+
+        try {a} catch (e) {
+            //console.log(e, e.stack, e.sourceURL, e.stacktrace);
+            var stack = e.stack || e.sourceURL || e.stacktrace || '';
+            var rgx = /(?:http|https|file):\/\/.*?\/.+?.js/;
+            var src = (rgx.exec(stack)||[])[0] || '';
+        }
+
+        /*while (i-- && !arr) {
+            node = scripts[i];
+            arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
+        }*/
+
+        if (!arr) return;
+        Validator.dir = arr[1].split('/').slice(0, -1).join('/')+'/';
+        Validator.load(arr[2]);
+    })();
+
+    return $[NS] = Validator;
 }));
