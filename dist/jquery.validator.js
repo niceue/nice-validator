@@ -5,11 +5,10 @@
 /*jshint evil:true*/
 ;(function(factory) {
     typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
-    typeof define === 'function' && (define.amd || define.cmd) ? define(['jquery'], factory) :
+    typeof define === 'function' && define.amd ? define(['jquery'], factory) :
     factory(jQuery);
 }(function($, undefined) {
     "use strict";
-    if (!$.fn) $ = window.jQuery;
 
     var NS = 'validator',
         CLS_NS = '.' + NS,
@@ -2106,7 +2105,7 @@
     };
 
     /**
-     * Load resource
+     * Resource loader
      *
      * @static load
      * @param {String} str
@@ -2152,36 +2151,22 @@
         }
     };
 
+    $[NS] = Validator;
+
     // Auto loading resources
     (function(){
         var scripts = document.scripts,
             i = scripts.length, node, arr,
             re = /(.*validator(?:\.min)?.js)(\?.*(?:local|css|dir)(?:=[\w\-]*)?)?/;
 
-        while (i--) {
-            console.log(scripts[i].src)
-          if (scripts[i] && scripts[i].readyState === "interactive") {
-            console.log(scripts[i].src);
-          }
-        }
-console.log(123)
-
-        try {a} catch (e) {
-            //console.log(e, e.stack, e.sourceURL, e.stacktrace);
-            var stack = e.stack || e.sourceURL || e.stacktrace || '';
-            var rgx = /(?:http|https|file):\/\/.*?\/.+?.js/;
-            var src = (rgx.exec(stack)||[])[0] || '';
-        }
-
-        /*while (i-- && !arr) {
+        while (i-- && !arr) {
             node = scripts[i];
             arr = (node.hasAttribute ? node.src : node.getAttribute('src',4)||'').match(re);
-        }*/
+        }
 
         if (!arr) return;
         Validator.dir = arr[1].split('/').slice(0, -1).join('/')+'/';
         Validator.load(arr[2]);
     })();
 
-    return $[NS] = Validator;
 }));

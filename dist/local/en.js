@@ -65,7 +65,7 @@
                 lte: "Please enter a number less than or equal to {1}.",
                 gtlt: "Please fill in the number of {1} to {2}.",
                 gt: "Please enter a number greater than {1}.",
-                lt: "Please enter a number less than {1}.",
+                lt: "Please enter a number less than {1}."
             },
             checked: {
                 eq: "Please check {1} items.",
