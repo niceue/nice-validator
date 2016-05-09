@@ -12,6 +12,9 @@
     "jquery-plugin",
     "ecosystem:jquery"
   ],
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/niceue/nice-validator",
   "author": "Jony Zhang <niceue@live.com>",
   "license": "MIT",
