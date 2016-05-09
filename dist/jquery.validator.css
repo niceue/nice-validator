@@ -2,6 +2,7 @@
 .nice-validator input,
 .nice-validator select,
 .nice-validator textarea,
+.nice-validator [contenteditable],
 .msg-wrap,
 .n-icon,
 .n-msg {

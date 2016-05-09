@@ -241,7 +241,7 @@
         return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
                  name === 'select' ||
                  name === 'textarea' ) &&
-               elem.disabled === false;
+               elem.disabled === false || elem.getAttribute('contenteditable') !== null;
     };
 
     // any value, but not only whitespace
@@ -1246,12 +1246,12 @@
         _getMsgDOM: function(el, msgOpt) {
             var $el = $(el), $msgbox, datafor, tgt, container;
 
-            if ( $el.is(':input') ) {
+            if ( $el.is(INPUT_SELECTOR) ) {
                 tgt = msgOpt.target || attr(el, DATA_TARGET);
                 if (tgt) {
                     tgt = isFunction(tgt) ? tgt.call(this, el) : this.$el.find(tgt);
                     if (tgt.length) {
-                        if ( tgt.is(':input') ) {
+                        if ( tgt.is(INPUT_SELECTOR) ) {
                             el = tgt.get(0);
                         } else if ( tgt.hasClass(CLS_MSG_BOX) ) {
                             $msgbox = tgt;
@@ -1502,11 +1502,18 @@
      */
     function _FieldFactory(context) {
         function FieldValue() {
+            this._valHandler = function() {
+                return this.element.getAttribute('contenteditable') !== null ? 'text' : 'val';
+            };
             this.getValue = function() {
-                return $(this.element).val();
+                var elem = this.element;
+                if (elem.type === "number" && elem.validity && elem.validity.badInput) {
+                    return 'NaN';
+                }
+                return  $(elem)[this._valHandler()]();
             };
             this.setValue = function(value) {
-                $(this.element).val(this.value = value);
+                $(this.element)[this._valHandler()](this.value = value);
             };
         }
         function Field(key) {
