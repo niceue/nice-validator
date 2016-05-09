@@ -29,6 +29,7 @@
   "scripts": {
     "test": "gulp"
   },
+  "main": "dist/jquery.validator.js",
   "dependencies": {
     "jquery": "^1.7 || ^2.0"
   },
