@@ -2151,8 +2151,6 @@
         }
     };
 
-    $[NS] = Validator;
-
     // Auto loading resources
     (function(){
         var scripts = document.scripts,
@@ -2169,4 +2167,5 @@
         Validator.load(arr[2]);
     })();
 
+    return $[NS] = Validator;
 }));
