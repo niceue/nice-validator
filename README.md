@@ -22,13 +22,18 @@ width `<script>` tag:
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
 ```
-via module loader [Requirejs](http://requirejs.org/) or [Sea.js](http://seajs.org/docs/en.html):
+via module loader [Requirejs](http://requirejs.org/):
 ```javascript
-require(['path/to/nice-validator/local/en']);
+requirejs.config({
+    paths: {
+        jquery: 'http://cdn.jsdelivr.net/jquery/1.12.3/jquery.min',
+        validator: 'path/to/jquery.validator.js?local=en'
+    }
+});
+
+require(['validator']);
 ```
-```javascript
-seajs.use('path/to/nice-validator/local/zh-CN');
-```
+
 #### 3. Config rules
 ```html
 <form id="form1">
@@ -68,7 +73,7 @@ $("#form1").on('valid.form', function(){
   * IE6+
   * Chrome
   * Safari 4+
-  * Firefox 3.5+
+  * Firefox 9+
   * Opera
 
 
