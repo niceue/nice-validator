@@ -407,10 +407,12 @@
             dataRule && attr(el, DATA_RULE, null);
 
             // If the field has passed the key as id mode, or it doesn't has a name
-            if ( el.id && ('#' + el.id in me.fields) ||
-                 !key ||
-                 // If dataRule and element are diffrent from old's, we use ID mode.
-                 (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && el.id && field.key !== el.id)
+            if ( el.id && (
+                ('#' + el.id in me.fields) ||
+                !key ||
+                // If dataRule and element are diffrent from old's, we use ID mode.
+                (dataRule !== null && (field = me.fields[key]) && dataRule !== field.rule && el.id !== field.key)
+                )
             ) {
                 key = '#' + el.id;
             }
