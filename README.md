@@ -17,7 +17,7 @@ $ bower install nice-validator
 
 ## Getting started
 #### 1. Include [jQuery 1.7+](http://jquery.com)
-#### 2. Include nice-validator to your project
+#### 2. Include nice-validator
 width `<script>` tag:
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
