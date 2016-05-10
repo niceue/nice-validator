@@ -4,7 +4,7 @@
  *********************************/
 (function(factory) {
     typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
-    typeof define === 'function' && define.amd ? define(['jquery', '../jquery.validator.min'], factory) :
+    typeof define === 'function' && define.amd ? define(['jquery', '../jquery.validator'], factory) :
     factory(jQuery);
 }(function($) {
 
