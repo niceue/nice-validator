@@ -1,7 +1,9 @@
 {
   "name": "nice-validator",
-  "description": "Simple, smart and pleasant verification solution.",
   "version": "0.10.9",
+  "author": "Jony Zhang <niceue@live.com>",
+  "license": "MIT",
+  "description": "Simple, smart and pleasant verification solution.",
   "keywords": [
     "jquery",
     "validation",
@@ -12,23 +14,18 @@
     "jquery-plugin",
     "ecosystem:jquery"
   ],
-  "files": [
-    "dist"
-  ],
   "homepage": "https://github.com/niceue/nice-validator",
-  "author": "Jony Zhang <niceue@live.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/niceue/nice-validator.git"
   },
   "bugs": "https://github.com/niceue/nice-validator/issues",
-  "engine": [
-    "node >=0.12.0"
-  ],
   "scripts": {
     "test": "gulp"
   },
+  "files": [
+    "dist"
+  ],
   "main": "dist/jquery.validator.js",
   "dependencies": {
     "jquery": "^1.7 || ^2.0"
