@@ -1687,8 +1687,7 @@
         if ( attr(this, NOVALIDATE) !== null ) return;
         var $form = $(this), me;
 
-        if ( !$form.data(NS) ) {
-            me = _getInstance(this);
+        if ( !$form.data(NS) && (me = _getInstance(this)) ) {
             if ( !$.isEmptyObject(me.fields) ) {
                 // Execute event handler
                 if (e.type === 'focusin') {
