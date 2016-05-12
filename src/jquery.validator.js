@@ -297,10 +297,6 @@
             me.deferred = {};
             me.errors = {};
             me.fields = {};
-
-            // Initialization fields
-            me._initFields(opt.fields);
-
             // Initialization message parameters
             me.msgOpt = {
                 type: 'error',
@@ -312,6 +308,10 @@
                 icon: opt.msgIcon
             };
 
+            // Initialization fields
+            me._initFields(opt.fields);
+
+            // Display all messages in target container
             if ( isString(opt.target) ) {
                 me.$el.find(opt.target).addClass('msg-container');
             }
@@ -1353,7 +1353,7 @@
             }
             $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
 
-            if (msgShow = field.msgShow || opt.msgShow) {
+            if (isFunction(msgShow = field.msgShow || opt.msgShow)) {
                 msgShow.call(me, $msgbox, msgOpt.type);
             }
         },
@@ -1386,7 +1386,7 @@
             $msgbox = me._getMsgDOM(el, msgOpt);
             if (!$msgbox.length) return;
 
-            if ( msgHide = field && field.msgHide || opt.msgHide ) {
+            if ( isFunction(msgHide = field && field.msgHide || opt.msgHide) ) {
                 msgHide.call(me, $msgbox, msgOpt.type);
             } else {
                 $msgbox[0].style.display = 'none';
