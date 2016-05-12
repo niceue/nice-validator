@@ -301,10 +301,6 @@
             me.deferred = {};
             me.errors = {};
             me.fields = {};
-
-            // Initialization fields
-            me._initFields(opt.fields);
-
             // Initialization message parameters
             me.msgOpt = {
                 type: 'error',
@@ -313,11 +309,13 @@
                 cls: opt.msgClass,
                 style: opt.msgStyle,
                 arrow: opt.msgArrow,
-                icon: opt.msgIcon,
-                show: opt.msgShow,
-                hide: opt.msgHide
+                icon: opt.msgIcon
             };
 
+            // Initialization fields
+            me._initFields(opt.fields);
+
+            // Display all messages in target container
             if ( isString(opt.target) ) {
                 me.$el.find(opt.target).addClass('msg-container');
             }
@@ -1312,6 +1310,7 @@
             if (!el) return;
             var me = this,
                 opt = me.options,
+                msgShow,
                 msgMaker,
                 temp,
                 $msgbox;
@@ -1358,7 +1357,9 @@
             }
             $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
 
-            isFunction(msgOpt.show) && msgOpt.show.call(me, $msgbox, msgOpt.type);
+            if (isFunction(msgShow = field.msgShow || opt.msgShow)) {
+                msgShow.call(me, $msgbox, msgOpt.type);
+            }
         },
 
         /**
@@ -1371,6 +1372,7 @@
         hideMsg: function(el, msgOpt, /*INTERNAL*/ field) {
             var me = this,
                 opt = me.options,
+                msgHide,
                 $msgbox;
 
             el = $(el).get(0);
@@ -1388,8 +1390,8 @@
             $msgbox = me._getMsgDOM(el, msgOpt);
             if (!$msgbox.length) return;
 
-            if ( isFunction(msgOpt.hide) ) {
-                msgOpt.hide.call(me, $msgbox, msgOpt.type);
+            if ( isFunction(msgHide = field && field.msgHide || opt.msgHide) ) {
+                msgHide.call(me, $msgbox, msgOpt.type);
             } else {
                 $msgbox[0].style.display = 'none';
                 $msgbox[0].innerHTML = null;
