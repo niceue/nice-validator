@@ -103,7 +103,7 @@
             //msgStyle: null,
             //msgShow: null,
             //msgHide: null,
-            //bindClassTo: ':input',
+            //bindClassTo: ':verifiable',
             validClass: 'n-valid',
             invalidClass: 'n-invalid'
         },
@@ -131,7 +131,7 @@
         invalid       {Function}                    Triggered when the form is invalid
         validClass    {String}      'n-valid'       Add this class name to a valid field
         invalidClass  {String}      'n-invalid'     Add this class name to a invalid field
-        bindClassTo   {jqSelector}  ':input'        Which element should the className binding to
+        bindClassTo   {jqSelector}  ':verifiable'   Which element should the className binding to
 
         display       {Function}                    Callback function to get dynamic display
         target        {Function}                    Callback function to get dynamic target
@@ -171,7 +171,7 @@
         var that = this,
             args = arguments;
 
-        if (that.is(':input')) return that;
+        if (that.is(INPUT_SELECTOR)) return that;
         !that.is('form') && (that = this.find('form'));
         !that.length && (that = this);
 
@@ -207,7 +207,7 @@
         opt = me.options;
 
         ret = me._multiValidate(
-            this.is(':input') ? this : this.find(INPUT_SELECTOR),
+            this.is(INPUT_SELECTOR) ? this : this.find(INPUT_SELECTOR),
             function(isValid){
                 if (!isValid && opt.focusInvalid && !me.checkOnly) {
                     // navigate to the error element
@@ -816,7 +816,7 @@
             var me = this,
                 el = e.target;
 
-            if ( $(el).is(':input') ) {
+            if ( $(el).is(INPUT_SELECTOR) ) {
                 me.showMsg(el, {type: type, msg: msg});
             }
             else if ( type === 'tip' ) {
@@ -829,7 +829,7 @@
         _hidemsg: function(e) {
             var $el = $(e.target);
 
-            if ( $el.is(':input') ) {
+            if ( $el.is(INPUT_SELECTOR) ) {
                 this.hideMsg($el);
             }
         },
