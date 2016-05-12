@@ -309,9 +309,7 @@
                 cls: opt.msgClass,
                 style: opt.msgStyle,
                 arrow: opt.msgArrow,
-                icon: opt.msgIcon,
-                show: opt.msgShow,
-                hide: opt.msgHide
+                icon: opt.msgIcon
             };
 
             if ( isString(opt.target) ) {
@@ -1308,6 +1306,7 @@
             if (!el) return;
             var me = this,
                 opt = me.options,
+                msgShow,
                 msgMaker,
                 temp,
                 $msgbox;
@@ -1354,7 +1353,9 @@
             }
             $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
 
-            isFunction(msgOpt.show) && msgOpt.show.call(me, $msgbox, msgOpt.type);
+            if (msgShow = field.msgShow || opt.msgShow) {
+                msgShow.call(me, $msgbox, msgOpt.type);
+            }
         },
 
         /**
@@ -1367,6 +1368,7 @@
         hideMsg: function(el, msgOpt, /*INTERNAL*/ field) {
             var me = this,
                 opt = me.options,
+                msgHide,
                 $msgbox;
 
             el = $(el).get(0);
@@ -1384,8 +1386,8 @@
             $msgbox = me._getMsgDOM(el, msgOpt);
             if (!$msgbox.length) return;
 
-            if ( isFunction(msgOpt.hide) ) {
-                msgOpt.hide.call(me, $msgbox, msgOpt.type);
+            if ( msgHide = field && field.msgHide || opt.msgHide ) {
+                msgHide.call(me, $msgbox, msgOpt.type);
             } else {
                 $msgbox[0].style.display = 'none';
                 $msgbox[0].innerHTML = null;
