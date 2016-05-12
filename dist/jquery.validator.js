@@ -373,30 +373,42 @@
         },
 
         _initFields: function(fields) {
-            var me = this,
+            var me = this, k, arr, i,
                 clear = fields === null;
 
             // Processing field information
             if (clear) fields = me.fields;
 
             if ( isObject(fields) ) {
-                $.each(fields, function(k, v) {
-                    // delete a field from settings
-                    if ( v === null || clear ) {
-                        var el = me.elements[k];
-                        if (el) me._resetElement(el, true);
-                        delete me.fields[k];
+                for (k in fields) {
+                    if (~k.indexOf(',')) {
+                        arr = k.split(',');
+                        i = arr.length;
+                        while (i--) {
+                            initField(trim(arr[i]), fields[k]);
+                        }
                     } else {
-                        me.fields[k] = me.fields[k] || new me.Field(k);
-                        $.extend(me.fields[k], isString(v) ? {rule: v} : v);
+                        initField(k, fields[k]);
                     }
-                });
+                }
             }
 
             // Parsing DOM rules
             me.$el.find(INPUT_SELECTOR).each(function() {
                 me._parse(this);
             });
+
+            function initField(k, v) {
+                // delete a field from settings
+                if ( v === null || clear ) {
+                    var el = me.elements[k];
+                    if (el) me._resetElement(el, true);
+                    delete me.fields[k];
+                } else {
+                    me.fields[k] = me.fields[k] || new me.Field(k);
+                    $.extend(me.fields[k], isString(v) ? {rule: v} : v);
+                }
+            }
         },
 
         // Parsing a field
