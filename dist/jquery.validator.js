@@ -67,22 +67,31 @@
 
         defaults = {
             debug: 0,
-            timely: 1,
             theme: 'default',
             ignore: '',
             focusInvalid: true,
-            //stopOnError: false,
-            //focusCleanup: false,
-            //ignoreBlank: false,
-            //showOk: true,
-
-            //dataFilter: null,
-            //valid: null,
-            //invalid: null,
-            //display: null,
-            //target: null,
+            focusCleanup: false,
+            stopOnError: false,
+            valid: null,
+            invalid: null,
+            validation: null,
             beforeSubmit: noop,
-
+            validClass: 'n-valid',
+            invalidClass: 'n-invalid',
+            bindClassTo: null
+        },
+        fieldDefaults = {
+            timely: 1,
+            display: null,
+            target: null,
+            // Translate ajax response to validation result
+            dataFilter: function (data) {
+                if ( isString(data) || ( isObject(data) && ('error' in data || 'ok' in data) ) ) {
+                    return data;
+                }
+            },
+            ignoreBlank: false,
+            showOk: true,
             msgWrapper: 'span',
             msgMaker: function(opt) {
                 var html;
@@ -100,12 +109,9 @@
             msgArrow: '',
             msgIcon: '<span class="n-icon"></span>',
             msgClass: '',
-            //msgStyle: null,
-            //msgShow: null,
-            //msgHide: null,
-            //bindClassTo: ':verifiable',
-            validClass: 'n-valid',
-            invalidClass: 'n-invalid'
+            msgStyle: null,
+            msgShow: null,
+            msgHide: null
         },
         themes = {
             'default': {
@@ -292,25 +298,15 @@
             dataOpt = attr(element, 'data-'+ NS +'-option');
             dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
             themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
-            opt = me.options = $.extend({}, defaults, themeOpt, me.options, options, dataOpt);
+            opt = me.options = $.extend({}, defaults, fieldDefaults, themeOpt, me.options, options, dataOpt);
 
             me.rules = new Rules(opt.rules, true);
             me.messages = new Messages(opt.messages, true);
-            me.Field = _FieldFactory(me);
+            me.Field = _createFieldFactory(me);
             me.elements = me.elements || {};
             me.deferred = {};
             me.errors = {};
             me.fields = {};
-            // Initialization message parameters
-            me.msgOpt = {
-                type: 'error',
-                pos: _getPos(opt.msgClass),
-                wrapper: opt.msgWrapper,
-                cls: opt.msgClass,
-                style: opt.msgStyle,
-                arrow: opt.msgArrow,
-                icon: opt.msgIcon
-            };
 
             // Initialization fields
             me._initFields(opt.fields);
@@ -403,8 +399,7 @@
                     if (el) me._resetElement(el, true);
                     delete me.fields[k];
                 } else {
-                    me.fields[k] = me.fields[k] || new me.Field(k);
-                    $.extend(me.fields[k], isString(v) ? {rule: v} : v);
+                    me.fields[k] = new me.Field(k, isString(v) ? {rule: v} : v, me.fields[k]);
                 }
             }
         },
@@ -412,9 +407,9 @@
         // Parsing a field
         _parse: function(el) {
             var me = this,
-                opt = me.options,
                 field,
                 key = el.name,
+                display,
                 timely,
                 dataRule = attr(el, DATA_RULE);
 
@@ -437,28 +432,21 @@
             // The priority of passing parameter by DOM is higher than by JS.
             field.rule = dataRule || field.rule || '';
 
-            if (!field.display) {
-                if ( !(field.display = attr(el, DATA_DISPLAY)) && opt.display ) {
-                    field.display = opt.display;
-                }
+            if (display = attr(el, DATA_DISPLAY)) {
+                field.display = display;
             }
             if (field.rule) {
-                if ( attr(el, DATA_MUST) !== null || /match\(|checked/.test(field.rule) ) {
+                if ( attr(el, DATA_MUST) !== null || /\b(?:match|checked)\b/.test(field.rule) ) {
                     field.must = true;
                 }
                 if ( ~field.rule.indexOf('required') ) {
                     field.required = true;
                     attr(el, ARIA_REQUIRED, true);
                 }
-                if ( !('showOk' in field) ) {
-                    field.showOk = opt.showOk;
-                }
-
-                timely = attr(el, DATA_TIMELY);
-                if (!timely) {
-                    if ('timely' in field) attr(el, DATA_TIMELY, +field.timely);
-                } else {
+                if (timely = attr(el, DATA_TIMELY)) {
                     field.timely = +timely;
+                } else if (field.timely > 3) {
+                    attr(el, DATA_TIMELY, field.timely);
                 }
                 me._parseRule(field);
                 field.old = {};
@@ -504,9 +492,9 @@
         // Verify a zone
         _multiValidate: function($inputs, doneCallback){
             var me = this,
-                opt = me.options;
+                opt = me.options,
+                isValid;
 
-            me.hasError = false;
             if (opt.ignore) {
                 $inputs = $inputs.not(opt.ignore);
             }
@@ -519,6 +507,9 @@
                 }
             });
 
+            isValid = !me.hasError;
+            me.hasError = undefined;
+
             // Need to wait for all fields validation complete, especially asynchronous validation
             if (doneCallback) {
                 me.validating = true;
@@ -526,14 +517,14 @@
                     null,
                     $.map(me.deferred, function(v){return v;})
                 ).done(function(){
-                    doneCallback.call(me, !me.hasError);
+                    doneCallback.call(me, isValid);
                     me.validating = false;
                 });
             }
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect form validation result through "doneCallback".
-            return !$.isEmptyObject(me.deferred) ? undefined : !me.hasError;
+            return !$.isEmptyObject(me.deferred) ? undefined : isValid;
         },
 
         // Validate the whole form
@@ -629,11 +620,6 @@
             }
         },
 
-        _getTimely: function(el, opt) {
-            var timely = attr(el, DATA_TIMELY);
-            return timely !== null ? +timely : +opt.timely;
-        },
-
         // Handle events: "focusin/click"
         _focusin: function(e) {
             var me = this,
@@ -664,9 +650,10 @@
                 if (attr(el, DATA_RULE)) {
                     me._parse(el);
                 }
-                timely = me._getTimely(el, opt);
-                if ( timely === 8 || timely === 9 ) {
-                    me._focusout(e);
+                if (timely = attr(el, DATA_TIMELY)) {
+                    if ( timely === 8 || timely === 9 ) {
+                        me._focusout(e);
+                    }
                 }
             }
         },
@@ -708,7 +695,7 @@
             // Cache event type
             etype0 = field._e;
             field._e = etype;
-            timely = me._getTimely(elem, opt);
+            timely = field.timely;
 
             if (!special) {
                 if (!timely || (_checkable(el) && etype !== 'click')) {
@@ -718,7 +705,7 @@
                 value = field.getValue();
 
                 // not validate field unless fill a value
-                if ( opt.ignoreBlank && !value && !focusin ) {
+                if ( field.ignoreBlank && !value && !focusin ) {
                     me.hideMsg(el);
                     return;
                 }
@@ -790,7 +777,6 @@
 
             clearTimeout(field._t);
 
-            if (timely !== undefined) field.timely = timely;
             if (timer) {
                 field._t = setTimeout(function() {
                     me._validate(el, field);
@@ -878,7 +864,7 @@
 
         _makeMsg: function(el, field, ret) {
             // show or hide the message
-            if ( field.msgMaker || this.options.msgMaker ) {
+            if (field.msgMaker) {
                 ret = $.extend({}, ret);
                 if (field._e === 'focusin') {
                     ret.type = 'tip';
@@ -897,7 +883,7 @@
                 msg,
                 rule,
                 method = field._r,
-                timely = field.timely || opt.timely,
+                timely = field.timely,
                 special = timely === 9 || timely === 8,
                 transfer,
                 temp,
@@ -1069,7 +1055,7 @@
                     function(d, textStatus, jqXHR) {
                         var data = jqXHR.responseText,
                             result,
-                            dataFilter = field.dataFilter || me.options.dataFilter || _dataFilter;
+                            dataFilter = field.dataFilter;
 
                         // detect if data is json or jsonp format
                         if (/jsonp?/.test(this.dataType)) {
@@ -1246,8 +1232,17 @@
             return !isString(str) ? isFunction(str) ? str.call(this, el) : '' : str;
         },
 
-        _getMsgOpt: function(obj) {
-            return $.extend({}, this.msgOpt, isString(obj) ? {msg: obj} : obj);
+        _getMsgOpt: function(obj, field) {
+            var opt = field ? field : this.options;
+            return $.extend({
+                type: 'error',
+                pos: _getPos(opt.msgClass),
+                wrapper: opt.msgWrapper,
+                style: opt.msgStyle,
+                cls: opt.msgClass,
+                arrow: opt.msgArrow,
+                icon: opt.msgIcon
+            }, isString(obj) ? {msg: obj} : obj);
         },
 
         _getMsgDOM: function(el, msgOpt) {
@@ -1275,7 +1270,8 @@
                 $msgbox = $el;
             }
 
-            if (!$msgbox.length) {
+            // Create new message box
+            if (!msgOpt.hide && !$msgbox.length) {
                 $el = this.$el.find(tgt || el);
 
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
@@ -1323,7 +1319,15 @@
                 return;
             }
 
-            msgOpt = me._getMsgOpt(msgOpt);
+            if ($(el).is(INPUT_SELECTOR)) {
+                field = field || me.getField(el);
+            }
+
+            if (!(msgMaker = (field || opt).msgMaker)) {
+                return;
+            }
+
+            msgOpt = me._getMsgOpt(msgOpt, field);
             el = $(el).get(0);
 
             // ok or tip
@@ -1333,19 +1337,6 @@
             }
 
             if ( !isString(msgOpt.msg) ) {
-                return;
-            }
-
-            if ($(el).is(INPUT_SELECTOR)) {
-                field = field || me.getField(el);
-                if (field) {
-                    msgOpt.style = field.msgStyle || msgOpt.style;
-                    msgOpt.cls = field.msgClass || msgOpt.cls;
-                    msgOpt.wrapper = field.msgWrapper || msgOpt.wrapper;
-                    msgOpt.target = field.target || opt.target;
-                }
-            }
-            if (!(msgMaker = (field || {}).msgMaker || opt.msgMaker)) {
                 return;
             }
 
@@ -1376,16 +1367,15 @@
                 $msgbox;
 
             el = $(el).get(0);
-            msgOpt = me._getMsgOpt(msgOpt);
-
             if ($(el).is(INPUT_SELECTOR)) {
                 field = field || me.getField(el);
                 if (field) {
                     if (field.isValid || me.reseting) attr(el, ARIA_INVALID, null);
-                    msgOpt.wrapper = field.msgWrapper || msgOpt.wrapper;
-                    msgOpt.target = field.target || opt.target;
                 }
             }
+
+            msgOpt = me._getMsgOpt(msgOpt, field);
+            msgOpt.hide = true;
 
             $msgbox = me._getMsgDOM(el, msgOpt);
             if (!$msgbox.length) return;
@@ -1503,7 +1493,6 @@
         }
     };
 
-
     /**
      * Create Field Factory
      *
@@ -1511,9 +1500,13 @@
      * @param  {Object}     context
      * @return {Function}   Factory
      */
-    function _FieldFactory(context) {
-        function FieldValue() {
-            this._valHandler = function() {
+    function _createFieldFactory(context) {
+        function FieldFactory() {
+            var options = this.options;
+            for (var i in options) {
+                if (i in fieldDefaults) this[i] = options[i];
+            }
+            this._valHook = function() {
                 return this.element.getAttribute('contenteditable') !== null ? 'text' : 'val';
             };
             this.getValue = function() {
@@ -1521,22 +1514,22 @@
                 if (elem.type === "number" && elem.validity && elem.validity.badInput) {
                     return 'NaN';
                 }
-                return  $(elem)[this._valHandler()]();
+                return  $(elem)[this._valHook()]();
             };
             this.setValue = function(value) {
-                $(this.element)[this._valHandler()](this.value = value);
+                $(this.element)[this._valHook()](this.value = value);
             };
         }
-        function Field(key) {
+        function Field(key, obj, oldField) {
             this.key = key;
+            $.extend(this, oldField, obj);
         }
 
-        FieldValue.prototype = context;
-        Field.prototype = new FieldValue();
+        FieldFactory.prototype = context;
+        Field.prototype = new FieldFactory();
 
         return Field;
     }
-
 
     /**
      * Create Rules
@@ -1651,13 +1644,6 @@
 
         if (str) pos = rPos.exec(str);
         return pos && pos[0];
-    }
-
-    // Translate ajax response to validation result
-    function _dataFilter(data) {
-        if ( isString(data) || ( isObject(data) && ('error' in data || 'ok' in data) ) ) {
-            return data;
-        }
     }
 
     // Check whether the element is checkbox or radio
@@ -2093,6 +2079,9 @@
             }
             else if (k === 'messages') {
                 new Messages(o);
+            }
+            else if (k in fieldDefaults) {
+                fieldDefaults[k] = o;
             }
             else {
                 defaults[k] = o;
