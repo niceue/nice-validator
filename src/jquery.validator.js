@@ -231,7 +231,7 @@
     };
 
 
-    // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled)"
+    // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[contenteditable])"
     $.expr[":"].verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
 
