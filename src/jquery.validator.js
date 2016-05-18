@@ -1654,7 +1654,9 @@
 
     // Translate field key to jQuery selector.
     function _key2selector(key) {
-        return key.charAt(0) === "#" ? key.replace(/(:|\.|\[|\])/g, "\\$1") : '[name="'+ key +'"]:input';
+        var isID = key.charAt(0) === "#";
+        key = key.replace(/([:.{(|)}/\[\]])/g, "\\$1");
+        return isID ? key : '[name="'+ key +'"]:input';
     }
 
 
