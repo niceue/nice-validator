@@ -68,10 +68,10 @@
             focusInvalid: true,
             focusCleanup: false,
             stopOnError: false,
+            beforeSubmit: null,
             valid: null,
             invalid: null,
             validation: null,
-            beforeSubmit: noop,
             validClass: 'n-valid',
             invalidClass: 'n-invalid',
             bindClassTo: null
@@ -80,15 +80,14 @@
             timely: 1,
             display: null,
             target: null,
+            ignoreBlank: false,
+            showOk: true,
             // Translate ajax response to validation result
             dataFilter: function (data) {
                 if ( isString(data) || ( isObject(data) && ('error' in data || 'ok' in data) ) ) {
                     return data;
                 }
             },
-            ignoreBlank: false,
-            showOk: true,
-            msgWrapper: 'span',
             msgMaker: function(opt) {
                 var html;
                 html = '<span role="alert" class="msg-wrap n-'+ opt.type + '">' + opt.arrow;
@@ -102,10 +101,11 @@
                 html += '</span>';
                 return html;
             },
+            msgWrapper: 'span',
             msgArrow: '',
             msgIcon: '<span class="n-icon"></span>',
             msgClass: '',
-            msgStyle: null,
+            msgStyle: '',
             msgShow: null,
             msgHide: null
         },
@@ -539,7 +539,7 @@
                 // Receive the "validate" event only from the form.
                 e.type === 'validate' && me.$el[0] !== form ||
                 // trigger the beforeSubmit callback.
-                opt.beforeSubmit.call(me, form) === false
+                isFunction(opt.beforeSubmit) && opt.beforeSubmit.call(me, form) === false
             ) {
                 return;
             }
@@ -1192,7 +1192,7 @@
 
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
                     'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
-                    'style': msgOpt.style || '',
+                    'style': msgOpt.style || undefined,
                     'for': datafor
                 });
 
