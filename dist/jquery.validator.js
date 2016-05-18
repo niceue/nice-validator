@@ -72,10 +72,10 @@
             focusInvalid: true,
             focusCleanup: false,
             stopOnError: false,
+            beforeSubmit: null,
             valid: null,
             invalid: null,
             validation: null,
-            beforeSubmit: noop,
             validClass: 'n-valid',
             invalidClass: 'n-invalid',
             bindClassTo: null
@@ -84,15 +84,14 @@
             timely: 1,
             display: null,
             target: null,
+            ignoreBlank: false,
+            showOk: true,
             // Translate ajax response to validation result
             dataFilter: function (data) {
                 if ( isString(data) || ( isObject(data) && ('error' in data || 'ok' in data) ) ) {
                     return data;
                 }
             },
-            ignoreBlank: false,
-            showOk: true,
-            msgWrapper: 'span',
             msgMaker: function(opt) {
                 var html;
                 html = '<span role="alert" class="msg-wrap n-'+ opt.type + '">' + opt.arrow;
@@ -106,10 +105,11 @@
                 html += '</span>';
                 return html;
             },
+            msgWrapper: 'span',
             msgArrow: '',
             msgIcon: '<span class="n-icon"></span>',
             msgClass: '',
-            msgStyle: null,
+            msgStyle: '',
             msgShow: null,
             msgHide: null
         },
@@ -543,7 +543,7 @@
                 // Receive the "validate" event only from the form.
                 e.type === 'validate' && me.$el[0] !== form ||
                 // trigger the beforeSubmit callback.
-                opt.beforeSubmit.call(me, form) === false
+                isFunction(opt.beforeSubmit) && opt.beforeSubmit.call(me, form) === false
             ) {
                 return;
             }
@@ -1148,86 +1148,6 @@
             return ret === true || ret === undefined || ret === null;
         },
 
-        // Get a range of validation messages
-        getRangeMsg: function(value, params, field, suffix) {
-            if (!params) return;
-
-            var me = this,
-                msg = me.messages[field._r] || '',
-                result,
-                p = params[0].split('~'),
-                e = params[1] === 'false',
-                a = p[0],
-                b = p[1],
-                c = 'rg',
-                args = [''],
-                isNumber = trim(value) && +value === +value;
-
-            function compare(large, small) {
-                return !e ? large >= small : large > small;
-            }
-
-            if (p.length === 2) {
-                if (a && b) {
-                    if (isNumber && compare(value, +a) && compare(+b, value)) {
-                        result = true;
-                    }
-                    args = args.concat(p);
-                    c = e ? 'gtlt' : 'rg';
-                }
-                else if (a && !b) {
-                    if (isNumber && compare(value, +a)) {
-                        result = true;
-                    }
-                    args.push(a);
-                    c = e ? 'gt' : 'gte';
-                }
-                else if (!a && b) {
-                    if (isNumber && compare(+b, value)) {
-                        result = true;
-                    }
-                    args.push(b);
-                    c = e ? 'lt' : 'lte';
-                }
-            }
-            else {
-                if (value === +a) {
-                    result = true;
-                }
-                args.push(a);
-                c = 'eq';
-            }
-
-            if (msg) {
-                if (suffix && msg[c + suffix]) {
-                    c += suffix;
-                }
-                args[0] = msg[c];
-            }
-
-            return result || field._rules && ( field._rules[field._i].msg = me.renderMsg.apply(null, args) );
-        },
-
-        /**
-         * Render message template
-         *
-         * @method renderMsg
-         * @return {String}
-         */
-        renderMsg: function() {
-            var args = arguments,
-                tpl = args[0],
-                i = args.length;
-
-            if (!tpl) return;
-
-            while (--i) {
-                tpl = tpl.replace('{' + i + '}', args[i]);
-            }
-
-            return tpl;
-        },
-
         _getDisplay: function(el, str) {
             return !isString(str) ? isFunction(str) ? str.call(this, el) : '' : str;
         },
@@ -1276,7 +1196,7 @@
 
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
                     'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
-                    'style': msgOpt.style || '',
+                    'style': msgOpt.style || undefined,
                     'for': datafor
                 });
 
@@ -1506,19 +1426,94 @@
             for (var i in options) {
                 if (i in fieldDefaults) this[i] = options[i];
             }
-            this._valHook = function() {
-                return this.element.getAttribute('contenteditable') !== null ? 'text' : 'val';
-            };
-            this.getValue = function() {
-                var elem = this.element;
-                if (elem.type === "number" && elem.validity && elem.validity.badInput) {
-                    return 'NaN';
+            $.extend(this, {
+                _valHook: function() {
+                    return this.element.getAttribute('contenteditable') !== null ? 'text' : 'val';
+                },
+                getValue: function() {
+                    var elem = this.element;
+                    if (elem.type === "number" && elem.validity && elem.validity.badInput) {
+                        return 'NaN';
+                    }
+                    return  $(elem)[this._valHook()]();
+                },
+                setValue: function(value) {
+                    $(this.element)[this._valHook()](this.value = value);
+                },
+                // Get a range of validation messages
+                getRangeMsg: function(value, params, suffix) {
+                    if (!params) return;
+
+                    var me = this,
+                        msg = me.messages[me._r] || '',
+                        result,
+                        p = params[0].split('~'),
+                        e = params[1] === 'false',
+                        a = p[0],
+                        b = p[1],
+                        c = 'rg',
+                        args = [''],
+                        isNumber = trim(value) && +value === +value;
+
+                    function compare(large, small) {
+                        return !e ? large >= small : large > small;
+                    }
+
+                    if (p.length === 2) {
+                        if (a && b) {
+                            if (isNumber && compare(value, +a) && compare(+b, value)) {
+                                result = true;
+                            }
+                            args = args.concat(p);
+                            c = e ? 'gtlt' : 'rg';
+                        }
+                        else if (a && !b) {
+                            if (isNumber && compare(value, +a)) {
+                                result = true;
+                            }
+                            args.push(a);
+                            c = e ? 'gt' : 'gte';
+                        }
+                        else if (!a && b) {
+                            if (isNumber && compare(+b, value)) {
+                                result = true;
+                            }
+                            args.push(b);
+                            c = e ? 'lt' : 'lte';
+                        }
+                    }
+                    else {
+                        if (value === +a) {
+                            result = true;
+                        }
+                        args.push(a);
+                        c = 'eq';
+                    }
+
+                    if (msg) {
+                        if (suffix && msg[c + suffix]) {
+                            c += suffix;
+                        }
+                        args[0] = msg[c];
+                    }
+
+                    return result || me._rules && ( me._rules[me._i].msg = me.renderMsg.apply(null, args) );
+                },
+                // Render message template
+                renderMsg: function() {
+                    var args = arguments,
+                        tpl = args[0],
+                        i = args.length;
+
+                    if (!tpl) return;
+
+                    while (--i) {
+                        tpl = tpl.replace('{' + i + '}', args[i]);
+                    }
+
+                    return tpl;
                 }
-                return  $(elem)[this._valHook()]();
-            };
-            this.setValue = function(value) {
-                $(this.element)[this._valHook()](this.value = value);
-            };
+            });
         }
         function Field(key, obj, oldField) {
             this.key = key;
@@ -1905,7 +1900,7 @@
             range[~100]    Number less than or equal to 100
          **/
         range: function(element, params) {
-            return this.getRangeMsg(this.value, params, this);
+            return this.getRangeMsg(this.value, params);
         },
 
         /**
@@ -1936,7 +1931,7 @@
             }
 
             if (params) {
-                return me.getRangeMsg(count, params, me);
+                return me.getRangeMsg(count, params);
             } else {
                 return !!count || _getDataMsg(elem, me, '') || me.messages.required;
             }
@@ -1955,7 +1950,7 @@
             var value = this.value,
                 len = (params[1] === 'true' ? value.replace(rDoubleBytes, 'xx') : value).length;
 
-            return this.getRangeMsg(len, params, this, (params[1] ? '_2' : ''));
+            return this.getRangeMsg(len, params, (params[1] ? '_2' : ''));
         },
 
         /**
