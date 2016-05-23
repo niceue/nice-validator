@@ -477,9 +477,7 @@
                         not: args[2] === "!",
                         or: args[6] === "|",
                         method: args[3],
-                        params: args[4] ?
-                            $.map( args[4].split(', '), function(i){return trim(i)} ) :
-                            undefined
+                        params: args[4] ? $.map( args[4].split(', '), trim ) : undefined
                     });
                 });
             }
@@ -564,9 +562,7 @@
                             // navigate to the error element
                             me.$el.find('[' + ARIA_INVALID + ']:first').focus();
                         }
-                        errors = $.map(me.errors, function(err){
-                            return err;
-                        });
+                        errors = $.map(me.errors, function(err){return err;});
                     }
 
                     // releasing submit
@@ -597,7 +593,7 @@
             me.errors = {};
             if (e) {
                 me.reseting = true;
-                me.$el.find(INPUT_SELECTOR).each( function(i, el){
+                me.$el.find(INPUT_SELECTOR).map(function(el){
                     me._resetElement(el);
                 });
                 delete me.reseting;
@@ -2027,9 +2023,7 @@
             if(!params || $(element).data(VALIDATED)) return;
 
             this.$el.find(
-                $.map(params, function(key){
-                    return _key2selector(key);
-                }).join(',')
+                $.map(params, _key2selector).join(',')
             ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
