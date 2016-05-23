@@ -580,19 +580,15 @@
                     opt.debug && debug.log('>>> ' + ret);
 
                     if (!isValid) return;
+                    // For jquery.form plugin
                     if (me.vetoed) {
                         $(form).ajaxSubmit(me.ajaxFormOptions);
                     }
                     else if (canSubmit && !me.isAjaxSubmit) {
-                        submitForm();
+                        document.createElement('form').submit.call(form);
                     }
                 }
             );
-
-            function submitForm() {
-                var submit = document.createElement('form').submit;
-                submit.call(form);
-            }
         },
 
         _reset: function(e) {
