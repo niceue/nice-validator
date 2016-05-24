@@ -597,8 +597,8 @@
             me.errors = {};
             if (e) {
                 me.reseting = true;
-                me.$el.find(INPUT_SELECTOR).each( function(i, el){
-                    me._resetElement(el);
+                me.$el.find(INPUT_SELECTOR).each( function(){
+                    me._resetElement(this);
                 });
                 delete me.reseting;
             }
