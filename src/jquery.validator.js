@@ -2022,9 +2022,8 @@
             var VALIDATED = '_validated_';
             if(!params || $(element).data(VALIDATED)) return;
 
-            this.$el.find(
-                $.map(params, _key2selector).join(',')
-            ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
+            this.$el.find( $.map(params, _key2selector).join(',') )
+                .data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
         /**
