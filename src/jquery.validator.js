@@ -174,20 +174,20 @@
             args = arguments;
 
         if (that.is(INPUT_SELECTOR)) return that;
-        !that.is('form') && (that = this.find('form'));
-        !that.length && (that = this);
+        if (!that.is('form')) that = this.find('form');
+        if (!that.length) that = this;
 
         that.each(function() {
-            var cache = $(this).data(NS);
+            var instance = $(this).data(NS);
 
-            if (cache) {
+            if (instance) {
                 if ( isString(options) ) {
                     if ( options.charAt(0) === '_' ) return;
-                    cache[options].apply(cache, Array.prototype.slice.call(args, 1));
+                    instance[options].apply(instance, [].slice.call(args, 1));
                 }
                 else if (options) {
-                    cache._reset(true);
-                    cache._init(this, options);
+                    instance._reset(true);
+                    instance._init(this, options);
                 }
             } else {
                 new Validator(this, options);
