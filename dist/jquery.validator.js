@@ -178,20 +178,20 @@
             args = arguments;
 
         if (that.is(INPUT_SELECTOR)) return that;
-        !that.is('form') && (that = this.find('form'));
-        !that.length && (that = this);
+        if (!that.is('form')) that = this.find('form');
+        if (!that.length) that = this;
 
         that.each(function() {
-            var cache = $(this).data(NS);
+            var instance = $(this).data(NS);
 
-            if (cache) {
+            if (instance) {
                 if ( isString(options) ) {
                     if ( options.charAt(0) === '_' ) return;
-                    cache[options].apply(cache, Array.prototype.slice.call(args, 1));
+                    instance[options].apply(instance, [].slice.call(args, 1));
                 }
                 else if (options) {
-                    cache._reset(true);
-                    cache._init(this, options);
+                    instance._reset(true);
+                    instance._init(this, options);
                 }
             } else {
                 new Validator(this, options);
@@ -430,7 +430,7 @@
 
             field = me.getField(key, true);
             // The priority of passing parameter by DOM is higher than by JS.
-            field.rule = dataRule || field.rule || '';
+            field.rule = dataRule || field.rule;
 
             if (display = attr(el, DATA_DISPLAY)) {
                 field.display = display;
@@ -439,7 +439,7 @@
                 if ( attr(el, DATA_MUST) !== null || /\b(?:match|checked)\b/.test(field.rule) ) {
                     field.must = true;
                 }
-                if ( ~field.rule.indexOf('required') ) {
+                if ( /\brequired\b/.test(field.rule) ) {
                     field.required = true;
                     attr(el, ARIA_REQUIRED, true);
                 }
@@ -948,8 +948,8 @@
                         4. rule returned message;
                         5. default message;
                     */
-                    msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || me.messages.fallback).replace(/\{0\|?([^\}]*)\}/, function(){
-                        return me._getDisplay(el, field.display) || arguments[1] || me.messages[0];
+                    msg = (_getDataMsg(el, field, msg || rule.msg || me.messages[method]) || me.messages.fallback).replace(/\{0\|?([^\}]*)\}/, function(m, defaultDisplay){
+                        return me._getDisplay(el, field.display) || defaultDisplay || me.messages[0];
                     });
                 }
                 if (!isValid) field.isValid = isValid;
@@ -1314,6 +1314,7 @@
 
             if (isString(el)) {
                 key = el;
+                el = undefined;
             } else {
                 if (attr(el, DATA_RULE)) {
                     return me._parse(el);
@@ -1367,9 +1368,7 @@
             for (k in fields) {
                 field = fields[k];
                 if (!field._rules || !field.required && !field.must && !field.value) continue;
-                if (!field.isValid) {
-                    return field.isValid;
-                }
+                if (!field.isValid) return false;
             }
             return true;
         },
@@ -1560,7 +1559,6 @@
                 return fn;
             case 'array':
                 var f = function() {
-                    fn.msg = fn[1];
                     return fn[0].test(this.value) || fn[1] || false;
                 };
                 f.msg = fn[1];
@@ -1606,10 +1604,10 @@
     // Get custom rules on the node
     function _getDataRule(el, method) {
         var fn = trim(attr(el, DATA_RULE + '-' + method));
-
-        if (!fn) return;
-        fn = (new Function("return " + fn))();
-        if (fn) return _getRule(fn);
+        
+        if ( fn && (fn = new Function("return " + fn)()) ) {
+            return _getRule(fn);
+        }
     }
 
     // Get custom messages on the node
@@ -2026,9 +2024,8 @@
             var VALIDATED = '_validated_';
             if(!params || $(element).data(VALIDATED)) return;
 
-            this.$el.find(
-                $.map(params, _key2selector).join(',')
-            ).data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
+            this.$el.find( $.map(params, _key2selector).join(',') )
+                .data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
         /**
