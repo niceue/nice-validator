@@ -593,7 +593,7 @@
             me.errors = {};
             if (e) {
                 me.reseting = true;
-                me.$el.find(INPUT_SELECTOR).map(function(el){
+                me.$el.find(INPUT_SELECTOR).each( function(i, el){
                     me._resetElement(el);
                 });
                 delete me.reseting;
