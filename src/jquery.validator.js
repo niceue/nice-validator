@@ -54,10 +54,6 @@
                 return el.getAttribute(key);
             }
         },
-        debug = window.console || {
-            log: noop,
-            info: noop
-        },
         novalidateonce,
         preinitialized = {},
 
@@ -546,7 +542,7 @@
                 me._guessAjax(form);
             }
 
-            opt.debug && debug.log("\n<<< event: " + e.type);
+            me._debug('log', '\n<<< event: ' + e.type);
 
             me._reset();
             me.submiting = true;
@@ -573,7 +569,7 @@
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
 
-                    opt.debug && debug.log('>>> ' + ret);
+                    me._debug('log', '>>> ' + ret);
 
                     if (!isValid) return;
                     // For jquery.form plugin
@@ -962,10 +958,7 @@
                 });
             }
 
-            // output the debug message
-            if (opt.debug) {
-                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msg));
-            }
+            me._debug('log', '   ' + field._i + ': ' + method + ' => ' + (isValid || msg));
 
             // the current rule has passed, continue to validate
             if ( (isValid || special) && field._i < field._rules.length - 1) {
@@ -1087,7 +1080,7 @@
             if (!field._rules) me._parse(el);
             if (!field._rules) return;
 
-            if (me.options.debug) debug.info(field.key);
+            me._debug('info', field.key);
 
             field.isValid = true;
             field.element = el;
@@ -1104,6 +1097,12 @@
 
             me._checkRule(el, field);
             return field.isValid;
+        },
+
+        _debug: function(type, messages) {
+            if (window.console && this.options.debug) {
+                console[type](messages);
+            }
         },
 
         /**
