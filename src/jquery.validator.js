@@ -1504,6 +1504,7 @@
         }
         function Field(key, obj, oldField) {
             this.key = key;
+            this.validator = context;
             $.extend(this, oldField, obj);
         }
 
