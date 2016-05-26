@@ -498,7 +498,6 @@
             });
 
             isValid = !me.hasError;
-            me.hasError = undefined;
 
             // Need to wait for all fields validation complete, especially asynchronous validation
             if (doneCallback) {
@@ -511,6 +510,8 @@
                     me.validating = false;
                 });
             }
+
+            delete me.hasError;
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect form validation result through "doneCallback".
