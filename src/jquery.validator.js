@@ -1647,7 +1647,7 @@
     function _key2selector(key) {
         var isID = key.charAt(0) === "#";
         key = key.replace(/([:.{(|)}/\[\]])/g, "\\$1");
-        return isID ? key : '[name="'+ key +'"]:input';
+        return isID ? key : '[name="'+ key +'"]:first';
     }
 
 
