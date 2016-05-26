@@ -68,7 +68,7 @@
                 lte: "<#=lang.range_lte#>",
                 gtlt: "<#=lang.range_gtlt#>",
                 gt: "<#=lang.range_gt#>",
-                lt: "<#=lang.range_lt#>",
+                lt: "<#=lang.range_lt#>"
             },
             checked: {
                 eq: "<#=lang.checked_eq#>",
