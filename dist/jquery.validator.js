@@ -1,4 +1,4 @@
-/*! nice-validator 0.10.9
+/*! nice-validator 0.10.11
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -35,7 +35,7 @@
         NOVALIDATE = 'novalidate',
         INPUT_SELECTOR = ':verifiable',
 
-        rRules = /(&)?(!)?\s?(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\||&)?/g,
+        rRules = /(&)?(!)?\b(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?\s*(;|\|)?/g,
         rRule = /(\w+)(?:\[\s*(.*?\]?)\s*\]|\(\s*(.*?\)?)\s*\))?/,
         rDisplay = /(?:([^:;\(\[]*):)?(.*)/,
         rDoubleBytes = /[^\x00-\xff]/g,
@@ -552,13 +552,7 @@
                 me._guessAjax(form);
             }
 
-            // Prevent infinite loop validation
-            if (canSubmit && e.isTrigger && me.isValid) {
-                submitForm();
-                return;
-            }
-
-            opt.debug && debug.log("\n<<< " + (e.isTrigger ? 'trigger: ':'event: ') + e.type);
+            opt.debug && debug.log("\n<<< event: " + e.type);
 
             me._reset();
             me.submiting = true;
