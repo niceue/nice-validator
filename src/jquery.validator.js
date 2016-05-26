@@ -2010,20 +2010,6 @@
         },
 
         /**
-         * validate other fields
-         *
-         * @example
-         *  validate(name1, #id2)
-         */
-        validate: function(element, params) {
-            var VALIDATED = '_validated_';
-            if(!params || $(element).data(VALIDATED)) return;
-
-            this.$el.find( $.map(params, _key2selector).join(',') )
-                .data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
-        },
-
-        /**
          * filter characters, direct filtration without prompting error (support custom regular expressions)
          *
          * @example
