@@ -58,10 +58,6 @@
                 return el.getAttribute(key);
             }
         },
-        debug = window.console || {
-            log: noop,
-            info: noop
-        },
         novalidateonce,
         preinitialized = {},
 
@@ -506,7 +502,6 @@
             });
 
             isValid = !me.hasError;
-            me.hasError = undefined;
 
             // Need to wait for all fields validation complete, especially asynchronous validation
             if (doneCallback) {
@@ -519,6 +514,8 @@
                     me.validating = false;
                 });
             }
+
+            delete me.hasError;
 
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect form validation result through "doneCallback".
@@ -550,7 +547,7 @@
                 me._guessAjax(form);
             }
 
-            opt.debug && debug.log("\n<<< event: " + e.type);
+            me._debug('log', '\n<<< event: ' + e.type);
 
             me._reset();
             me.submiting = true;
@@ -577,7 +574,7 @@
                     isFunction(opt[ret]) && opt[ret].call(me, form, errors);
                     me.$el.trigger(ret + CLS_NS_FORM, [form, errors]);
 
-                    opt.debug && debug.log('>>> ' + ret);
+                    me._debug('log', '>>> ' + ret);
 
                     if (!isValid) return;
                     // For jquery.form plugin
@@ -871,7 +868,6 @@
             msgOpt = msgOpt || {};
 
             var me = this,
-                opt = me.options,
                 msg,
                 rule,
                 method = field._r,
@@ -966,10 +962,7 @@
                 });
             }
 
-            // output the debug message
-            if (opt.debug) {
-                debug.log('   ' + field._i + ': ' + method + ' => ' + (isValid || msg));
-            }
+            me._debug('log', '   ' + field._i + ': ' + method + ' => ' + (isValid || msg));
 
             // the current rule has passed, continue to validate
             if ( (isValid || special) && field._i < field._rules.length - 1) {
@@ -1091,7 +1084,7 @@
             if (!field._rules) me._parse(el);
             if (!field._rules) return;
 
-            if (me.options.debug) debug.info(field.key);
+            me._debug('info', field.key);
 
             field.isValid = true;
             field.element = el;
@@ -1108,6 +1101,12 @@
 
             me._checkRule(el, field);
             return field.isValid;
+        },
+
+        _debug: function(type, messages) {
+            if (window.console && this.options.debug) {
+                console[type](messages);
+            }
         },
 
         /**
@@ -1508,6 +1507,7 @@
         }
         function Field(key, obj, oldField) {
             this.key = key;
+            this.validator = context;
             $.extend(this, oldField, obj);
         }
 
@@ -1604,7 +1604,7 @@
     // Get custom rules on the node
     function _getDataRule(el, method) {
         var fn = trim(attr(el, DATA_RULE + '-' + method));
-        
+
         if ( fn && (fn = new Function("return " + fn)()) ) {
             return _getRule(fn);
         }
@@ -1650,7 +1650,7 @@
     function _key2selector(key) {
         var isID = key.charAt(0) === "#";
         key = key.replace(/([:.{(|)}/\[\]])/g, "\\$1");
-        return isID ? key : '[name="'+ key +'"]:input';
+        return isID ? key : '[name="'+ key +'"]:first';
     }
 
 
@@ -2012,20 +2012,6 @@
                 data: data,
                 dataType: dataType
             });
-        },
-
-        /**
-         * validate other fields
-         *
-         * @example
-         *  validate(name1, #id2)
-         */
-        validate: function(element, params) {
-            var VALIDATED = '_validated_';
-            if(!params || $(element).data(VALIDATED)) return;
-
-            this.$el.find( $.map(params, _key2selector).join(',') )
-                .data(VALIDATED, 1).trigger('validate').removeData(VALIDATED);
         },
 
         /**
