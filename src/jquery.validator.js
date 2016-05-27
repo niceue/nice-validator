@@ -864,7 +864,6 @@
             msgOpt = msgOpt || {};
 
             var me = this,
-                opt = me.options,
                 msg,
                 rule,
                 method = field._r,
@@ -1601,7 +1600,7 @@
     // Get custom rules on the node
     function _getDataRule(el, method) {
         var fn = trim(attr(el, DATA_RULE + '-' + method));
-        
+
         if ( fn && (fn = new Function("return " + fn)()) ) {
             return _getRule(fn);
         }
