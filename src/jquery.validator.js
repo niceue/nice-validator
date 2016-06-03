@@ -1034,14 +1034,14 @@
                 // waiting to parse the response data
                 ret.then(
                     function(d, textStatus, jqXHR) {
-                        var data = jqXHR.responseText,
+                        var data = trim(jqXHR.responseText),
                             result,
                             dataFilter = field.dataFilter;
 
                         // detect if data is json or jsonp format
                         if (/jsonp?/.test(this.dataType)) {
                             data = d;
-                        } else if (trim(data).charAt(0) === '{') {
+                        } else if (data.charAt(0) === '{') {
                             data = $.parseJSON(data);
                         }
 
