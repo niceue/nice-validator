@@ -44,14 +44,14 @@ gulp.task('build-css', function () {
 
 // copy images
 gulp.task('copy-images', function () {
-    gulp.src('src/images/*')
+    gulp.src(['src/images/*'])
         .pipe(rename({dirname:'images'}))
         .pipe(gulp.dest(DIST));
 });
 
 // build local settings
 gulp.task('i18n', function () {
-    var compiler = tpl( fs.readFileSync( 'src/local/_lang.tpl' ).toString() );
+    var compiler = tpl( fs.readFileSync( 'src/local/_config.tpl' ).toString() );
 
     gulp.src('src/local/*.js')
         .pipe(i18n())
@@ -89,7 +89,7 @@ gulp.task('test', function () {
 gulp.task('release', ['build', 'test'], function () {
     var zip = require('gulp-zip');
     gulp.src([
-            "dist/**", "!images/Thumbs.db",
+            "dist/**",
             "demo/**",
             "package.json",
             "README.md"
