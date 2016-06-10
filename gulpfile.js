@@ -3,7 +3,7 @@ var fs = require('fs'),
     path = require('path'),
     gulp = require('gulp'),
     insert = require('gulp-insert'),
-    jshint = require('gulp-jshint'),
+    eslint = require('gulp-eslint'),
     uglify = require('gulp-uglify'),
     stylus = require('gulp-stylus'),
     rename = require('gulp-rename'),
@@ -17,11 +17,12 @@ var pkg = require('./package.json'),
              ' */';
 
 
-// run jshint
+// run eslint
 gulp.task('lint', function () {
     gulp.src(['src/*.js', 'src/local/*.js', 'test/unit/*.js'])
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'))
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
 });
 
 // build js
