@@ -263,10 +263,9 @@
         me.$el = $(element);
 
         if (me.$el.length) {
-            if (Validator.loading) {
+            init();
+            if (Validator.pending) {
                 $(window).on('validatorready', init);
-            } else {
-                init();
             }
         }
         else if ( isString(element) ) {
@@ -274,12 +273,12 @@
         }
 
         function init() {
-            me._init(me.$el[0], options);
+            me._init(me.$el[0], options, !!arguments[0]);
         }
     }
 
     Validator.prototype = {
-        _init: function(element, options) {
+        _init: function(element, options, hasInit) {
             var me = this,
                 opt, themeOpt, dataOpt;
 
@@ -289,53 +288,51 @@
                     valid: options
                 };
             }
-            options = options || {};
+            options = me._opt = options || {};
             dataOpt = attr(element, 'data-'+ NS +'-option');
-            dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
-            themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
+            dataOpt = me._dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
+            themeOpt = me._themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
             opt = me.options = $.extend({}, defaults, fieldDefaults, themeOpt, me.options, options, dataOpt);
 
-            me.rules = new Rules(opt.rules, true);
-            me.messages = new Messages(opt.messages, true);
-            me.Field = _createFieldFactory(me);
-            me.elements = me.elements || {};
-            me.deferred = {};
-            me.errors = {};
-            me.fields = {};
-
-            // Initialization fields
-            me._initFields(opt.fields);
-
-            // Display all messages in target container
-            if ( isString(opt.target) ) {
-                me.$el.find(opt.target).addClass('msg-container');
+            if (!hasInit) {
+                me.rules = new Rules(opt.rules, true);
+                me.messages = new Messages(opt.messages, true);
+                me.Field = _createFieldFactory(me);
+                me.elements = me.elements || {};
+                me.deferred = {};
+                me.errors = {};
+                me.fields = {};
+                // Initialization fields
+                me._initFields(opt.fields);
             }
 
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
-                      .on('form-submit-validate', function(e, a, $form, opts, veto) {
-                            me.vetoed = veto.veto = !me.isValid;
-                            me.ajaxFormOptions = opts;
-                       })
-                      .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
-                      .on('reset'+ CLS_NS, proxy(me, '_reset'))
-                      .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
-                      .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
-                      .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
-                      .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
-
-                if ( opt.timely ) {
-                    me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
-                          .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
-                          .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
-                }
+                    .on('form-submit-validate', function(e, a, $form, opts, veto) {
+                        me.vetoed = veto.veto = !me.isValid;
+                        me.ajaxFormOptions = opts;
+                    })
+                    .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
+                    .on('reset'+ CLS_NS, proxy(me, '_reset'))
+                    .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
+                    .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
+                    .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
+                    .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
+                    .on('keyup'+ CLS_NS +' input'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
+                    .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
+                    .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
 
                 // cache the novalidate attribute value
-                me._novalidate = attr(element, NOVALIDATE);
+                me._NOVALIDATE = attr(element, NOVALIDATE);
                 // Initialization is complete, stop off default HTML5 form validation
                 // If use "jQuery.attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
+            }
+
+            // Display all messages in target container
+            if ( isString(opt.target) ) {
+                me.$el.find(opt.target).addClass('msg-container');
             }
         },
 
@@ -1258,7 +1255,7 @@
             }
             $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
 
-            if (isFunction(msgShow = field.msgShow || opt.msgShow)) {
+            if (isFunction(msgShow = field && field.msgShow || opt.msgShow)) {
                 msgShow.call(me, $msgbox, msgOpt.type);
             }
         },
@@ -1398,7 +1395,7 @@
         destroy: function() {
             this._reset(1);
             this.$el.off(CLS_NS).removeData(NS);
-            attr(this.$el[0], NOVALIDATE, this._novalidate);
+            attr(this.$el[0], NOVALIDATE, this._NOVALIDATE);
         }
     };
 
@@ -2109,15 +2106,15 @@
         }
         if (!Validator.local && params.local !== '') {
             Validator.local = (params.local || doc.documentElement.lang || 'en').replace('_','-');
-            Validator.loading = 1;
+            Validator.pending = 1;
             el = doc.createElement('script');
             el.src = dir + 'local/' + Validator.local + '.js';
             ONLOAD = 'onload' in el ? 'onload' : 'onreadystatechange';
             el[ONLOAD] = function() {
                 if (!el.readyState || /loaded|complete/.test(el.readyState)) {
-                    $(window).trigger('validatorready');
                     el = el[ONLOAD] = null;
-                    delete Validator.loading;
+                    delete Validator.pending;
+                    $(window).triggerHandler('validatorready');
                 }
             };
             node.parentNode.insertBefore(el, node);
