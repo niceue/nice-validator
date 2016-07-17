@@ -328,7 +328,7 @@
                 }
 
                 // cache the novalidate attribute value
-                me._novalidate = attr(element, NOVALIDATE);
+                me._NOVALIDATE = attr(element, NOVALIDATE);
                 // Initialization is complete, stop off default HTML5 form validation
                 // If use "jQuery.attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
@@ -1394,7 +1394,7 @@
         destroy: function() {
             this._reset(1);
             this.$el.off(CLS_NS).removeData(NS);
-            attr(this.$el[0], NOVALIDATE, this._novalidate);
+            attr(this.$el[0], NOVALIDATE, this._NOVALIDATE);
         }
     };
 
