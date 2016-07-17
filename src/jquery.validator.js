@@ -285,10 +285,10 @@
                     valid: options
                 };
             }
-            options = options || {};
+            options = me._opt = options || {};
             dataOpt = attr(element, 'data-'+ NS +'-option');
-            dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
-            themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
+            dataOpt = me._dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
+            themeOpt = me._themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
             opt = me.options = $.extend({}, defaults, fieldDefaults, themeOpt, me.options, options, dataOpt);
 
             me.rules = new Rules(opt.rules, true);
