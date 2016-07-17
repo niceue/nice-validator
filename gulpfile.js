@@ -20,7 +20,10 @@ var pkg = require('./package.json'),
 // run eslint
 gulp.task('lint', function () {
     gulp.src(['src/*.js', 'src/local/*.js', 'test/unit/*.js'])
-        .pipe(eslint())
+        .pipe(eslint({
+            globals: ['jQuery'],
+            envs: ['browser']
+        }))
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
 });
