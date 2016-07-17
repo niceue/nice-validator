@@ -259,10 +259,9 @@
         me.$el = $(element);
 
         if (me.$el.length) {
-            if (Validator.loading) {
+            init();
+            if (Validator.pending) {
                 $(window).on('validatorready', init);
-            } else {
-                init();
             }
         }
         else if ( isString(element) ) {
@@ -299,14 +298,6 @@
             me.errors = {};
             me.fields = {};
 
-            // Initialization fields
-            me._initFields(opt.fields);
-
-            // Display all messages in target container
-            if ( isString(opt.target) ) {
-                me.$el.find(opt.target).addClass('msg-container');
-            }
-
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
@@ -332,6 +323,16 @@
                 // Initialization is complete, stop off default HTML5 form validation
                 // If use "jQuery.attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
+            }
+
+            if (Validator.pending) return;
+
+            // Initialization fields
+            me._initFields(opt.fields);
+
+            // Display all messages in target container
+            if ( isString(opt.target) ) {
+                me.$el.find(opt.target).addClass('msg-container');
             }
         },
 
@@ -2105,15 +2106,15 @@
         }
         if (!Validator.local && params.local !== '') {
             Validator.local = (params.local || doc.documentElement.lang || 'en').replace('_','-');
-            Validator.loading = 1;
+            Validator.pending = 1;
             el = doc.createElement('script');
             el.src = dir + 'local/' + Validator.local + '.js';
             ONLOAD = 'onload' in el ? 'onload' : 'onreadystatechange';
             el[ONLOAD] = function() {
                 if (!el.readyState || /loaded|complete/.test(el.readyState)) {
-                    $(window).trigger('validatorready');
                     el = el[ONLOAD] = null;
-                    delete Validator.loading;
+                    delete Validator.pending;
+                    $(window).triggerHandler('validatorready');
                 }
             };
             node.parentNode.insertBefore(el, node);
