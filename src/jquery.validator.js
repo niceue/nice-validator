@@ -269,12 +269,12 @@
         }
 
         function init() {
-            me._init(me.$el[0], options);
+            me._init(me.$el[0], options, !!arguments[0]);
         }
     }
 
     Validator.prototype = {
-        _init: function(element, options) {
+        _init: function(element, options, hasInit) {
             var me = this,
                 opt, themeOpt, dataOpt;
 
@@ -290,33 +290,34 @@
             themeOpt = me._themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
             opt = me.options = $.extend({}, defaults, fieldDefaults, themeOpt, me.options, options, dataOpt);
 
-            me.rules = new Rules(opt.rules, true);
-            me.messages = new Messages(opt.messages, true);
-            me.Field = _createFieldFactory(me);
-            me.elements = me.elements || {};
-            me.deferred = {};
-            me.errors = {};
-            me.fields = {};
+            if (!hasInit) {
+                me.rules = new Rules(opt.rules, true);
+                me.messages = new Messages(opt.messages, true);
+                me.Field = _createFieldFactory(me);
+                me.elements = me.elements || {};
+                me.deferred = {};
+                me.errors = {};
+                me.fields = {};
+                // Initialization fields
+                me._initFields(opt.fields);
+            }
 
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
                 me.$el.data(NS, me).addClass(CLS_WRAPPER +' '+ opt.formClass)
-                      .on('form-submit-validate', function(e, a, $form, opts, veto) {
-                            me.vetoed = veto.veto = !me.isValid;
-                            me.ajaxFormOptions = opts;
-                       })
-                      .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
-                      .on('reset'+ CLS_NS, proxy(me, '_reset'))
-                      .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
-                      .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
-                      .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
-                      .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'));
-
-                if ( opt.timely ) {
-                    me.$el.on('keyup'+ CLS_NS +' input'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
-                          .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
-                          .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
-                }
+                    .on('form-submit-validate', function(e, a, $form, opts, veto) {
+                        me.vetoed = veto.veto = !me.isValid;
+                        me.ajaxFormOptions = opts;
+                    })
+                    .on('submit'+ CLS_NS +' validate'+ CLS_NS, proxy(me, '_submit'))
+                    .on('reset'+ CLS_NS, proxy(me, '_reset'))
+                    .on('showmsg'+ CLS_NS, proxy(me, '_showmsg'))
+                    .on('hidemsg'+ CLS_NS, proxy(me, '_hidemsg'))
+                    .on('focusin'+ CLS_NS + ' click'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusin'))
+                    .on('focusout'+ CLS_NS +' validate'+ CLS_NS, INPUT_SELECTOR, proxy(me, '_focusout'))
+                    .on('keyup'+ CLS_NS +' input'+ CLS_NS + ' compositionstart compositionend', INPUT_SELECTOR, proxy(me, '_focusout'))
+                    .on('click'+ CLS_NS, ':radio,:checkbox', 'click', proxy(me, '_focusout'))
+                    .on('change'+ CLS_NS, 'select,input[type="file"]', 'change', proxy(me, '_focusout'));
 
                 // cache the novalidate attribute value
                 me._NOVALIDATE = attr(element, NOVALIDATE);
@@ -324,11 +325,6 @@
                 // If use "jQuery.attr('novalidate')" in IE7 will complain: "SCRIPT3: Member not found."
                 attr(element, NOVALIDATE, NOVALIDATE);
             }
-
-            if (Validator.pending) return;
-
-            // Initialization fields
-            me._initFields(opt.fields);
 
             // Display all messages in target container
             if ( isString(opt.target) ) {
@@ -1255,7 +1251,7 @@
             }
             $msgbox.html( msgMaker.call(me, msgOpt) )[0].style.display = '';
 
-            if (isFunction(msgShow = field.msgShow || opt.msgShow)) {
+            if (isFunction(msgShow = field && field.msgShow || opt.msgShow)) {
                 msgShow.call(me, $msgbox, msgOpt.type);
             }
         },
