@@ -200,6 +200,7 @@
             ret, opt;
 
         if (!me) return true;
+        if (!hasCallback && hideMsg === undefined) hideMsg = callback;
         me.checkOnly = !!hideMsg;
         opt = me.options;
 
