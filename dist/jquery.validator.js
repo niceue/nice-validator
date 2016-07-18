@@ -231,7 +231,7 @@
 
 
     // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[contenteditable])"
-    $.expr[":"].verifiable = function(elem) {
+    $.expr.pseudos.verifiable = function(elem) {
         var name = elem.nodeName.toLowerCase();
 
         return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
@@ -241,7 +241,7 @@
     };
 
     // any value, but not only whitespace
-    $.expr[":"].filled = function(elem) {
+    $.expr.pseudos.filled = function(elem) {
         return !!trim($(elem).val());
     };
 
