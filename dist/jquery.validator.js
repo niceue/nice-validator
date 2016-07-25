@@ -1,4 +1,4 @@
-/*! nice-validator 1.0.0-alpha
+/*! nice-validator 1.0.0-beta
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -168,7 +168,7 @@
         fields[key][timely]     {Boolean}           Whether to enable timely validation
         fields[key][target]     {jqSelector}        Define placement of a message
      */
-    $.fn[NS] = function(options) {
+    $.fn.validator = function(options) {
         var that = this,
             args = arguments;
 
@@ -204,6 +204,7 @@
             ret, opt;
 
         if (!me) return true;
+        if (!hasCallback && hideMsg === undefined) hideMsg = callback;
         me.checkOnly = !!hideMsg;
         opt = me.options;
 
