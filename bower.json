@@ -24,9 +24,9 @@
     "type": "git",
     "url": "https://github.com/niceue/nice-validator.git"
   },
-  "main": "dist/jquery.validate.js",
+  "main": "dist/jquery.validator.js",
   "dependencies": {
-    "jquery": "^1.7 || ^2.0"
+    "jquery": ">=1.7"
   },
   "ignore": [
     ".*",

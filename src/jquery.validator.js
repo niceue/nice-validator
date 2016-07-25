@@ -164,7 +164,7 @@
         fields[key][timely]     {Boolean}           Whether to enable timely validation
         fields[key][target]     {jqSelector}        Define placement of a message
      */
-    $.fn[NS] = function(options) {
+    $.fn.validator = function(options) {
         var that = this,
             args = arguments;
 
