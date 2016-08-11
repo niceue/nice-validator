@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>Required From Group</title>
-	<link rel="stylesheet" href="demo.css">
+    <link rel="stylesheet" href="demo.css">
 </head>
 
 <body>
 
 <form class="form" data-validator-option="{timely:2,showOk:''}">
     <div class="form-item">
-		<input type="text" class="contact" name="mobile" placeholder="手机号"
+        <input type="text" class="contact" name="mobile" placeholder="手机号"
             data-rule="required(from, .contact); mobile"
             data-msg-required="请至少填写一种联系方式">
-	</div>
+    </div>
     <div class="form-item">
-		<input type="text" class="contact" name="tel" placeholder="电话"
+        <input type="text" class="contact" name="tel" placeholder="电话"
             data-rule="required(from, .contact); tel">
-	</div>
+    </div>
     <div class="form-item">
         <input type="text" class="contact" name="email" placeholder="邮箱"
             data-rule="required(from, .contact); email">
@@ -28,7 +28,7 @@
 </form>
 
 
-<script src="http://dn-nice.qbox.me/libs/jquery/1.x/jquery.min.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
 <script src="../dist/jquery.validator.min.js?local=zh-CN"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ describe('Core', function(){
         });
     });
 
-    afterEach(function(){
+    beforeEach(function(){
         $('#dom_way,#js_way').each(function(){
             var $form = $(this),
                 data = $form.data('validator');
@@ -20,7 +20,7 @@ describe('Core', function(){
                     return $(this).attr('data-cacherule');
                 });
             }
-        }); 
+        });
     });
 
     describe('Initialization', function(){

@@ -3,11 +3,9 @@
  * Locale: Chinese; 中文; TW (Taiwan)
  *********************************/
 (function(factory) {
-    'function' === typeof define && (define.amd || define.cmd) ? define(function(require, exports, module){
-        var $ = require('jquery')||jQuery; $._VALIDATOR_URI = module.uri;
-        require('../jquery.validator.min')($);
-        factory($);
-    }) : factory(jQuery);
+    typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
+    typeof define === 'function' && define.amd ? define(['jquery', '../jquery.validator'], factory) :
+    factory(jQuery);
 }(function($) {
 
     /* Global configuration

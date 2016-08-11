@@ -3,7 +3,7 @@
   "description": "Simple, smart and pleasant verification solution.",
   "moduleType": [
     "amd",
-    "cmd",
+    "node",
     "globals"
   ],
   "keywords": [
@@ -24,8 +24,9 @@
     "type": "git",
     "url": "https://github.com/niceue/nice-validator.git"
   },
+  "main": "dist/jquery.validator.js",
   "dependencies": {
-    "jquery": "^1.7.0"
+    "jquery": ">=1.7"
   },
   "ignore": [
     ".*",

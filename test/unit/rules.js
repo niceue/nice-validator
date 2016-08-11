@@ -587,39 +587,6 @@ describe('Rules', function(){
         
     });
 
-    describe('validate', function(){
-        it('validate(name)', function(){
-            var input1 = elems['field1'],
-                input2 = elems['field2'];
-
-            me.setField({
-                field1: 'required',
-                field2: 'required;validate(field1)'
-            });
-
-            input1.value = '';
-            assert.ok( test(input2, '1234') && !me.fields['field1'].isValid, 'assert false' );
-            input1.value = '1234';
-            assert.ok( test(input2, '1234') && me.fields['field1'].isValid, 'assert true' );
-        });
-
-        it('validate(name, #id)', function(){
-            var input1 = elems['field1'],
-                input2 = elems['field2'],
-                input3 = elems['field3'];
-
-            me.setField({
-                field1: 'required',
-                field2: 'required',
-                field3: 'validate(field1, #field2)'
-            });
-
-            input1.value = 'value1';
-            input2.value = 'value2';
-            assert.ok( test(input3, 'value3') && me.fields['field1'].isValid && me.fields['field2'].isValid, 'assert false' );
-        });
-    });
-
     describe('filter', function(){
         it('filter', function(){
             var input = elems['field1'];
