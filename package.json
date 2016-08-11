@@ -1,6 +1,6 @@
 {
   "name": "nice-validator",
-  "version": "1.0.0-beta",
+  "version": "1.0.0",
   "author": "Jony Zhang <niceue@live.com>",
   "license": "MIT",
   "description": "Simple, smart and pleasant verification solution.",
