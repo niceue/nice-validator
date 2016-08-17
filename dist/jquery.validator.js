@@ -1,4 +1,4 @@
-/*! nice-validator 1.0.0
+/*! nice-validator 1.0.1
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -238,7 +238,7 @@
         return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
                  name === 'select' ||
                  name === 'textarea' ) &&
-               elem.disabled === false || elem.getAttribute('contenteditable') !== null;
+               elem.disabled === false || elem.getAttribute('contenteditable') === true;
     };
 
     // any value, but not only whitespace
