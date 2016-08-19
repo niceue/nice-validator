@@ -1,4 +1,4 @@
-/*! nice-validator 1.0.2
+/*! nice-validator 1.0.3
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -237,8 +237,9 @@
 
         return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
                  name === 'select' ||
-                 name === 'textarea' ) &&
-               elem.disabled === false || elem.getAttribute('contenteditable') === true;
+                 name === 'textarea' ||
+                 elem.contentEditable === 'true'
+                ) && !elem.disabled;
     };
 
     // any value, but not only whitespace
@@ -1142,6 +1143,7 @@
             return $.extend({
                 type: 'error',
                 pos: _getPos(opt.msgClass),
+                target: opt.target,
                 wrapper: opt.msgWrapper,
                 style: opt.msgStyle,
                 cls: opt.msgClass,
