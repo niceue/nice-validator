@@ -1139,6 +1139,7 @@
             return $.extend({
                 type: 'error',
                 pos: _getPos(opt.msgClass),
+                target: opt.target,
                 wrapper: opt.msgWrapper,
                 style: opt.msgStyle,
                 cls: opt.msgClass,
