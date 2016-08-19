@@ -479,8 +479,9 @@
         // Verify a zone
         _multiValidate: function($inputs, doneCallback){
             var me = this,
-                opt = me.options,
-                isValid;
+                opt = me.options;
+
+            me.hasError = false;
 
             if (opt.ignore) {
                 $inputs = $inputs.not(opt.ignore);
@@ -494,8 +495,6 @@
                 }
             });
 
-            isValid = !me.hasError;
-
             // Need to wait for all fields validation complete, especially asynchronous validation
             if (doneCallback) {
                 me.validating = true;
@@ -503,16 +502,14 @@
                     null,
                     $.map(me.deferred, function(v){return v;})
                 ).done(function(){
-                    doneCallback.call(me, isValid);
+                    doneCallback.call(me, !me.hasError);
                     me.validating = false;
                 });
             }
 
-            delete me.hasError;
-
             // If the form does not contain asynchronous validation, the return value is correct.
             // Otherwise, you should detect form validation result through "doneCallback".
-            return !$.isEmptyObject(me.deferred) ? undefined : isValid;
+            return !$.isEmptyObject(me.deferred) ? undefined : !me.hasError;
         },
 
         // Validate the whole form
