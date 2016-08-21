@@ -1,6 +1,6 @@
 ;(function(factory) {
     typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
-    typeof define === 'function' && define.amd ? define(['jquery'], factory) :
+    typeof define === 'function' && define.amd ? require(['jquery'], factory) :
     factory(jQuery);
 }(function($, undefined) {
     "use strict";
