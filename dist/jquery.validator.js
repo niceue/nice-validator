@@ -4,7 +4,7 @@
  */
 ;(function(factory) {
     typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
-    typeof define === 'function' && define.amd ? define(['jquery'], factory) :
+    typeof define === 'function' && define.amd ? require(['jquery'], factory) :
     factory(jQuery);
 }(function($, undefined) {
     "use strict";
@@ -816,17 +816,17 @@
             ret.id = el.id;
             ret.value = field.value;
 
+            me.elements[field.key] = ret.element = el;
+            me.isValid = me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
+
             if (isValid) {
                 ret.type = 'ok';
             } else {
                 if (me.submiting) {
                     me.errors[field.key] = ret.msg;
                 }
-                me.isValid = false;
                 me.hasError = true;
             }
-            me.elements[field.key] = ret.element = el;
-            me.$el[0].isValid = isValid ? me.isFormValid() : isValid;
 
             // cache result
             field.old = ret;
