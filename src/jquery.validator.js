@@ -782,13 +782,18 @@
             var me = this,
                 el = e.target;
 
-            if ( $(el).is(INPUT_SELECTOR) ) {
-                me.showMsg(el, {type: type, msg: msg});
+            if ( me.$el.is(el) ) {
+                if (isObject(type)) {
+                    me.showMsg(type)
+                }
+                else if ( type === 'tip' ) {
+                    me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
+                        me.showMsg(this, {type: type, msg: msg});
+                    });
+                }
             }
-            else if ( type === 'tip' ) {
-                me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
-                    me.showMsg(this, {type: type, msg: msg});
-                });
+            else {
+                me.showMsg(el, {type: type, msg: msg});
             }
         },
 
