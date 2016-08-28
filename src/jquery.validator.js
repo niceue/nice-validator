@@ -1179,9 +1179,9 @@
                 $el = this.$el.find(tgt || el);
 
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
-                    'className': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
+                    'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
                     'style': msgOpt.style || undefined,
-                    'htmlFor': datafor
+                    'for': datafor
                 });
 
                 if ( _checkable(el) ) {
