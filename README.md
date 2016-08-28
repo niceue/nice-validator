@@ -22,12 +22,21 @@ width `<script>` tag:
 ```html
 <script src="path/to/nice-validator/jquery.validator.min.js?local=en"></script>
 ```
+via [webpack](http://webpack.github.io/)
+```javascript
+require('nice-validator')
+require('nice-validator/local/zh-CN')
+```
+
 via module loader [Requirejs](http://requirejs.org/):
 ```javascript
 requirejs.config({
     paths: {
         jquery: 'http://cdn.jsdelivr.net/jquery/1.12.3/jquery.min',
-        validator: 'path/to/jquery.validator.js?local=en'
+        validator: 'path/to/nice-validator/local/en'
+    },
+    shim: {
+        validator: ['path/to/nice-validator/jquery.validator.js?css']
     }
 });
 
