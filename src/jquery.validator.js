@@ -67,6 +67,7 @@
             valid: null,
             invalid: null,
             validation: null,
+            formClass: 'n-default',
             validClass: 'n-valid',
             invalidClass: 'n-invalid',
             bindClassTo: null
@@ -99,17 +100,12 @@
             msgWrapper: 'span',
             msgArrow: '',
             msgIcon: '<span class="n-icon"></span>',
-            msgClass: '',
+            msgClass: 'n-right',
             msgStyle: '',
             msgShow: null,
             msgHide: null
         },
-        themes = {
-            'default': {
-                formClass: 'n-default',
-                msgClass: 'n-right'
-            }
-        };
+        themes = {};
 
     /** jQuery Plugin
      * @param {Object} options
@@ -1183,9 +1179,9 @@
                 $el = this.$el.find(tgt || el);
 
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
-                    'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
+                    'className': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
                     'style': msgOpt.style || undefined,
-                    'for': datafor
+                    'htmlFor': datafor
                 });
 
                 if ( _checkable(el) ) {
