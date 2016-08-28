@@ -1,6 +1,6 @@
 ;(function(factory) {
     typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
-    typeof define === 'function' && define.amd ? require(['jquery'], factory) :
+    typeof define === 'function' && define.amd ? define(['jquery'], factory) :
     factory(jQuery);
 }(function($, undefined) {
     "use strict";
@@ -782,13 +782,18 @@
             var me = this,
                 el = e.target;
 
-            if ( $(el).is(INPUT_SELECTOR) ) {
-                me.showMsg(el, {type: type, msg: msg});
+            if ( me.$el.is(el) ) {
+                if (isObject(type)) {
+                    me.showMsg(type)
+                }
+                else if ( type === 'tip' ) {
+                    me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
+                        me.showMsg(this, {type: type, msg: msg});
+                    });
+                }
             }
-            else if ( type === 'tip' ) {
-                me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
-                    me.showMsg(this, {type: type, msg: msg});
-                });
+            else {
+                me.showMsg(el, {type: type, msg: msg});
             }
         },
 
@@ -2100,7 +2105,7 @@
             el.href = Validator.css = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
         }
-        if (!Validator.local && params.local !== '') {
+        if (!Validator.local && ~str.indexOf('local') && params.local !== '') {
             Validator.local = (params.local || doc.documentElement.lang || 'en').replace('_','-');
             Validator.pending = 1;
             el = doc.createElement('script');

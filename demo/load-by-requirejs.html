@@ -8,7 +8,7 @@
 
 <body>
 
-<form id="form1" class="form" data-validator-option="{timely:2}">
+<form id="form1" class="form">
     <div class="form-item">
         <input type="text" name="user[email]" data-rule="required;email" placeholder="Email">
     </div>
@@ -27,29 +27,32 @@ requirejs.config({
     baseUrl: '../',
     paths: {
         jquery: 'http://cdn.jsdelivr.net/jquery/1.12.3/jquery.min',
-		validator: 'dist/jquery.validator.js?local=en'
+        validator: 'dist/local/zh-CN'
+    },
+    shim: {
+        validator: ['../dist/jquery.validator.js?css']
     }
 });
 
-// Just include nice-validator
-require(['validator']);
 
-
-/*
-// Use plugin methods
+// Way 1: Use plugin methods
 require(['jquery', 'validator'], function($){
-    $('#form1').validator();
+    $('#form1').validator({
+        timely: 2,
+        stopOnError: true,
+        theme: 'yellow_right'
+    });
 });
-*/
 
 
-/*
-// Define a module dependency nice-validator
-define('some-module', ['jquery', 'validator'], function($){
-    // some code
-});
-*/
+// Way 2: Just include nice-validator
+// require(['validator']);
 
+
+// Way 3: Define a module dependency nice-validator
+// define('some-module', ['jquery', 'validator'], function($){
+//     // some code
+// });
 </script>
 </body>
 </html>
