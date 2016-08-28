@@ -1,6 +1,6 @@
 ;(function(factory) {
     typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
-    typeof define === 'function' && define.amd ? require(['jquery'], factory) :
+    typeof define === 'function' && define.amd ? define(['jquery'], factory) :
     factory(jQuery);
 }(function($, undefined) {
     "use strict";
@@ -2105,7 +2105,7 @@
             el.href = Validator.css = dir + 'jquery.validator.css';
             node.parentNode.insertBefore(el, node);
         }
-        if (!Validator.local && params.local !== '') {
+        if (!Validator.local && ~str.indexOf('local') && params.local !== '') {
             Validator.local = (params.local || doc.documentElement.lang || 'en').replace('_','-');
             Validator.pending = 1;
             el = doc.createElement('script');
