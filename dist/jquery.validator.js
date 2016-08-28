@@ -1,4 +1,4 @@
-/*! nice-validator 1.0.5
+/*! nice-validator 1.0.6
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -71,6 +71,7 @@
             valid: null,
             invalid: null,
             validation: null,
+            formClass: 'n-default',
             validClass: 'n-valid',
             invalidClass: 'n-invalid',
             bindClassTo: null
@@ -103,17 +104,12 @@
             msgWrapper: 'span',
             msgArrow: '',
             msgIcon: '<span class="n-icon"></span>',
-            msgClass: '',
+            msgClass: 'n-right',
             msgStyle: '',
             msgShow: null,
             msgHide: null
         },
-        themes = {
-            'default': {
-                formClass: 'n-default',
-                msgClass: 'n-right'
-            }
-        };
+        themes = {};
 
     /** jQuery Plugin
      * @param {Object} options
