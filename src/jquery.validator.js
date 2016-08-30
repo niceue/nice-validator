@@ -1411,7 +1411,7 @@
             }
             $.extend(this, {
                 _valHook: function() {
-                    return this.element.getAttribute('contenteditable') !== null ? 'text' : 'val';
+                    return this.element.contentEditable === 'true' ? 'text' : 'val';
                 },
                 getValue: function() {
                     var elem = this.element;
