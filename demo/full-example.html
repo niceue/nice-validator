@@ -14,7 +14,7 @@
         <label class="label">Username</label>
         <input type="text" name="username"
             data-rule="required;username;"
-            data-rule-username="[/[\w\d]{4,30}/, 'Please enter 3-12 digits, letters, underscores']"
+            data-rule-username="[/^[\w\d]{3,12}$/, 'Please enter 3-12 digits, letters, underscores']"
             data-tip="You can use letters, numbers and periods"
         >
     </div>
