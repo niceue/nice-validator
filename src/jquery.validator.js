@@ -253,25 +253,25 @@
             return new Validator(element, options);
         }
 
-        me.$el = $(element);
-
-        if (me.$el.length) {
+        if (Validator.pending) {
+            $(window).on('validatorready', init);
+        } else {
             init();
-            if (Validator.pending) {
-                $(window).on('validatorready', init);
-            }
-        }
-        else if ( isString(element) ) {
-            preinitialized[element] = options;
         }
 
         function init() {
-            me._init(me.$el[0], options, !!arguments[0]);
+            me.$el = $(element);
+            if (me.$el.length) {
+                me._init(me.$el[0], options);
+            }
+            else if (isString(element)) {
+                preinitialized[element] = options;
+            }
         }
     }
 
     Validator.prototype = {
-        _init: function(element, options, hasInit) {
+        _init: function(element, options) {
             var me = this,
                 opt, themeOpt, dataOpt;
 
@@ -287,17 +287,15 @@
             themeOpt = me._themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
             opt = me.options = $.extend({}, defaults, fieldDefaults, themeOpt, me.options, options, dataOpt);
 
-            if (!hasInit) {
-                me.rules = new Rules(opt.rules, true);
-                me.messages = new Messages(opt.messages, true);
-                me.Field = _createFieldFactory(me);
-                me.elements = me.elements || {};
-                me.deferred = {};
-                me.errors = {};
-                me.fields = {};
-                // Initialization fields
-                me._initFields(opt.fields);
-            }
+            me.rules = new Rules(opt.rules, true);
+            me.messages = new Messages(opt.messages, true);
+            me.Field = _createFieldFactory(me);
+            me.elements = me.elements || {};
+            me.deferred = {};
+            me.errors = {};
+            me.fields = {};
+            // Initialization fields
+            me._initFields(opt.fields);
 
             // Initialization events and make a cache
             if ( !me.$el.data(NS) ) {
