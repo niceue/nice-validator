@@ -222,23 +222,22 @@
         return hasCallback ? this : ret;
     };
 
+    $.extend($.expr.pseudos || $.expr[':'], {
+        // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[contenteditable])"
+        verifiable: function(elem) {
+            var name = elem.nodeName.toLowerCase();
 
-    // A faster selector than ":input:not(:submit,:button,:reset,:image,:disabled,[contenteditable])"
-    $.expr.pseudos.verifiable = function(elem) {
-        var name = elem.nodeName.toLowerCase();
-
-        return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
-                 name === 'select' ||
-                 name === 'textarea' ||
-                 elem.contentEditable === 'true'
-                ) && !elem.disabled;
-    };
-
-    // any value, but not only whitespace
-    $.expr.pseudos.filled = function(elem) {
-        return !!trim($(elem).val());
-    };
-
+            return ( name === 'input' && !({submit: 1, button: 1, reset: 1, image: 1})[elem.type] ||
+                     name === 'select' ||
+                     name === 'textarea' ||
+                     elem.contentEditable === 'true'
+                    ) && !elem.disabled;
+        },
+        // any value, but not only whitespace
+        filled: function(elem) {
+            return !!trim($(elem).val());
+        }
+    });
 
     /**
      * Creates a new Validator
