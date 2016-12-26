@@ -1,5 +1,6 @@
 var fs = require('fs'),
     Stream = require('stream'),
+    exec = require('child_process').exec,
     path = require('path'),
     gulp = require('gulp'),
     insert = require('gulp-insert'),
@@ -89,8 +90,7 @@ gulp.task('test', function () {
         }));
 });
 
-// when release a version
-gulp.task('release', ['build', 'test'], function () {
+gulp.task('zip', ['build', 'test'], function () {
     var zip = require('gulp-zip');
     gulp.src([
             "dist/**",
@@ -100,6 +100,14 @@ gulp.task('release', ['build', 'test'], function () {
         ], {base: './'})
         .pipe(zip(pkg.name + '-' + pkg.version  + '.zip'))
         .pipe(gulp.dest('./'));
+});
+
+// when release a version
+gulp.task('release', ['build', 'test'], function () {
+    exec('git checkout master && npm publish --registry=https://registry.npmjs.org', function(e, stdout, stderr) {
+　　　　console.log(stdout);
+　　　　console.log(stderr);
+    })
 });
 
 

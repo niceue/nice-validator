@@ -21,7 +21,9 @@
   },
   "bugs": "https://github.com/niceue/nice-validator/issues",
   "scripts": {
-    "test": "gulp"
+    "test": "gulp",
+    "build": "gulp build",
+    "zip": "gulp zip"
   },
   "files": [
     "dist"
