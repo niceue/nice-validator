@@ -688,8 +688,8 @@
                         return;
                     }
                     if ( timely === 2 || timely === 8 ) {
-                        if (value) {
-                            old = field.old;
+                        old = field.old;
+                        if (value && old) {
                             if (field.isValid && !old.showOk) {
                                 me.hideMsg(el);
                             } else {
