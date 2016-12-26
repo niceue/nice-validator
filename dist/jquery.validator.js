@@ -1,4 +1,4 @@
-/*! nice-validator 1.0.8
+/*! nice-validator 1.0.9
  * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -666,7 +666,7 @@
             // For checkbox and radio
             elem = el.name && _checkable(el) ? me.$el.find('input[name="'+ el.name +'"]').get(0) : el;
             // Get field
-            if (!(field = me.getField(elem))) {
+            if (!(field = me.getField(elem)) || !field.rule) {
                 return;
             }
             // Cache event type
@@ -692,8 +692,8 @@
                         return;
                     }
                     if ( timely === 2 || timely === 8 ) {
-                        if (value) {
-                            old = field.old;
+                        old = field.old;
+                        if (value && old) {
                             if (field.isValid && !old.showOk) {
                                 me.hideMsg(el);
                             } else {
