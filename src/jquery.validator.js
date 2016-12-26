@@ -662,7 +662,7 @@
             // For checkbox and radio
             elem = el.name && _checkable(el) ? me.$el.find('input[name="'+ el.name +'"]').get(0) : el;
             // Get field
-            if (!(field = me.getField(elem))) {
+            if (!(field = me.getField(elem)) || !field.rule) {
                 return;
             }
             // Cache event type
