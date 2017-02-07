@@ -1,5 +1,5 @@
-/*! nice-validator 1.0.9
- * (c) 2012-2016 Jony Zhang <niceue@live.com>, MIT Licensed
+/*! nice-validator 1.0.10
+ * (c) 2012-2017 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
 ;(function(factory) {
@@ -1159,6 +1159,7 @@
                     tgt = isFunction(tgt) ? tgt.call(this, el) : this.$el.find(tgt);
                     if (tgt.length) {
                         if ( tgt.is(INPUT_SELECTOR) ) {
+                            $el = tgt
                             el = tgt.get(0);
                         } else if ( tgt.hasClass(CLS_MSG_BOX) ) {
                             $msgbox = tgt;
@@ -1177,8 +1178,6 @@
 
             // Create new message box
             if (!msgOpt.hide && !$msgbox.length) {
-                $el = this.$el.find(tgt || el);
-
                 $msgbox = $('<'+ msgOpt.wrapper + '>').attr({
                     'class': CLS_MSG_BOX + (msgOpt.cls ? ' ' + msgOpt.cls : ''),
                     'style': msgOpt.style || undefined,
@@ -1233,7 +1232,7 @@
             }
 
             msgOpt = me._getMsgOpt(msgOpt, field);
-            el = $(el).get(0);
+            el = (el.name && _checkable(el) ? me.$el.find('input[name="'+ el.name +'"]') : $(el)).get(0);
 
             // ok or tip
             if (!msgOpt.msg && msgOpt.type !== 'error') {
