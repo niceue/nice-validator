@@ -90,7 +90,7 @@ gulp.task('test', function () {
         }));
 });
 
-gulp.task('zip', ['build', 'test'], function () {
+gulp.task('zip', function () {
     var zip = require('gulp-zip');
     gulp.src([
             "dist/**",
@@ -103,7 +103,7 @@ gulp.task('zip', ['build', 'test'], function () {
 });
 
 // when release a version
-gulp.task('release', ['build', 'test'], function () {
+gulp.task('release', ['build', 'test', 'zip'], function () {
     exec('git checkout master && npm publish --registry=https://registry.npmjs.org', function(e, stdout, stderr) {
 　　　　console.log(stdout);
 　　　　console.log(stderr);
