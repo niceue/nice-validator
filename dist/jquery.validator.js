@@ -1,4 +1,4 @@
-/*! nice-validator 1.0.10
+/*! nice-validator 1.1.0
  * (c) 2012-2017 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -16,7 +16,6 @@
         CLS_NS_FORM = '.form',
         CLS_WRAPPER = 'nice-' + NS,
         CLS_MSG_BOX = 'msg-box',
-        ARIA_REQUIRED = 'aria-required',
         ARIA_INVALID = 'aria-invalid',
         DATA_RULE = 'data-rule',
         DATA_MSG = 'data-msg',
@@ -412,8 +411,10 @@
             ) {
                 key = '#' + el.id;
             }
-            // doesn't verify a field that has neither id nor name
-            if (!key) return;
+            // Generate id
+            if (!key) {
+                key = '#' + (el.id = 'N' + +new Date());
+            }
 
             field = me.getField(key, true);
             // The priority of passing parameter by DOM is higher than by JS.
@@ -428,7 +429,6 @@
                 }
                 if ( /\brequired\b/.test(field.rule) ) {
                     field.required = true;
-                    attr(el, ARIA_REQUIRED, true);
                 }
                 if (timely = attr(el, DATA_TIMELY)) {
                     field.timely = +timely;
@@ -592,9 +592,6 @@
         _resetElement: function(el, all) {
             this._setClass(el, null);
             this.hideMsg(el);
-            if (all) {
-                attr(el, ARIA_REQUIRED, null);
-            }
         },
 
         // Handle events: "focusin/click"
@@ -1156,7 +1153,7 @@
             if ( $el.is(INPUT_SELECTOR) ) {
                 tgt = msgOpt.target || attr(el, DATA_TARGET);
                 if (tgt) {
-                    tgt = isFunction(tgt) ? tgt.call(this, el) : this.$el.find(tgt);
+                    tgt = !isFunction(tgt) ? tgt.charAt(0) === '#' ? $(tgt) : this.$el.find(tgt) : tgt.call(this, el);
                     if (tgt.length) {
                         if ( tgt.is(INPUT_SELECTOR) ) {
                             $el = tgt
@@ -1170,7 +1167,7 @@
                 }
                 if (!$msgbox) {
                     datafor = (!_checkable(el) || !el.name) && el.id ? el.id : el.name;
-                    $msgbox = this.$el.find(msgOpt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
+                    $msgbox = (container || this.$el).find(msgOpt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
                 }
             } else {
                 $msgbox = $el;
@@ -1714,10 +1711,7 @@
                     }
                     else if ( me.rules[params[0]] ) {
                         if ( !val && !me.test(element, params[0]) ) {
-                            attr(element, ARIA_REQUIRED, null);
                             return null;
-                        } else {
-                            attr(element, ARIA_REQUIRED, true);
                         }
                     }
                 }
