@@ -12,7 +12,6 @@
         CLS_NS_FORM = '.form',
         CLS_WRAPPER = 'nice-' + NS,
         CLS_MSG_BOX = 'msg-box',
-        ARIA_REQUIRED = 'aria-required',
         ARIA_INVALID = 'aria-invalid',
         DATA_RULE = 'data-rule',
         DATA_MSG = 'data-msg',
@@ -424,7 +423,6 @@
                 }
                 if ( /\brequired\b/.test(field.rule) ) {
                     field.required = true;
-                    attr(el, ARIA_REQUIRED, true);
                 }
                 if (timely = attr(el, DATA_TIMELY)) {
                     field.timely = +timely;
@@ -588,9 +586,6 @@
         _resetElement: function(el, all) {
             this._setClass(el, null);
             this.hideMsg(el);
-            if (all) {
-                attr(el, ARIA_REQUIRED, null);
-            }
         },
 
         // Handle events: "focusin/click"
@@ -1710,10 +1705,7 @@
                     }
                     else if ( me.rules[params[0]] ) {
                         if ( !val && !me.test(element, params[0]) ) {
-                            attr(element, ARIA_REQUIRED, null);
                             return null;
-                        } else {
-                            attr(element, ARIA_REQUIRED, true);
                         }
                     }
                 }
