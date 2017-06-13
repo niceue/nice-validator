@@ -1152,7 +1152,7 @@
             if ( $el.is(INPUT_SELECTOR) ) {
                 tgt = msgOpt.target || attr(el, DATA_TARGET);
                 if (tgt) {
-                    tgt = isFunction(tgt) ? tgt.call(this, el) : this.$el.find(tgt);
+                    tgt = !isFunction(tgt) ? tgt.charAt(0) === '#' ? $(tgt) : this.$el.find(tgt) : tgt.call(this, el);
                     if (tgt.length) {
                         if ( tgt.is(INPUT_SELECTOR) ) {
                             $el = tgt
@@ -1166,7 +1166,7 @@
                 }
                 if (!$msgbox) {
                     datafor = (!_checkable(el) || !el.name) && el.id ? el.id : el.name;
-                    $msgbox = this.$el.find(msgOpt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
+                    $msgbox = (container || this.$el).find(msgOpt.wrapper + '.' + CLS_MSG_BOX + '[for="' + datafor + '"]');
                 }
             } else {
                 $msgbox = $el;
