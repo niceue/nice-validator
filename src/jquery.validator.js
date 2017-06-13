@@ -409,7 +409,7 @@
             }
             // Generate id
             if (!key) {
-                key = '#' + (el.id = 'N' + +new Date());
+                key = '#' + (el.id = 'N' + String(Math.random()).slice(-12));
             }
 
             field = me.getField(key, true);
