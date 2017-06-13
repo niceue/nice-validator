@@ -407,8 +407,10 @@
             ) {
                 key = '#' + el.id;
             }
-            // doesn't verify a field that has neither id nor name
-            if (!key) return;
+            // Generate id
+            if (!key) {
+                key = '#' + (el.id = 'N' + +new Date());
+            }
 
             field = me.getField(key, true);
             // The priority of passing parameter by DOM is higher than by JS.
