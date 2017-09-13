@@ -1177,12 +1177,12 @@
                     'for': datafor
                 });
 
-                if ( _checkable(el) ) {
-                    var $parent = $el.parent();
-                    $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
+                if (container) {
+                    $msgbox.appendTo(container);
                 } else {
-                    if (container) {
-                        $msgbox.appendTo(container);
+                    if ( _checkable(el) ) {
+                        var $parent = $el.parent();
+                        $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
                     } else {
                         $msgbox[!msgOpt.pos || msgOpt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
                     }
