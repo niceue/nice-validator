@@ -36,12 +36,14 @@ inline-block() {
     inline-block();
 }
 .nice-validator {
-    input, select, textarea, [contenteditable] {
-        @extend .n-inline-block
-    }
     .msg-container {
         .msg-box {display: block;}
         .msg-wrap {position:static;}
+    }
+}
+.input-group {
+    input, select, textarea, [contenteditable] {
+        @extend .n-inline-block
     }
 }
 .msg-box {
