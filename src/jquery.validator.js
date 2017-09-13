@@ -1780,7 +1780,7 @@
             }
             re = '^(?:' + re + ')$';
 
-            return new RegExp(re).test(this.value) || this.messages.integer[key];
+            return new RegExp(re).test(this.value) || (this.messages.integer && this.messages.integer[key]);
         },
 
         /**
@@ -1801,6 +1801,7 @@
             if (!params) return;
 
             var me = this,
+                isValid = true,
                 a, b,
                 key, msg, type = 'eq', parser,
                 selector2, elem2, field2;
@@ -1848,22 +1849,25 @@
                 return true;
             }
 
-            msg = me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) );
-
             switch (type) {
                 case 'lt':
-                    return (+a < +b) || msg;
+                    isValid = +a < +b; break;
                 case 'lte':
-                    return (+a <= +b) || msg;
+                    isValid = +a <= +b; break;
                 case 'gte':
-                    return (+a >= +b) || msg;
+                    isValid = +a >= +b; break;
                 case 'gt':
-                    return (+a > +b) || msg;
+                    isValid = +a > +b; break;
                 case 'neq':
-                    return (a !== b) || msg;
+                    isValid = a !== b; break;
                 default:
-                    return (a === b) || msg;
+                    isValid = a === b;
             }
+
+            return isValid || (
+                isObject(me.messages.match)
+                && me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) )
+            );
         },
 
         /**
@@ -1908,7 +1912,7 @@
             if (params) {
                 return me.getRangeMsg(count, params);
             } else {
-                return !!count || _getDataMsg(elem, me, '') || me.messages.required;
+                return !!count || _getDataMsg(elem, me, '') || me.messages.required || false;
             }
         },
 
