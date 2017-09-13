@@ -1,4 +1,4 @@
-/*! nice-validator 1.1.1
+/*! nice-validator 1.1.2
  * (c) 2012-2017 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -1181,12 +1181,12 @@
                     'for': datafor
                 });
 
-                if ( _checkable(el) ) {
-                    var $parent = $el.parent();
-                    $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
+                if (container) {
+                    $msgbox.appendTo(container);
                 } else {
-                    if (container) {
-                        $msgbox.appendTo(container);
+                    if ( _checkable(el) ) {
+                        var $parent = $el.parent();
+                        $msgbox.appendTo( $parent.is('label') ? $parent.parent() : $parent );
                     } else {
                         $msgbox[!msgOpt.pos || msgOpt.pos === 'right' ? 'insertAfter' : 'insertBefore']($el);
                     }
@@ -1784,7 +1784,7 @@
             }
             re = '^(?:' + re + ')$';
 
-            return new RegExp(re).test(this.value) || this.messages.integer[key];
+            return new RegExp(re).test(this.value) || (this.messages.integer && this.messages.integer[key]);
         },
 
         /**
@@ -1805,6 +1805,7 @@
             if (!params) return;
 
             var me = this,
+                isValid = true,
                 a, b,
                 key, msg, type = 'eq', parser,
                 selector2, elem2, field2;
@@ -1852,22 +1853,25 @@
                 return true;
             }
 
-            msg = me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) );
-
             switch (type) {
                 case 'lt':
-                    return (+a < +b) || msg;
+                    isValid = +a < +b; break;
                 case 'lte':
-                    return (+a <= +b) || msg;
+                    isValid = +a <= +b; break;
                 case 'gte':
-                    return (+a >= +b) || msg;
+                    isValid = +a >= +b; break;
                 case 'gt':
-                    return (+a > +b) || msg;
+                    isValid = +a > +b; break;
                 case 'neq':
-                    return (a !== b) || msg;
+                    isValid = a !== b; break;
                 default:
-                    return (a === b) || msg;
+                    isValid = a === b;
             }
+
+            return isValid || (
+                isObject(me.messages.match)
+                && me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) )
+            );
         },
 
         /**
@@ -1912,7 +1916,7 @@
             if (params) {
                 return me.getRangeMsg(count, params);
             } else {
-                return !!count || _getDataMsg(elem, me, '') || me.messages.required;
+                return !!count || _getDataMsg(elem, me, '') || me.messages.required || false;
             }
         },
 
