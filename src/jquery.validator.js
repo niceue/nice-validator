@@ -1281,7 +1281,7 @@
                 msgHide.call(me, $msgbox, msgOpt.type);
             } else {
                 $msgbox[0].style.display = 'none';
-                $msgbox[0].innerHTML = null;
+                $msgbox[0].innerHTML = '';
             }
         },
 
