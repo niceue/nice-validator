@@ -886,6 +886,9 @@
                     isValid = true;
                 }
             }
+            else {
+                isValid = !!ret
+            }
 
             rule = field._rules[field._i];
             if (rule.not) {
