@@ -511,7 +511,7 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                canSubmit = e.type === 'submit' && !e.isDefaultPrevented();
+                canSubmit = e.type === 'submit' && form.tagName === 'FORM' && !e.isDefaultPrevented();
 
             e.preventDefault();
 
