@@ -1,8 +1,8 @@
 .n-inline-block,
-.input-group input,
-.input-group select,
-.input-group textarea,
-.input-group [contenteditable],
+.nice-validator input,
+.nice-validator select,
+.nice-validator textarea,
+.nice-validator [contenteditable],
 .msg-wrap,
 .n-icon,
 .n-msg {

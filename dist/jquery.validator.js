@@ -1,4 +1,4 @@
-/*! nice-validator 1.1.2
+/*! nice-validator 1.1.3
  * (c) 2012-2017 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
@@ -515,7 +515,7 @@
             var me = this,
                 opt = me.options,
                 form = e.target,
-                canSubmit = e.type === 'submit' && !e.isDefaultPrevented();
+                canSubmit = e.type === 'submit' && form.tagName === 'FORM' && !e.isDefaultPrevented();
 
             e.preventDefault();
 
@@ -889,6 +889,9 @@
                     msg = ret.ok;
                     isValid = true;
                 }
+            }
+            else {
+                isValid = !!ret
             }
 
             rule = field._rules[field._i];
@@ -1285,7 +1288,7 @@
                 msgHide.call(me, $msgbox, msgOpt.type);
             } else {
                 $msgbox[0].style.display = 'none';
-                $msgbox[0].innerHTML = null;
+                $msgbox[0].innerHTML = '';
             }
         },
 
