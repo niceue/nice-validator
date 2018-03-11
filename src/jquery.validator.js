@@ -1869,7 +1869,7 @@
 
             return isValid || (
                 isObject(me.messages.match)
-                && me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) )
+                && me.messages.match[type].replace( '{1}', me._getDisplay( elem2, field2.display || key ) )
             );
         },
 
