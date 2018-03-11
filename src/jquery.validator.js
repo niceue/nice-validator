@@ -1692,6 +1692,7 @@
          *
          * @example:
             required
+            required(jqSelector)
             required(anotherRule)
             required(not, -1)
             required(from, .contact)
@@ -1953,6 +1954,8 @@
             By GET:             remote(get:path/to/server, name1, name2, ...);
             Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3, ...)
             Query String        remote(path/to/server, foo=1&bar=2, name1, name2, ...)
+            CORS                remote(cors:path/to/server)
+            JSONP               remote(jsonp:path/to/server)
          */
         remote: function(element, params) {
             if (!params) return;
