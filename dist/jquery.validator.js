@@ -1,13 +1,13 @@
-/*! nice-validator 1.1.3
- * (c) 2012-2017 Jony Zhang <niceue@live.com>, MIT Licensed
+/*! nice-validator 1.1.4
+ * (c) 2012-2018 Jony Zhang <niceue@live.com>, MIT Licensed
  * https://github.com/niceue/nice-validator
  */
 ;(function(factory) {
-    typeof module === "object" && module.exports ? module.exports = factory( require( "jquery" ) ) :
+    typeof module === 'object' && module.exports ? module.exports = factory( require( 'jquery' ) ) :
     typeof define === 'function' && define.amd ? define(['jquery'], factory) :
     factory(jQuery);
 }(function($, undefined) {
-    "use strict";
+    'use strict';
 
     var NS = 'validator',
         CLS_NS = '.' + NS,
@@ -286,7 +286,7 @@
             }
             options = me._opt = options || {};
             dataOpt = attr(element, 'data-'+ NS +'-option');
-            dataOpt = me._dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function("return " + dataOpt))() : {};
+            dataOpt = me._dataOpt = dataOpt && dataOpt.charAt(0) === '{' ? (new Function('return ' + dataOpt))() : {};
             themeOpt = me._themeOpt = themes[ options.theme || dataOpt.theme || defaults.theme ];
             opt = me.options = $.extend({}, defaults, fieldDefaults, themeOpt, me.options, options, dataOpt);
 
@@ -336,19 +336,16 @@
 
             if ( !(me.isAjaxSubmit = !!me.options.valid) ) {
                 // if there is a "valid.form" event
-                var events = ($._data || $.data)(form, "events");
+                var events = ($._data || $.data)(form, 'events');
                 me.isAjaxSubmit = issetEvent(events, 'valid', 'form') || issetEvent(events, 'submit', 'form-plugin');
             }
 
             function issetEvent(events, name, namespace) {
-                if ( events && events[name] &&
-                     $.map(events[name], function(e){
+                return !!(
+                    events && events[name]
+                    && $.map(events[name], function(e){
                         return ~e.namespace.indexOf(namespace) ? 1 : null;
-                     }).length
-                ) {
-                    return true;
-                }
-                return false;
+                    }).length )
             }
         },
 
@@ -464,9 +461,9 @@
                     var args = arguments;
                     args[4] = args[4] || args[5];
                     field._rules.push({
-                        and: args[1] === "&",
-                        not: args[2] === "!",
-                        or: args[6] === "|",
+                        and: args[1] === '&',
+                        not: args[2] === '!',
+                        or:  args[6] === '|',
                         method: args[3],
                         params: args[4] ? $.map( args[4].split(', '), trim ) : undefined
                     });
@@ -781,7 +778,7 @@
                     me.showMsg(type)
                 }
                 else if ( type === 'tip' ) {
-                    me.$el.find(INPUT_SELECTOR +"["+ DATA_TIP +"]", el).each(function(){
+                    me.$el.find(INPUT_SELECTOR +'['+ DATA_TIP +']', el).each(function(){
                         me.showMsg(this, {type: type, msg: msg});
                     });
                 }
@@ -897,7 +894,7 @@
             rule = field._rules[field._i];
             if (rule.not) {
                 msg = undefined;
-                isValid = method === "required" || !isValid;
+                isValid = method === 'required' || !isValid;
             }
             if (rule.or) {
                 if (isValid) {
@@ -1002,7 +999,7 @@
             field._r = method;
 
             if (old && !field.must && !rule.must && rule.result !== undefined &&
-                 old.ruleName === method && old.id === el.id &&
+                old.ruleName === method && old.id === el.id &&
                 field.value && old.value === field.value )
             {
                 // get result from cache
@@ -1415,7 +1412,7 @@
                 },
                 getValue: function() {
                     var elem = this.element;
-                    if (elem.type === "number" && elem.validity && elem.validity.badInput) {
+                    if (elem.type === 'number' && elem.validity && elem.validity.badInput) {
                         return 'NaN';
                     }
                     return  $(elem)[this._valHook()]();
@@ -1523,8 +1520,9 @@
         var k, that = context ? context === true ? this : context : Rules.prototype;
 
         for (k in obj) {
-            if (_checkRuleName(k))
+            if (_checkRuleName(k)) {
                 that[k] = _getRule(obj[k]);
+            }
         }
     }
 
@@ -1598,7 +1596,7 @@
     function _getDataRule(el, method) {
         var fn = trim(attr(el, DATA_RULE + '-' + method));
 
-        if ( fn && (fn = new Function("return " + fn)()) ) {
+        if ( fn && (fn = new Function('return ' + fn)()) ) {
             return _getRule(fn);
         }
     }
@@ -1641,8 +1639,8 @@
 
     // Translate field key to jQuery selector.
     function _key2selector(key) {
-        var isID = key.charAt(0) === "#";
-        key = key.replace(/([:.{(|)}/\[\]])/g, "\\$1");
+        var isID = key.charAt(0) === '#';
+        key = key.replace(/([:.{(|)}/\[\]])/g, '\\$1');
         return isID ? key : '[name="'+ key +'"]:first';
     }
 
@@ -1683,7 +1681,7 @@
     });
 
     new Messages({
-        fallback: "This field is not valid.",
+        fallback: 'This field is not valid.',
         loading: 'Validating...'
     });
 
@@ -1696,6 +1694,7 @@
          *
          * @example:
             required
+            required(jqSelector)
             required(anotherRule)
             required(not, -1)
             required(from, .contact)
@@ -1836,7 +1835,7 @@
             }
 
             // If both fields are blank
-            if (!me.required && a === "" && b === "") {
+            if (!me.required && a === '' && b === '') {
                 return null;
             }
 
@@ -1852,7 +1851,7 @@
             }
 
             // If the compared field is incorrect, we only ensure that this field is correct.
-            if (type !== "eq" && !isNaN(+a) && isNaN(+b)) {
+            if (type !== 'eq' && !isNaN(+a) && isNaN(+b)) {
                 return true;
             }
 
@@ -1873,7 +1872,7 @@
 
             return isValid || (
                 isObject(me.messages.match)
-                && me.messages.match[type].replace( '{1}', me._getDisplay( element, field2.display || key ) )
+                && me.messages.match[type].replace( '{1}', me._getDisplay( elem2, field2.display || key ) )
             );
         },
 
@@ -1957,6 +1956,8 @@
             By GET:             remote(get:path/to/server, name1, name2, ...);
             Name proxy:         remote(path/to/server, name1, proxyname2:name2, proxyname3:#id3, ...)
             Query String        remote(path/to/server, foo=1&bar=2, name1, name2, ...)
+            CORS                remote(cors:path/to/server)
+            JSONP               remote(jsonp:path/to/server)
          */
         remote: function(element, params) {
             if (!params) return;
@@ -2017,7 +2018,7 @@
          */
         filter: function(element, params) {
             var value = this.value,
-                temp = value.replace( params ? (new RegExp("[" + params[0] + "]", "gm")) : rUnsafe, '' );
+                temp = value.replace( params ? (new RegExp('[' + params[0] + ']', 'gm')) : rUnsafe, '' );
             if (temp !== value) this.setValue(temp);
         }
     });
