@@ -337,9 +337,9 @@
             }
 
             function issetEvent(events, name, namespace) {
-                return (
+                return !!(
                     events && events[name]
-                    && !!$.map(events[name], function(e){
+                    && $.map(events[name], function(e){
                         return ~e.namespace.indexOf(namespace) ? 1 : null;
                     }).length )
             }
