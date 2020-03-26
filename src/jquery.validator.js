@@ -1711,6 +1711,7 @@
                         if ( !val && !me.test(element, params[0]) ) {
                             return null;
                         }
+                        me._r = 'required'
                     }
                 }
                 else if ( params[0] === 'not' ) {
