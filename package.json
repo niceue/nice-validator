@@ -20,6 +20,10 @@
     "url": "https://github.com/niceue/nice-validator.git"
   },
   "bugs": "https://github.com/niceue/nice-validator/issues",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "scripts": {
     "test": "gulp",
     "build": "gulp build",
