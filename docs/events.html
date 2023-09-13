@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html class="page-events">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>事件 （Events） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="订阅.on(&quot;validation&quot;)描述：每次验证完一个字段，都会触发 validation 事件，通过该事件可以获取到当前验证字段的验证结果。示例：$('#form').on('valida...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/events.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>事件 （Events）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Jun 07, 2015">Jun 07, 2015</time>
+    <div class="post-content typo">
+        <h2>订阅</h2><h3>.on("validation")</h3><p><strong>描述</strong>：每次验证完一个字段，都会触发 <code>validation</code> 事件，通过该事件可以获取到当前验证字段的验证结果。<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form').on('validation', function(e, current){
+    var form = this;
+    // form 中是否所有字段都验证通过
+    console.log(form.isValid);
+    // 当前验证字段是否通过
+    console.log(current.isValid);
+
+    // 打印其他属性
+    console.log(current.element);
+    console.log(current.value);
+    console.log(current.msg);
+});</code></pre><h3>.on("valid.form")</h3><p><strong>描述</strong>：在表单验证通过后触发<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form').on('valid.form', function(e, form){
+    //do something...
+});</code></pre><h3>.on("invalid.form")</h3><p><strong>描述</strong>：在表单验证不通过后触发<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form').on('invalid.form', function(e, form, errors){
+    //do something...
+});</code></pre><h3>.on("valid.field")</h3><p><strong>描述</strong>：在字段验证通过后触发<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#username').on('valid.field', function(e, result){
+    //do something...
+});</code></pre><h3>.on("invalid.field")</h3><p><strong>描述</strong>：在字段验证不通过后触发<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#username').on('invalid.field', function(e, result){
+    //do something...
+});</code></pre><h3>.on("valid.rule")</h3><p><strong>描述</strong>：在规则验证通过后触发<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#username').on('valid.rule', function(e, ruleName){
+    if (ruleName === 'remote') {
+        //do something...
+    }
+});</code></pre><h3>.on("invalid.rule")</h3><p><strong>描述</strong>：在规则验证不通过后触发<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#username').on('invalid.rule', function(e, ruleName){
+    if (ruleName === 'remote') {
+        //do something...
+    }
+});</code></pre><h2>发布</h2><h3>.trigger("validate")</h3><p><strong>描述</strong>：触发字段执行验证<br><strong>示例</strong>：</p><pre><code class="lang-javascript">// Verify the selected field.
+$('#username').trigger(&quot;validate&quot;);
+// Verify the selected form.
+$('#form').trigger(&quot;validate&quot;);
+// Verify the selected area.
+$('#area').trigger(&quot;validate&quot;);</code></pre><h3>.trigger("showmsg", [type, message])</h3><p><strong>支持</strong>：<code>v0.8.0+</code><br><strong>描述</strong>：触发字段提示消息<br><strong>示例</strong>：</p><pre><code class="lang-javascript">// Tips ok message
+$(&quot;#username&quot;).trigger(&quot;showmsg&quot;, [&quot;ok&quot;, &quot;Great name&quot;]);
+// Tips error message
+$(&quot;#username&quot;).trigger(&quot;showmsg&quot;, [&quot;error&quot;, &quot;Name is already taken&quot;]);
+// Tips general message
+$(&quot;#username&quot;).trigger(&quot;showmsg&quot;, [&quot;tip&quot;, &quot;Others make a good name for you impressed&quot;]);
+// Tips tip message has been bound (data-tip)
+$(&quot;#username&quot;).trigger(&quot;showmsg&quot;, [&quot;tip&quot;]);
+// Tips all tip message
+$(&quot;#form&quot;).trigger(&quot;showmsg&quot;, [&quot;tip&quot;]);</code></pre><h3>.trigger("hidemsg")</h3><p><strong>支持</strong>：<code>v0.8.0+</code><br><strong>描述</strong>：触发字段隐藏消息<br><strong>示例</strong>：</p><pre><code class="lang-javascript">// Hide field message
+$(&quot;#username&quot;).trigger(&quot;hidemsg&quot;);
+// Hide all messages form the form
+$(&quot;#form&quot;).trigger(&quot;hidemsg&quot;);</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

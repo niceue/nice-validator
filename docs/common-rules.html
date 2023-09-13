@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="page-common-rules">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>常用规则整理（Common Rules） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="一些简单规则numeric: [/^[0-9]*$/, '请填写数值'],money: [/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/, &amp;quot;请填写有效的金额&amp;quo...">
+<meta name="keywords" content="rules">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/common-rules.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>常用规则整理（Common Rules）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Sep 08, 2015">Sep 08, 2015</time>
+    <div class="post-content typo">
+        <h2>一些简单规则</h2><pre><code class="lang-javascript">numeric: [/^[0-9]*$/, '请填写数值'],
+money: [/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/, &quot;请填写有效的金额&quot;],
+ip: [/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/i, '请填写有效的 IP 地址'],</code></pre><h2>相同 name 的字段至少填写一个</h2><pre><code class="lang-javascript">requiredOne: function(element) {
+    return !!this.$el.find('input[name=&quot;' + element.name + '&quot;]').filter(function() {
+        return !this.disabled &amp;&amp; this.value;
+    }).length;
+}</code></pre><h2>身份证</h2><pre><code class="lang-javascript">// 身份证
+idcard: function(element) {
+    var value = element.value,
+        isValid = true;
+    var cityCode = {11:&quot;北京&quot;,12:&quot;天津&quot;,13:&quot;河北&quot;,14:&quot;山西&quot;,15:&quot;内蒙古&quot;,21:&quot;辽宁&quot;,22:&quot;吉林&quot;,23:&quot;黑龙江 &quot;,31:&quot;上海&quot;,32:&quot;江苏&quot;,33:&quot;浙江&quot;,34:&quot;安徽&quot;,35:&quot;福建&quot;,36:&quot;江西&quot;,37:&quot;山东&quot;,41:&quot;河南&quot;,42:&quot;湖北 &quot;,43:&quot;湖南&quot;,44:&quot;广东&quot;,45:&quot;广西&quot;,46:&quot;海南&quot;,50:&quot;重庆&quot;,51:&quot;四川&quot;,52:&quot;贵州&quot;,53:&quot;云南&quot;,54:&quot;西藏 &quot;,61:&quot;陕西&quot;,62:&quot;甘肃&quot;,63:&quot;青海&quot;,64:&quot;宁夏&quot;,65:&quot;新疆&quot;,71:&quot;台湾&quot;,81:&quot;香港&quot;,82:&quot;澳门&quot;,91:&quot;国外 &quot;};
+
+    /* 15位校验规则： (dddddd yymmdd xx g)    g奇数为男，偶数为女
+     * 18位校验规则： (dddddd yyyymmdd xxx p) xxx奇数为男，偶数为女，p校验位
+
+        校验位公式：C17 = C[ MOD( ∑(Ci*Wi), 11) ]
+            i----表示号码字符从由至左包括校验码在内的位置序号
+            Wi 7 9 10 5 8 4 2 1 6 3 7 9 10 5 8 4 2 1
+            Ci 1 0 X 9 8 7 6 5 4 3 2
+     */
+    var rFormat =/^\d{6}(19|20)\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$|^\d{6}\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}$/;    // 格式验证
+
+    if ( !rFormat.test(value) || !cityCode[value.substr(0,2)] ) {
+        isValid = false;
+    }
+    // 18位身份证需要验证最后一位校验位
+    else if (value.length === 18) {
+        var Wi = [ 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2, 1 ];    // 加权因子
+        var Ci = &quot;10X98765432&quot;; // 校验字符
+        // 加权求和
+        var sum = 0;
+        for (var i = 0; i &lt; 17; i++) {
+            sum += value.charAt(i) * Wi[i];
+        }
+        // 计算校验值
+        var C17 = Ci.charAt(sum % 11);
+        // 与校验位比对
+        if ( C17 !== value.charAt(17) ) {
+            isValid =false;
+        }
+    }
+    return isValid || &quot;请填写正确的身份证号码&quot;;
+}</code></pre><h2>银行卡（借记卡、贷记卡）</h2><pre><code class="lang-javascript">bankcard: function(element) {
+    var value = element.value.replace(/\s/g, ''),
+        isValid = true,
+        rFormat = /^[\d]{12,19}$/;
+
+    if ( !rFormat.test(value) ) {
+        isValid = false;
+    } else {
+        var arr = value.split('').reverse(),
+            i = arr.length,
+            temp,
+            sum = 0;
+
+        while ( i-- ) {
+            if ( i%2 === 0 ) {
+                sum += +arr[i];
+            } else {
+                temp = +arr[i] * 2;
+                sum += temp % 10;
+                if ( temp &gt; 9 ) sum += 1;
+            }
+        }
+        if ( sum % 10 !== 0 ) {
+            isValid = false;
+        }
+    }
+    return isValid || &quot;请填写有效的银行卡号&quot;;
+}</code></pre><h2>信用卡</h2><p><strong>规则</strong>：<code>creditcard(type1, type2, ... typen)</code><br><strong>参数</strong>：卡类型（不传参则支持全部类型）<br>支持的卡类型：visa, mastercard, amex, dinersclub, enroute, discover, jcb, unknown</p><pre><code class="lang-javascript">creditcard: function(element, params) {
+    var value = element.value,
+        validTypes = 0x0000,
+        types = {
+            mastercard: 0x0001,
+            visa: 0x0002,
+            amex: 0x0004,
+            dinersclub: 0x0008,
+            enroute: 0x0010,
+            discover: 0x0020,
+            jcb: 0x0040,
+            unknown: 0x0080
+        };
+
+    if (/[^0-9\-]+/.test(value)) {
+        return false;
+    }
+    value = value.replace(/\D/g, &quot;&quot;);
+
+    if ( !params ) {
+        validTypes = 0x0001 | 0x0002 | 0x0004 | 0x0008 | 0x0010 | 0x0020 | 0x0040 | 0x0080;
+    } else {
+        for (var i=0; i&lt;parmas.length; i++) {
+            validTypes |= types[params[i]];
+        }
+    }
+
+    if (validTypes &amp; 0x0001 &amp;&amp; /^(5[12345])/.test(value)) { //mastercard
+        return value.length === 16;
+    }
+    if (validTypes &amp; 0x0002 &amp;&amp; /^(4)/.test(value)) { //visa
+        return value.length === 16;
+    }
+    if (validTypes &amp; 0x0004 &amp;&amp; /^(3[47])/.test(value)) { //amex
+        return value.length === 15;
+    }
+    if (validTypes &amp; 0x0008 &amp;&amp; /^(3(0[012345]|[68]))/.test(value)) { //dinersclub
+        return value.length === 14;
+    }
+    if (validTypes &amp; 0x0010 &amp;&amp; /^(2(014|149))/.test(value)) { //enroute
+        return value.length === 15;
+    }
+    if (validTypes &amp; 0x0020 &amp;&amp; /^(6011)/.test(value)) { //discover
+        return value.length === 16;
+    }
+    if (validTypes &amp; 0x0040 &amp;&amp; /^(3)/.test(value)) { //jcb
+        return value.length === 16;
+    }
+    if (validTypes &amp; 0x0040 &amp;&amp; /^(2131|1800)/.test(value)) { //jcb
+        return value.length === 15;
+    }
+    if (validTypes &amp; 0x0080) { //unknown
+        return true;
+    }
+    return &quot;请填写有效的信用卡号&quot;;
+}</code></pre><h2>组织机构代码证</h2><pre><code class="lang-javascript">// 组织机构代码证
+orgcode: function(element) {
+    var value = element.value,
+        isValid = true,
+        rFormat = /^[A-Z\d]{8}-[X\d]/;
+
+    if (!rFormat.test(value)) {
+        isValid = false;
+    } else {
+        var Wi = [3,7,9,10,5,8,4,2];
+        var Ci = &quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;
+        // 加权求和
+        var sum = 0;
+        for(var i = 0; i &lt; 8; i++){
+            sum += Ci.indexOf( value.charAt(i) ) * Wi[i];
+        }
+        // 计算校验值： C9 = 11 - MOD ( ∑(Ci*Wi), 11 )
+        var C9 = 11 - (sum % 11);
+        if (C9===10) C9 = 'X';
+        else if (C9===11) C9 = 0;
+        C9 = ''+C9;
+        // 与校验位比对
+        if ( C9 !== value.charAt(9)) {
+            isValid = false;
+        }
+    }
+
+    return isValid || &quot;请填写正确的组织机构代码&quot;;
+}</code></pre><h2>营业执照号 (工商注册号)</h2><pre><code class="lang-javascript">// 营业执照号
+bizcode: function(element) {
+    var value = element.value,
+        isValid = true,
+        rFormat = /^[1-6]\d{14}$/;
+
+    // 共15位：6位首次登记机关代码 + 8位顺序码 + 校验位
+    if (!rFormat.test(value)) {
+        isValid = false;
+    } else {
+        var s = [],
+            p = [10];
+
+        for (var i=0; i&lt;15; i++) {
+            s[i] = ( p[i] % 11 ) + (+value.charAt(i));
+            p[i+1] = (s[i] % 10 || 10) * 2; 
+        }
+        if (1 !== s[14] % 10) {
+            isValid = false;
+        }
+    }
+    return isValid || &quot;请填写正确的营业执照号&quot;;
+}</code></pre><h2>统一社会信用代码（三码合一）</h2><pre><code class="lang-javascript">// 统一社会信用代码
+unicode: function(element) {
+    var value = element.value.replace(/^\s*|\s*$/g, ''),
+        isValid = true,
+        rFormat = /^[1-9A-GV][1239][1-9]\d{5}[A-Z\d]{8}[X\d][Y\d]/;
+
+    if (!rFormat.test(value)) {
+        isValid = false;
+    } else {
+        var code, Wi, Ci, sum, C9, C18;
+
+        // 计算组织机构代码校验位：C9 = 11 - MOD ( ∑(Ci*Wi), 11 )
+        code = value.slice(9,17);
+        Wi = [3,7,9,10,5,8,4,2];
+        Ci = &quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;
+        // 加权求和
+        sum = 0;
+        for(var i = 0; i &lt; Wi.length; i++){
+            sum += Ci.indexOf( code.charAt(i) ) * Wi[i];
+        } 
+        C9 = 11 - (sum % 11);
+        if (C9===10) C9 = 'X';
+        else if (C9===11) C9 = 0;
+        C9 = ''+C9;
+        // 与校验位比对
+        if ( C9 !== code.charAt(9)) {
+            isValid = false;
+        }
+
+        if (isValid) {
+            // 计算最后校验位：C18 = 31 - MOD ( ∑(Ci*Wi), 31 )
+            code = value.slice(0,17);
+            Wi = [1,3,9,27,19,26,16,17,20,29,25,13,8,24,10,30,28];
+            Ci = &quot;0123456789ABCDEFGHJKLMNPQRTUWXY&quot;;
+            // 加权求和
+            sum = 0;
+            for(var i = 0; i &lt; Wi.length; i++){
+                sum += Ci.indexOf( code.charAt(i) ) * Wi[i];
+            }
+            C18 = 31 - (sum % 31);
+            if (C18===30) C18 = 'Y';
+            else if (C18===31) C18 = 0;
+            C18 = ''+C18;
+            // 与校验位比对
+            if ( C18 !== code.charAt(18)) {
+                isValid = false;
+            }
+        }
+    }
+
+    return isValid || &quot;请填写正确的统一社会信用代码&quot;;
+}</code></pre>    </div>
+    <div class="post-tags"><a href="https://validator.niceue.com/tag/rules/">rules</a></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

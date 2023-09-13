@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="page-v08-upgrade-guide">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>低版本升级到 v0.8+ 指南 - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="0.8 版本有较大的改变，简化了部分参数和方法，使用方式更加统一。  如果你在使用 nice-validator 过程中没有用到以下特性，则不会受到影响。  如果用到了部分特性，可以参考对应解决...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/v08-upgrade-guide.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>低版本升级到 v0.8+ 指南</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Sep 10, 2015">Sep 10, 2015</time>
+    <div class="post-content typo">
+        <hr><blockquote><p>0.8 版本有较大的改变，简化了部分参数和方法，使用方式更加统一。<br>  如果你在使用 nice-validator 过程中没有用到以下特性，则不会受到影响。<br>  如果用到了部分特性，可以参考对应解决办法</p></blockquote><h2>不再支持的参数</h2><h3>废弃 groups</h3><p><strong>解决</strong>：使用规则 <code>required(from, class)</code> 替代，参考<a href="http://validator.niceue.com/docs/core-rules.html">内置规则 required</a></p><h3>废弃 defaultMsg 和 loadingMsg</h3><p><strong>解决</strong>：使用 messages 配置的 fallback 和 loading 替代</p><h2>不再支持的方法</h2><h3>废弃 mspMsg</h3><p><strong>解决</strong>：直接替换为 showMsg</p><h3>废弃 setMsg</h3><p><strong>解决</strong>：<code>.attr(&quot;data-msg-xxx&quot;)</code></p><h3>废弃 setRule</h3><p><strong>解决</strong>：<code>.attr(&quot;data-rule-xxx&quot;)</code></p><h2>不再支持的 DOM 属性</h2><h3>废弃 notimely</h3><p><strong>解决</strong>：使用 DOM 属性 <code>data-timely=&quot;0&quot;</code></p><h2>不再支持的事件</h2><h3>废弃 showtip</h3><p><strong>解决</strong>：使用 <code>.trigger(&quot;showmsg&quot;, [&quot;tip&quot;])</code> 替代</p>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

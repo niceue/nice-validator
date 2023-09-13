@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="page-migrating-from-jquery-validation">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>从 jQuery Validation 迁移 - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="1. 初始化表单验证.validate VS .validatorjquery-validation:$(&amp;quot;#myform&amp;quot;).validate(options)nice-v...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/migrating-from-jquery-validation.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>从 jQuery Validation 迁移</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Jan 16, 2016">Jan 16, 2016</time>
+    <div class="post-content typo">
+        <h2>1. 初始化表单验证</h2><blockquote><p><code>.validate</code> VS <code>.validator</code></p></blockquote><p><strong>jquery-validation:</strong></p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validate(options)</code></pre><p><strong>nice-validator:</strong></p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validator(options)
+// 或者 DOM 传参，不需要初始化</code></pre><h2>2. 设置验证规则</h2><blockquote><p><code>rules</code> VS <code>fields</code></p></blockquote><p><strong>jquery-validation</strong> 使用 rules 参数设置字段规则</p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validate({
+    rules: {
+        name: &quot;required&quot;,
+        email: {
+            required: true,
+            email: true
+        },
+        contact: {
+            required: true,
+            email: {
+                depends: function(element) {
+                    return $(&quot;#contactform_email&quot;).is(&quot;:checked&quot;);
+                }
+            }
+        },
+        pay_what_you_want: {
+            required: true
+            min: {
+                param: 15,
+                depends: function(element) {
+                  return $(&quot;#bonus-material&quot;).is(&quot;:checked&quot;);
+                }
+            }
+        }
+    }
+});</code></pre><p><strong>nice-validator</strong> 使用 fields 参数设置字段规则</p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validator({
+    fields: {
+        name: &quot;required&quot;,
+        email: &quot;required; email&quot;,
+        contact: &quot;required(#contactform_email:checked); email&quot;,
+        pay_what_you_want: &quot;required(#bonus-material:checked); length(15~)&quot;
+    }
+});</code></pre><h2>3. 设置规则消息</h2><blockquote><p><code>messages[name].rule</code> VS <code>fields[name].msg</code></p></blockquote><p><strong>jquery-validation</strong> 使用 messages 配置消息</p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validate({
+    rules: {
+        name: {
+          required: true,
+          minlength: 2
+        }
+    },
+    messages: {
+        name: {
+          required: &quot;We need your email address to contact you&quot;,
+          minlength: jQuery.validator.format(&quot;At least {0} characters required!&quot;)
+        }
+    }
+});</code></pre><p><strong>nice-validator</strong> 直接在 fields 里面配置消息</p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validator({
+    fields: {
+        name: {
+            rule: &quot;required; length(2~)&quot;,
+            msg: {
+                required: &quot;We need your email address to contact you&quot;,
+                length: &quot;At least {1} characters required!&quot;
+            }
+        }
+    }
+});</code></pre><p><strong>nice-validator</strong> 也支持 messages 参数，是针对规则的通用配置</p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validator({
+    fields: {
+        name: &quot;required; length(2~)&quot;,
+        email: &quot;required; email&quot;
+    },
+    messages: {
+        required: &quot;请填写{0}&quot;
+    }
+});</code></pre><h2>4. 自定义规则</h2><blockquote><p><code>$.validator.addMethod</code> VS <code>$.validator.config</code></p></blockquote><p><strong>jquery-validation</strong></p><pre><code class="lang-javascript">// 自定义全局规则
+$.validator.addMethod( &quot;integer&quot;, function( value, element ) {
+    return this.optional( element ) || /^-?\d+$/.test( value );
+}, &quot;A positive or negative non-decimal number please&quot; );
+
+$.validator.addMethod( &quot;time&quot;, function( value, element ) {
+    return this.optional( element ) || /^([01]\d|2[0-3]|[0-9])(:[0-5]\d){1,2}$/.test( value );
+}, &quot;Please enter a valid time, between 00:00 and 23:59&quot; );
+
+// 自定义当前实例的规则 ??????</code></pre><p><strong>nice-validator</strong></p><pre><code class="lang-javascript">// 自定义全局规则
+$.validator.config({
+    rules: {
+        integer: [/^-?\d+$/, &quot;A positive or negative non-decimal number please&quot;]
+        time: [/^([01]\d|2[0-3]|[0-9])(:[0-5]\d){1,2}$/, &quot;Please enter a valid time, between 00:00 and 23:59&quot;]
+    }
+});
+
+// 自定义当前实例的规则
+$(&quot;#myform&quot;).validator({
+    rules: {
+        integer: [/^-?\d+$/, &quot;A positive or negative non-decimal number please&quot;]
+        time: [/^([01]\d|2[0-3]|[0-9])(:[0-5]\d){1,2}$/, &quot;Please enter a valid time, between 00:00 and 23:59&quot;]
+    }
+});</code></pre><h2>5. 设置参数默认值</h2><blockquote><p><code>$.validator.setDefaults</code> VS <code>$.validator.config</code></p></blockquote><p><strong>jquery-validation</strong></p><pre><code class="lang-javascript">$.validator.setDefaults({
+    debug: true
+});</code></pre><p><strong>nice-validator</strong></p><pre><code class="lang-javascript">$.validator.config({
+    debug: true
+});</code></pre><h2>6. 提示与隐藏消息</h2><p><strong>jquery-validation</strong></p><pre><code class="lang-javascript">// 提示错误消息
+var validator = $( &quot;#myshowErrors&quot; ).validate();
+validator.showErrors({
+  &quot;firstname&quot;: &quot;I know that your firstname is Pete, Pete!&quot;
+});
+// 隐藏错误消息 ??????</code></pre><p><strong>nice-validator</strong></p><pre><code class="lang-javascript">// 批量提示错误消息
+$(&quot;#myform&quot;).validator(&quot;showMsg&quot;, {
+    &quot;firstname&quot;: &quot;I know that your firstname is Pete, Pete!&quot;
+});
+// 提示字段错误消息
+$(&quot;#firstname&quot;).trigger(&quot;showmsg&quot;, [&quot;error&quot;, &quot;I know that your firstname is Pete, Pete!&quot;]);
+
+// 隐藏字段错误消息
+$(&quot;#firstname&quot;).trigger(&quot;hidemsg&quot;);
+// 隐藏表单全部消息
+$(&quot;#myform&quot;).trigger(&quot;hidemsg&quot;);</code></pre><h2>7. 检查是否验证通过</h2><p><strong>jquery-validation</strong></p><pre><code class="lang-javascript">// 检查表单
+var validator = $( &quot;#myform&quot; ).validate();
+if (validator.form()) {
+    // do something
+}
+// 检查字段
+var validator = $( &quot;#myform&quot; ).validate();
+if (validator.element( &quot;#myselect&quot; )) {
+    // do something
+}</code></pre><p><strong>nice-validator</strong></p><pre><code class="lang-javascript">// 检查表单
+if ($(&quot;#myform&quot;).isValid()) {
+    // do something
+}
+// 检查字段
+if ($(&quot;#myselect&quot;).isValid()) {
+    // do something
+}</code></pre><h2>8. 验证完毕的回调</h2><p><strong>jquery-validation</strong></p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validate({
+    submitHandler: function(form) {
+        $(form).ajaxSubmit();
+    },
+    invalidHandler: function(event, validator) {
+        // do something
+    }
+});</code></pre><p><strong>nice-validator</strong></p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validator({
+    valid: function(form) {
+        $(form).ajaxSubmit();
+    },
+    invalid: function(form, errors) {
+        // do something
+    }
+});</code></pre><h2>9. 销毁表单验证</h2><p><strong>jquery-validation</strong></p><pre><code class="lang-javascript">var validator = $(&quot;#myform&quot;).validate();
+validator.resetForm();</code></pre><p><strong>nice-validator</strong></p><pre><code class="lang-javascript">$(&quot;#myform&quot;).validator(&quot;destroy&quot;);</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

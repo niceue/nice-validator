@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="page-dom-bindings">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>DOM 绑定（DOM Bindings） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="针对表单的绑定示例：在 form 上绑定 data-validator-option 来配置参数&amp;lt;form data-validator-option='{stopOnError:fals...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/dom-bindings.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>DOM 绑定（DOM Bindings）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Jun 03, 2015">Jun 03, 2015</time>
+    <div class="post-content typo">
+        <h2>针对表单的绑定</h2><p><strong>示例</strong>：在 form 上绑定 <code>data-validator-option</code> 来配置参数</p><pre><code class="lang-html">&lt;form data-validator-option='{stopOnError:false, timely:2, theme:&quot;yellow_right&quot;}'&gt;
+    ......
+&lt;/form&gt;</code></pre><p><strong>示例</strong>：在 form 上绑定 <code>novalidate</code>，使其不要自动初始化</p><pre><code class="lang-html">&lt;form novalidate&gt;
+    ......
+&lt;/form&gt;</code></pre><h2>针对表单元素的绑定</h2><h3>配置在字段元素上</h3><ul><li><code>data-rule</code> - 给字段配置规则</li><li><code>data-rule-*</code> - 给字段自定义规则</li><li><code>data-msg</code> - 字段验证不通过时的提示</li><li><code>data-msg-*</code> - 字段具体规则验证不通过时的提示</li><li><code>data-tip</code> - 字段填写帮助</li><li><code>data-ok</code> - 字段验证通过时的提示</li><li><code>data-target</code> - 配置提示消息的显示位置</li><li><code>data-timely</code> - 配置验证的实时性 (<code>v0.8.0+</code>)</li><li><code>data-must</code> - 是否强制验证 (<code>v0.8.0+</code>)</li><li><code>novalidate</code> - 如果配置则停止验证该字段</li></ul><p><strong>示例</strong>：</p><pre><code class="lang-html">&lt;input type=&quot;password&quot; name=&quot;pwd&quot; 
+    data-rule=&quot;required; password&quot;
+    data-rule-password=&quot;[/^\d{6}$/, '请填写6位数字']&quot;
+    data-msg-required=&quot;请填写密码&quot;
+    data-tip=&quot;密码由6位数字组成&quot;
+    data-ok=&quot;别担心，稍后您还可以更改&quot;
+    data-target=&quot;#msg_holder&quot;
+&gt;
+&lt;span class=&quot;msg-box&quot; id=&quot;msg_holder&quot;&gt;&lt;/span&gt;</code></pre><h3>配置在 submit 按钮</h3><ul><li><code>formnovalidate</code> - 点击配置了该属性后的按钮不会验证表单 (<code>v0.8.0+</code>)</li></ul><p><strong>示例</strong>：</p><pre><code class="lang-html">&lt;form&gt;
+    &lt;!-- some fields --&gt;
+    ........
+    &lt;button type=&quot;submit&quot; formnovalidate&gt;提交&lt;/button&gt;
+&lt;/form&gt;</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

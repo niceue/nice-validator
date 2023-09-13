@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html class="page-discuss">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>讨论 - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="遇到问题？您可以：查看 常见问题QQ群①：329733532 已满；&amp;nbsp;QQ群②：333513550 在下面提问到 Github 提交 issue">
+    <link rel="stylesheet" href="static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="index.html" class="clearfix"><img src="static/picture/N.png"></a>
+        <a href="index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="docs/index.html" class="">文档</a><a href="examples/index.html" class="">示例</a><a href="download/index.html" class="">下载</a><a href="" class="active">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/discuss.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="sponsor.html"><i class="icon-shang"></i>
+            <img src="static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title"><i class="icon-speech-bubble"></i> 讨论</h1>
+<article class="post article">
+    <div class="post-content typo">
+        <h4>遇到问题？您可以：</h4><ol><li>查看 <a href="docs/faq.html">常见问题</a></li><li>QQ群①：<del>329733532</del> <strong>已满</strong>；&nbsp;QQ群②：333513550 <a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=979b22804355333e47f1aeef73cd0ac5a2493fadaba080abe145eb18f370e28a"><img border="0" src="static/picture/group.png" alt="333513550" title="333513550"></a></li><li>在下面提问</li><li>到 Github 提交 <a href="https://github.com/niceue/nice-validator/issues/new">issue</a></li></ol>    </div>
+</article>
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+var gitalk = new Gitalk({
+  clientID: 'd36c06258d084affc480',
+  clientSecret: 'aa536e909af981790f7197b848b239b18f47307d',
+  repo: 'nice-validator',
+  owner: 'niceue',
+  admin: ['niceue'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+});
+gitalk.render('gitalk-container');
+</script>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="static/js/prism.js"></script>
+<script src="static/js/script.js"></script>
+</body>
+</html>

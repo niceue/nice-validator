@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="page-custom-rules">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>自定义规则 （Custom Rules） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="规则定义方式(1). 正则适用于使用单个正则能搞定的验证// 使用数组包裹正则和错误消息，规则不通过时提示该消息mobile: [/^1[3458]\d{9}$/, '请检查手机号格式']// ...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/custom-rules.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>自定义规则 （Custom Rules）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Sep 06, 2015">Sep 06, 2015</time>
+    <div class="post-content typo">
+        <h2>规则定义方式</h2><h3>(1). 正则</h3><p>适用于使用单个正则能搞定的验证</p><pre><code class="lang-javascript">// 使用数组包裹正则和错误消息，规则不通过时提示该消息
+mobile: [/^1[3458]\d{9}$/, '请检查手机号格式']
+// 或者，直接定义正则，需要另外定义错误消息，否则提示默认消息
+mobile: /^1[3458]\d{9}$/</code></pre><h3>(2). 函数</h3><p>函数方式具有最大的灵活性，搞定任何验证。不同返回值，导致不同验证结果：</p><table>
+<tr>
+    <th>返回值</th>
+    <th width="58">结果</th>
+    <th>描述</th>
+</tr>
+<tr>
+    <td>return undefined（无返回）</td>
+    <td></td>
+    <td>不影响验证结果不提示消息（继续验证下一个规则）</td>
+</tr>
+<tr>
+    <td>return null</td>
+    <td></td>
+    <td>忽略本次验证（跳过该字段的验证，如果已经显示了消息将会自动隐藏）</td>
+</tr>
+<tr>
+    <td>return true</td>
+    <td><span class="green">√通过</span></td>
+    <td></td>
+</tr>
+<tr>
+    <td>return false</td>
+    <td><span class="red">×不通过</span></td>
+    <td></td>
+</tr>
+<tr>
+    <td>return ""</td>
+    <td><span class="green">√通过</span></td>
+    <td></td>
+</tr>
+<tr>
+    <td>return "错误消息"</td>
+    <td><span class="red">×不通过</span></td>
+    <td>提示“错误消息”</td>
+</tr>
+<tr>
+    <td>return {"ok": "正确"}</td>
+    <td><span class="green">√通过</span></td>
+    <td>提示“正确”</td>
+</tr>
+<tr>
+    <td>return {"error": "错误消息"}</td>
+    <td><span class="red">×不通过</span></td>
+    <td>提示“错误消息”</td>
+</tr>
+<tr>
+    <td>return $.ajax()</td>
+    <td></td>
+    <td>ajax验证，等待服务器返回验证结果</td>
+</tr>
+</table><p>例1：自定义规则，如果通过返回true，否则返回错误消息</p><pre><code class="lang-javascript">mobile: function(element, params) {
+    return /^1[3458]\d{9}$/.test(element.value) || '请检查手机号格式';
+}</code></pre><p>例2：使用内置的 <code>.test()</code> 方法检测是否符合某个规则</p><pre><code class="lang-javascript">loginName: function(element) {
+    return /^[a-zA-Z]\w{3,}/.test(element.value) ||
+        this.test(element, &quot;mobile&quot;)===true ||
+        this.test(element, &quot;email&quot;)===true ||
+        '请填写用户名、手机号或者邮箱';
+}</code></pre><p>例3：自定义 ajax 验证</p><pre><code class="lang-javascript">// 你只需要将 $.ajax 返回，并且保证 response 符合上面的返回值说明，其他的插件都会自动处理。
+// 当然，你也可以加上 success 回调做点别的，或者自己加上自定义 header
+myRemote: function(element){
+    return $.ajax({
+        url: 'check/username.php',
+        type: 'post',
+        data: element.name +'='+ element.value,
+        dataType: 'json'
+    });
+}</code></pre><p>例4：无返回值，对验证结果没有影响</p><pre><code class="lang-javascript">passwordStrength: function() {
+    // 密码强度验证 和 UI处理
+}</code></pre><p>例5：动态跳过当前字段的验证</p><pre><code class="lang-javascript">myRule: function() {
+    if (foo) {
+        return &quot;Error Message&quot;
+    }
+    // 跳过验证（当前规则之后的所有规则都不被验证）
+    else (bar) {
+        return null
+    }
+}</code></pre><h2>规则作用范围</h2><h3>(1). 全局</h3><p>使用 <code>$.validator.config()</code>，建议配置在 local 配置文件（如：zh-CN.js）中<br>任何实例，任何字段都能访问到该规则</p><pre><code class="lang-javascript">$.validator.config(
+    rules: {
+        mobile: [/^1[3-9]\d{9}$/, &quot;请填写有效的手机号&quot;],
+        chinese: [/^[\u0391-\uFFE5]+$/, &quot;请填写中文字符&quot;]
+    }
+);</code></pre><h3>(2). 当前实例</h3><p>在调用初始化验证的时候传参，只对调用时的实例有效</p><pre><code class="lang-javascript">$(&quot;#myForm&quot;).validator(
+    rules: {
+        mobile: [/^1[3-9]\d{9}$/, &quot;请填写有效的手机号&quot;],
+        chinese: [/^[\u0391-\uFFE5]+$/, &quot;请填写中文字符&quot;]
+    }
+);</code></pre><h3>(3). 当前字段</h3><p>只能通过 DOM 方式在表单元素上定义</p><pre><code class="lang-html">&lt;input name=&quot;demo&quot; data-rule=&quot;required;xxx&quot; data-rule-xxx=&quot;[/^\d{6}$/, '请输入6位数字']&quot;&gt;</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

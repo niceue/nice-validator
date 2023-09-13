@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html class="page-custom-themes">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>自定义主题 （Custom Themes） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="主题特性简单，js 配置 className，css 定义主题样式独立，不同表单可以应用不同主题自由，除了主题参数，其他参数也都可以配置到主题中灵活，主题配置本质上是在传参，优先级高于全局配置，...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/custom-themes.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>自定义主题 （Custom Themes）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Sep 07, 2015">Sep 07, 2015</time>
+    <div class="post-content typo">
+        <h2>主题特性</h2><ol><li><strong>简单</strong>，js 配置 className，css 定义主题样式</li><li><strong>独立</strong>，不同表单可以应用不同主题</li><li><strong>自由</strong>，除了主题参数，其他参数也都可以配置到主题中</li><li><strong>灵活</strong>，主题配置本质上是在传参，优先级高于全局配置，但是又会被调用时的传参覆盖</li></ol><h2>配置主题</h2><h3>(1). 调用 <code>$.validator.setTheme()</code> 接口</h3><pre><code class="lang-javascript">$.validator.setTheme(&quot;themeName&quot;, {
+    formClass: &quot;nice-flat&quot;,
+    msgClass: &quot;n-right&quot;
+});</code></pre><p>其中的 <code>formClass</code> 参数定义了 CSS 的名称空间，表单初始化后自动添加到 form 上面。<code>msgClass</code> 参数定义了每条消息拥有的 CSS 类。虽然这两个参数没有要求，但是建议 <code>msgClass</code> 按照以下 4 个类名命名：</p><ol><li><code>n-top</code>：使消息显示在输入框上边</li><li><code>n-right</code>：使消息显示在输入框右边</li><li><code>n-bottom</code>：使消息显示在输入框下边</li><li><code>n-left</code>：使消息显示在输入框左边</li></ol><p>nice-validator 对 <code>msgClass</code> 有一个方向的检测机制，包含 <code>top|right|bottom|left</code> 的名称可以控制消息插入的位置。</p><h3>(2). 配置更多参数</h3><blockquote><ol><li>每个主题可以配置所有参数，互不干扰</li><li>配置优先级：<code>data-validator-option</code> &gt; <code>options</code> &gt; <code>theme options</code> &gt; <code>global options</code></li></ol></blockquote><h2>编写主题样式</h2><p>主题 CSS 样式可以写在 jquery.validator.css 文件中，也可以定义在你的其他样式表中。</p><p>官方的主题样式使用 <a href="http://stylus-lang.com/">stylus</a> 工具开发，所有主题配置文件放置在 src/themes 目录，然后通过src/jquery.validator.styl 文件导入，编译该文件就得到 dist 目录下的 jquery.validator.css 文件。  </p><p>以下是 simple 系列主题代码：</p><pre><code class="lang-javascript">// local/zh-Cn.js 中的配置
+$.validator.setTheme({
+    'simple_right': {
+        formClass: 'n-simple',
+        msgClass: 'n-right'
+    },
+    'simple_bottom': {
+        formClass: 'n-simple',
+        msgClass: 'n-bottom'
+    }
+});</code></pre><pre><code class="lang-css">/* src/themes/simple.styl */
+.n-simple {
+    .msg-wrap {
+        position: absolute;
+        z-index: 1;
+        .n-icon {
+            background-image: url(images/validator_simple.png);
+        }
+    }
+    .n-top {
+        .msg-wrap {
+            bottom: 100%;
+        }
+    }
+    .n-bottom {
+        .msg-wrap {
+            top: 100%;
+        }
+    }
+    .n-left, .n-right {
+        margin-top: 5px;
+    }
+    .n-bottom .msg-wrap {
+        margin-top: 3px;
+    }
+    .n-tip {
+        .n-icon {display:none;}
+    }
+}</code></pre><h2>自定义消息结构</h2><p>参见 <a href="options.html#section-2-9">msgMaker</a> 参数</p>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

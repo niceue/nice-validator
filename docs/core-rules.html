@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="page-core-rules">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>内置规则 （Core Rules） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="required - 必填适用于 input、textarea、select 输入框。（checkbox 与 radio 请使用 checked 规则）字段必填，则值不能为空。字段非必填，则值为...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/core-rules.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>内置规则 （Core Rules）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Sep 05, 2015">Sep 05, 2015</time>
+    <div class="post-content typo">
+        <h2>required - 必填</h2><blockquote><p>适用于 input、textarea、select 输入框。（checkbox 与 radio 请使用 <a href="#section-2">checked</a> 规则）<br>字段必填，则值不能为空。字段非必填，则值为空的时候直接验证通过<br>nice-validator 扩展了选择器 <code>:filled</code>，选择填写了的字段</p></blockquote><table><thead><tr><th>规则</th><th>描述</th><th>示例</th></tr></thead><tbody><tr><td><code>required</code></td><td>字段必填</td><td>required</td></tr><tr><td><code>required(ruleName)</code></td><td>满足规则 ruleName 则字段必填</td><td>required(isCompany)</td></tr><tr><td><code>required(jqSelector)</code></td><td>满足 jqSelector 则字段必填 (<code>v0.8.0+</code>)</td><td>required(#id:filled)、required(#id:checked)、required(#id:enabled)</td></tr><tr><td><code>required(from, class, count)</code></td><td>在一组字段中至少填写一个或多个 (<code>v0.8.0+</code>)</td><td>required(from, .contact)</td></tr><tr><td><code>required(not, value)</code></td><td>字段必填，但是排除值为 value 的情况</td><td>required(not, -1)</td></tr></tbody></table><p><strong>示例</strong>：字段必填</p><pre><code class="lang-html">&lt;input type=&quot;text&quot; name=&quot;username&quot; data-rule=&quot;required&quot;&gt;
+&lt;select name=&quot;gender&quot; data-rule=&quot;required&quot;&gt;
+    &lt;option value=&quot;&quot;&gt;select ...&lt;/option&gt;
+    &lt;option value=&quot;1&quot;&gt;Male&lt;/option&gt;
+    &lt;option value=&quot;2&quot;&gt;Female&lt;/option&gt;
+    &lt;option value=&quot;3&quot;&gt;Other&lt;/option&gt;
+&lt;/select&gt;
+&lt;textarea name=&quot;content&quot; data-rule=&quot;required&quot;&gt;&lt;/textarea&gt;</code></pre><p><strong>示例</strong>：只有在 A 字段填写过后，B 字段才必填</p><pre><code class="lang-javascript">$('#form1').validator({
+    fields: {
+        A: 'required',
+        B: 'required(#A:filled)'
+    }
+});</code></pre><p><strong>示例</strong>：如果满足 jQuery 选择器 "#isCompany:checked"，则字段必填</p><pre><code class="lang-javascript">$('#form1').validator({
+    fields: {
+        companyName: 'required(#isCompany:checked)'
+    }
+});</code></pre><p><strong>示例</strong>：如果满足规则 "isCompany"，则字段必填</p><pre><code class="lang-html">&lt;form id=&quot;form1&quot;&gt;
+    &lt;input type=&quot;checkbox&quot; name=&quot;isCompany&quot; id=&quot;isCompany&quot;&gt;
+    &lt;input type=&quot;text&quot; name=&quot;companyName&quot;&gt;
+&lt;/form&gt;</code></pre><pre><code class="lang-javascript">$('#form1').validator({
+    rules: {
+        isCompany: function() {
+            return $('#isCompany').prop('checked');
+        }
+    },
+    fields: {
+        companyName: 'required(isCompany)'
+    }
+});</code></pre><p><strong>示例</strong>：className 为 contact 的字段至少填写一个</p><pre><code class="lang-html">&lt;input class=&quot;contact&quot; name=&quot;mobile&quot; placeholder=&quot;手机号&quot;
+    data-rule=&quot;required(from, .contact); mobile&quot;
+    data-msg-required=&quot;请至少填写一种联系方式&quot;&gt;
+
+&lt;input class=&quot;contact&quot; name=&quot;tel&quot; placeholder=&quot;电话&quot;
+    data-rule=&quot;required(from, .contact); tel&quot;&gt;
+
+&lt;input class=&quot;contact&quot; name=&quot;email&quot; placeholder=&quot;邮箱&quot;
+    data-rule=&quot;required(from, .contact); email&quot;&gt;</code></pre><h2>checked - 必选</h2><blockquote><p>注意：checkbox 和 radio 类型的输入框请使用 checked 规则（而不是 required）</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>checked</code></td><td>必选</td></tr><tr><td><code>checked(n)</code></td><td>必选 n 项</td></tr><tr><td><code>checked(n~)</code></td><td>至少选择 n 项</td></tr><tr><td><code>checked(~n)</code></td><td>最多选择 n 项</td></tr><tr><td><code>checked(n1~n2)</code></td><td>选择 n1 到 n2 项</td></tr></tbody></table><p><strong>示例</strong>：至少选择一项</p><pre><code class="lang-html">&lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;1&quot; data-rule=&quot;checked&quot;&gt;男&lt;/label&gt;
+&lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;2&quot;&gt;女&lt;/label&gt;
+&lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;0&quot;&gt;保密&lt;/label&gt;</code></pre><h2>match - 两个字段匹配和比较</h2><blockquote><p>match 可以用于比较两个字段值是否相同，或是否不同，或大小关系，也可以用于比较日期或者时间</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>match(name)</code></td><td>当前字段值必须和 name 字段的值匹配</td></tr><tr><td><code>match(eq, name)</code></td><td>同上</td></tr><tr><td><code>match(neq, name)</code></td><td>当前字段值必须和 name 字段值不同</td></tr><tr><td><code>match(lt, name)</code></td><td>当前字段值必须小于 name 字段值</td></tr><tr><td><code>match(gt, name)</code></td><td>当前字段值必须大于 name 字段值</td></tr><tr><td><code>match(lte, name)</code></td><td>当前字段值必须小于等于 name 字段值</td></tr><tr><td><code>match(gte, name)</code></td><td>当前字段值必须大于等于 name 字段值</td></tr><tr><td><code>match(gte, name, date)</code></td><td>当前日期值必须大于等于 name 字段日期值</td></tr><tr><td><code>match(gte, name, datetime)</code></td><td>当前时间值必须大于等于 name 字段时间值</td></tr></tbody></table><p><strong>示例</strong>：确认密码要与密码一致</p><pre><code class="lang-html">&lt;label&gt;密码：&lt;/label&gt;
+&lt;input name=&quot;pwd&quot; data-rule=&quot;密码: required;password;&quot;&gt;
+&lt;label&gt;确认密码：&lt;/label&gt;
+&lt;input name=&quot;confirmPwd&quot; data-rule=&quot;确认密码: match(pwd);&quot;&gt;</code></pre><p><strong>示例</strong>：结束日期必须大于开始日期</p><pre><code class="lang-html">&lt;label&gt;开始日期：&lt;/label&gt;
+&lt;input name=&quot;startDate&quot; data-rule=&quot;开始日期: required;date;&quot;&gt;
+&lt;label&gt;结束日期：&lt;/label&gt;
+&lt;input name=&quot;endDate&quot; data-rule=&quot;结束日期: required;date;match(gt, startDate, date)&quot;&gt;</code></pre><h2>remote - 远程验证</h2><blockquote><p>服务端验证并返回结果，URL 为必传参数，默认 POST 请求</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>remote(URL)</code></td><td>请求服务端验证</td></tr><tr><td><code>remote(get:URL)</code></td><td>使用 GET 方式请求服务端验证</td></tr><tr><td><code>remote(URL, name1, #id2 ...)</code></td><td>传递额外动态参数</td></tr><tr><td><code>remote(URL, foo=value1&amp;bar=value2, name3 ...)</code></td><td>传递额外固定参数 (<code>v0.8.0+</code>)</td></tr><tr><td><code>remote(URL, foo:name1, bar:#id2, name3 ...)</code></td><td>代理参数名称（实际服务器接收的参数为 foo 和 bar）</td></tr><tr><td><code>remote(jsonpURL)</code></td><td>跨域地址自动采用 JSONP 请求方式</td></tr><tr><td><code>remote(jsonp:URL)</code></td><td>强制 JSONP 请求方式</td></tr><tr><td><code>remote(cors:post:URL)</code></td><td>强制 CORS + POST 请求方式(<code>v0.10.8+</code>)</td></tr></tbody></table><p><strong>示例</strong>：跨域请求</p><pre><code class="lang-javascript">// 强制 jsonp 请求
+&quot;remote(jsonp:/user/checkName)&quot;
+// 强制 CORS, 请求类型为 POST （0.10.8+）
+&quot;remote(cors:post:/user/checkName)&quot;</code></pre><h3>服务端返回结果格式</h3><ol><li><p>直接返回字符串结果</p><pre><code class="lang-javascript">// 为空代表通过
+&quot;&quot;
+// 不为空则代表错误
+&quot;名字已被占用&quot;</code></pre></li><li><p>返回 <a href="https://zh.wikipedia.org/wiki/JSON">JSON</a> 格式</p><pre><code class="lang-javascript">// 验证通过
+{&quot;ok&quot;: &quot;名字很棒&quot;}
+// 验证不通过
+{&quot;error&quot;: &quot;名字已被占用&quot;}
+
+// 结果在第二级 data
+{&quot;status&quot;: 200, &quot;data&quot;: {&quot;error&quot;: &quot;名字已被占用&quot;}}</code></pre></li></ol><h3>前端转换服务端返回的结果格式</h3><p><strong>示例</strong>：如果服务端返回格式无法更改，可以用 <a href="options.html#section-1-18">dataFilter</a> 参数转换</p><pre><code class="lang-javascript">/* 假设服务端返回结果为： {&quot;status&quot;:600, &quot;msg&quot;:&quot;名字已被占用&quot;}
+ */
+$('#form1').validator({
+    dataFilter: function(data) {
+        if (data.status === 200) return &quot;&quot;;
+        else return data.msg;
+    },
+    fields: {
+        name: &quot;required; length(4~12); remote(/user/check/name)&quot;
+    }
+});</code></pre><h2>integer - 整数</h2><blockquote><p>整数或者整数范围</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>integer</code></td><td>整数</td></tr><tr><td><code>integer(+)</code></td><td>正整数</td></tr><tr><td><code>integer(+0)</code></td><td>正整数和零</td></tr><tr><td><code>integer(-)</code></td><td>负整数</td></tr><tr><td><code>integer(-0)</code></td><td>负整数和零</td></tr></tbody></table><h2>range - 数值范围</h2><blockquote><p>注意：只验证范围，不验证是整数或者浮点数</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>range(n~)</code></td><td>请填写不小于 n 的数</td></tr><tr><td><code>range(~n)</code></td><td>请填写不大于 n 的数</td></tr><tr><td><code>range(n1~n2)</code></td><td>请填写 n1 到 n2 的数</td></tr><tr><td><code>range(n1~n2, false)</code></td><td>请填写 n1 到 n2 的数（不包含边界值）(<code>v0.9.0+</code>)</td></tr></tbody></table><p><strong>示例</strong>：输入 0 ~ 100 的整数</p><pre><code class="lang-html">&lt;input name=&quot;score&quot; data-rule=&quot;required; integer[+0]; range[~100]&quot;&gt;</code></pre><h2>length - 字符长度</h2><blockquote><p>如果传第二个参数 “true”，则全角字符（汉子）计算为两个字符</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>length(n)</code></td><td>请填写 n 个字符</td></tr><tr><td><code>length(n~)</code></td><td>请至少填写 n 个字符</td></tr><tr><td><code>length(~n)</code></td><td>请最多填写 n 个字符</td></tr><tr><td><code>length(n1~n2)</code></td><td>请填写 n1 到 n2 个字符</td></tr><tr><td><code>length(n~, true)</code></td><td>请至少填写 n 个字符（全角字符计算双字符）</td></tr></tbody></table><p><strong>示例</strong>：</p><pre><code class="lang-html">&lt;!-- 密码为 6 到 16 位 --&gt;
+&lt;input type=&quot;password&quot; name=&quot;pwd&quot; data-rule=&quot;required;length(6~16)&quot;&gt;
+&lt;!-- 内容不超过 140 个字符 --&gt;
+&lt;textarea name=&quot;content&quot; data-rule=&quot;length(~140)&quot;&gt;&lt;/textarea&gt;</code></pre><h2>filter - 过滤字符</h2><blockquote><p>注意：只过滤字符，不验证</p></blockquote><table><thead><tr><th>规则</th><th>描述</th></tr></thead><tbody><tr><td><code>filter</code></td><td>过滤 &lt;&gt;`"' 和字符实体编码的字符</td></tr><tr><td><code>filter(RegExp)</code></td><td>自定义过滤正则</td></tr></tbody></table><p><strong>示例</strong>：</p><pre><code class="lang-javascript">// 过滤非数字字符
+&quot;filter(\D)&quot;
+// 过滤非中文
+&quot;filter(^\u0391-\uFFE5)&quot;</code></pre><h2><del>validate - 执行验证另一个字段</del></h2><blockquote><p><code>v0.8.0+</code> & <code>1.0-</code><br>注意：用于在当前字段验证的时候触发其他字段验证，对当前字段不起作用</p></blockquote><p><strong>示例</strong>：字段 B 验证通过后，触发验证字段 A</p><pre><code class="lang-html">&lt;input type=&quot;text&quot; name=&quot;A&quot; data-rule=&quot;required;&quot;&gt;
+&lt;input type=&quot;text&quot; name=&quot;B&quot; data-rule=&quot;required; validate(A)&quot;&gt;</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="page-methods">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>方法 （Methods） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="$.fn （插件方法）.validator().validator( options )描述：根据参数初始化验证，验证 jQuery 选中的表单参数：{Object} options - 可选，...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/methods.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>方法 （Methods）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Jun 06, 2015">Jun 06, 2015</time>
+    <div class="post-content typo">
+        <h2>$.fn （插件方法）</h2><h3>.validator()</h3><h4>.validator( options )</h4><p><strong>描述</strong>：根据参数初始化验证，验证 jQuery 选中的表单<br><strong>参数</strong>：<em>{Object}</em> options - 可选，参考<a href="options.html">配置选项</a><br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form1').validator({
+    timely: 2,
+    stopOnError: true,
+    fields: {
+        email: &quot;required;email&quot;,
+        password: &quot;required;length(6~16)&quot;,
+        mobile: &quot;required;mobile&quot;
+    },
+    valid: function(form) {
+        $.post(&quot;path/to/server&quot;, $(form).serialize())
+            .done(function(){
+                // some code
+            });
+    }
+});</code></pre><h4>.validator( validCallback )</h4><p><strong>描述</strong>：初始化验证，验证 jQuery 选中的表单，验证通过后执行回调<br><strong>参数</strong>：<em>{Function}</em> validCallback - 表单验证通过的回调<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form1').validator(validCallback);
+// 等同于
+$('#form1').validator({
+    valid: validCallback
+});</code></pre><h4>.validator( instanceMethod, arg1, arg2... )</h4><p><strong>描述</strong>：通过<code>.validator()</code> 方法调用实例方法<br><strong>参数</strong>：<em>{String}</em> instanceMethod - 实例方法名称<br><strong>参数</strong>：<em>{Arguments}</em> argn - 调用实例方法时的参数<br><strong>示例</strong>：</p><pre><code class="lang-javascript">// 清空表单验证消息
+$('#form1').validator(&quot;cleanUp&quot;);
+// 销毁表单验证
+$('#form1').validator(&quot;destroy&quot;);</code></pre><h3>.isValid( callback )</h3><p><strong>描述</strong>：判断某个区域或者某个字段是否验证通过，如果字段中有异步 ajax 验证，需要通过 callback 获取验证结果<br><strong>参数</strong>： <em>{Function}</em> callback - 回调函数<br><strong>示例</strong>：</p><pre><code class="lang-javascript">// 使用回调函数获取验证结果
+$('#mobile').isValid(function(v){
+    if (v) {
+        // do something
+    }
+});
+// v0.10.5+ 还支持下面这种写法，即回调不带参数，就是验证通过的回调
+$('#mobile').isValid(function(){
+    // do something
+});
+// 如果验证的字段中没有 ajax 异步验证，直接获取结果也是可以的
+if ( $('#mobile').isValid() ) {
+    // do something
+} </code></pre><h2>$.validator （静态方法）</h2><h3>$.validator(selector, options)</h3><p><strong>描述</strong>：初始化表单。如果 <code>selector</code> 选择的元素存在于 DOM，其等同于 <code>$(selector).validator(options)</code> 这种写法。如果不存在，nice-validator 会 <span class="red">预初始化</span> 该选择器选中的表单，等到该表单存在时就可以直接被验证。</p><p><strong>参数</strong>：<em>{jqSelector|Element}</em> selector - jQuery 选择器（支持预初始化），或者 DOM Element<br><strong>参数</strong>：<em>{Object}</em> options - 参考<a href="options.html">配置选项</a><br><strong>示例</strong>：</p><pre><code class="lang-javascript">// 即使 &quot;#form1&quot; 这个表单被动态加载，也可以验证
+$.validator(&quot;#form1&quot;, {
+    timely: 2,
+    stopOnError: true,
+    fields: {
+        email: &quot;required;email&quot;,
+        password: &quot;required;length(6~16)&quot;,
+        mobile: &quot;required;mobile&quot;
+    }
+});</code></pre><h3>.config(options)</h3><p><strong>描述</strong>：配置全局选项<br><strong>参数</strong>：<em>{Object}</em> options - 参考<a href="options.html">配置选项</a><br><strong>示例</strong>：</p><pre><code class="lang-javascript">$.validator.config({
+    timely: 2
+});</code></pre><h3>.setTheme(name, options)</h3><p><strong>描述</strong>：配置全局主题<br><strong>参数</strong>：<em>{String}</em> name - 主题名称<br><strong>参数</strong>：<em>{Object}</em> options - 参考<a href="options.html">配置选项</a><br><strong>示例</strong>：</p><pre><code class="lang-javascript">$.validator.setTheme(&quot;myTheme&quot;, {
+    formClass: &quot;nice-flat&quot;,
+    msgClass: &quot;n-right&quot;,
+    timely: 2,
+    stopOnError: true
+});</code></pre><h2>instance （实例方法）</h2><blockquote><p>实例方法需要获取对象实例，才能调用。<br>  验证初始化的时候会自动初始实例，通过 <code>$form.data('validator')</code> 可以获取到实例</p></blockquote><h3>.test(elem, rule)</h3><p><strong>描述</strong>：验证字段是否符合指定的规则<br><strong>参数</strong>：<em>{Element}</em> elem - DOM 元素<br><strong>参数</strong>：<em>{String}</em> rule - 规则<br><strong>返回</strong>：<em>{Boolean}</em><br><strong>示例</strong>：</p><pre><code class="lang-javascript">$(&quot;#myForm&quot;).validator({
+    rules: {
+        loginName: function(element) {
+            return /^[a-zA-Z]\w{3,}/.test(element.value)
+                   || this.test(element, &quot;mobile&quot;)
+                   || this.test(element, &quot;email&quot;)
+                   || 'Please fill user name, phone number or E-mail';
+        }
+    },
+    fields: {
+        username: &quot;required; loginName&quot;,
+        password: &quot;required; length(6~16)&quot;
+    }
+});</code></pre><h3>.setField()</h3><h4>.setField(key, field)</h4><p><strong>描述</strong>：动态配置字段参数<br><strong>参数</strong>：<em>{String}</em> key - 字段 name 或者 #id<br><strong>参数</strong>：<em>{Object}</em> field - 字段参数<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('form').validator(&quot;setField&quot;, &quot;username&quot;, &quot;required;&quot;);
+// Remove the field's verification.
+$('form').validator(&quot;setField&quot;, &quot;username&quot;, null);</code></pre><h4>.setField(obj)</h4><p><strong>描述</strong>：动态配置字段参数<br><strong>参数</strong>：<em>{Object}</em> obj - 字段参数 Hash<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('form').validator(&quot;setField&quot;, {
+    username: &quot;required;username&quot;,
+    pwd: &quot;required;password&quot;
+});</code></pre><h3>.showMsg(elem, obj)</h3><p><strong>描述</strong>：使字段提示消息（不推荐），推荐使用<a href="events.html#section-2-2">.trigger("showmsg")</a><br><strong>参数</strong>：<em>{Element | jqSelector}</em> elem - DOM 元素或者 jQuery 选择器<br><strong>参数</strong>：<em>{Object}</em> obj - 参数<br><strong>示例</strong>：</p><pre><code class="lang-javascript">// 单个字段提示消息
+$('form').validator('showMsg', '#mobile', {
+    type: &quot;error&quot;,
+    msg: &quot;Phone number already exists.&quot;
+});
+// 映射消息到多个字段
+$('form').validator('showMsg', {
+    mobile: {
+        type: &quot;error&quot;,
+        msg: &quot;Phone number already exists.&quot;
+    },
+    email: {
+        type: &quot;error&quot;,
+        msg: &quot;Email already exists.&quot;
+    }
+});</code></pre><h3>.hideMsg(elem)</h3><p><strong>描述</strong>：使字段隐藏消息（不推荐），推荐使用<a href="#section-3-4">.trigger("hidemsg")</a><br><strong>参数</strong>：<em>{Element|jqSelector}</em> elem - DOM 元素或者 jQuery 选择器<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form1').validator('hideMsg', '#mobile');
+// or
+$('#form1').data('validator').hideMsg('#mobile');</code></pre><h3>.holdSubmit(hold)</h3><p><strong>描述</strong>：防止表单重复提交的措施<br><strong>参数</strong>：{Boolean} hold - 是否控制表单提交<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$(&quot;#myForm&quot;).validator({
+    valid: function(form){
+        var me = this;
+        // Before submitting the form, hold form, to prevent duplicate submission.
+        me.holdSubmit();
+        $.ajax({
+            url: &quot;xxx.php&quot;,
+            data: $(form).serialize(),
+            type: &quot;POST&quot;,
+            success: function(){
+                // After the form is submitted successfully, release hold.
+                me.holdSubmit(false);
+            }
+        });
+    }
+});</code></pre><h3>.cleanUp()</h3><p><strong>描述</strong>：清除表单中的全部验证消息<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form1').validator('cleanUp');</code></pre><h3>.destroy()</h3><p><strong>描述</strong>：销毁表单验证实例<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form1').validator('destroy');</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

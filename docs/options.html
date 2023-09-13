@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="page-options">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>选项 （Options） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="核心参数debug - 调试类型：Number默认：0可用值：0：关闭调试信息1：开启调试信息（查看浏览器控制台）2：开启调试，无视验证结果直接触发验证通过事件timely - 实时验证类型：N...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/options.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>选项 （Options）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Jun 04, 2015">Jun 04, 2015</time>
+    <div class="post-content typo">
+        <h2>核心参数</h2><h3>debug - 调试</h3><p><strong>类型</strong>：<code>Number</code><br><strong>默认</strong>：<code>0</code><br><strong>可用值</strong>：</p><ul><li><code>0</code>：关闭调试信息</li><li><code>1</code>：开启调试信息（查看浏览器控制台）</li><li><code>2</code>：开启调试，无视验证结果直接触发验证通过事件</li></ul><h3>timely - 实时验证</h3><p><strong>类型</strong>：<code>Number</code><br><strong>默认</strong>：<code>1</code><br><strong>可用值</strong>：</p><ul><li><code>0</code>：关闭实时验证，只在提交表单的时候执行验证</li><li><code>1</code>：输入框失去焦点（focusout）时执行验证</li><li><code>2</code>：输入框改变值（input）时执行验证</li><li><code>3</code>：输入框失去焦点和改变值（综合 1 + 2） (<code>v0.8.0+</code>)</li><li><code>8</code>：同 2，并且详细提示每个规则的结果 (<code>v0.9.0+</code>)</li><li><code>9</code>：同 3，并且详细提示每个规则的结果 (<code>v0.9.0+</code>)</li><li>大于 100 的数值：验证延迟时间</li></ul><h3>theme - 主题</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>&quot;default&quot;</code><br>主题名称，每个表单验证实例可以设置不同的主题。参考<a href="custom-themes.html">自定义主题</a>，以及 zh-CN.js 的主题配置</p><h3>stopOnError - 在第一次错误时停止验证</h3><p><strong>类型</strong>：<code>Boolean</code><br><strong>默认</strong>：<code>false</code></p><h3>focusInvalid - 第一个错误字段自动获得焦点</h3><p><strong>类型</strong>：<code>Boolean</code><br><strong>默认</strong>：<code>true</code></p><h3>focusCleanup - 输入框获得焦点时清除验证消息</h3><p><strong>类型</strong>：<code>Boolean</code><br><strong>默认</strong>：<code>false</code></p><h3>ignoreBlank - 不验证空值的字段（只针对实时验证）</h3><p><strong>支持</strong>：<code>v0.8.0+</code><br><strong>类型</strong>：<code>Boolean</code><br><strong>默认</strong>：<code>false</code></p><h3>ignore - 忽略验证 jQuery 选择器选中的字段</h3><p><strong>类型</strong>：<code>jqSelector</code><br><strong>默认</strong>：<code>&quot;&quot;</code><br><strong>示例</strong>：</p><pre><code class="lang-javascript">//任何不可见的元素，都不作验证
+$('form').validator({
+    ignore: ':hidden'
+});
+//id为tab2下的所有子元素都不作验证
+$('form').validator({
+    ignore: '#tab2'
+});
+//动态改变要忽略验证的元素
+$('form').data('validator').options.ignore = '#tab1';</code></pre><h3>display - 自定义消息中<code>{0}</code>的替换字符</h3><p><strong>类型</strong>：<code>Function(elem)</code><br><strong>默认</strong>：<code>null</code><br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('form').validator({
+    display: function(elem){
+        return $(elem).closest('.form-item').children('label:eq(0)').text();
+    }
+});</code></pre><h3>target - 自定义消息的显示位置</h3><p><strong>类型</strong>：<code>Function(elem) | jqSelector</code><br><strong>默认</strong>：<code>null</code><br><strong>描述</strong>：验证当前字段，但是实际上在 target 的元素上提示错误消息。<br>1、如果目标元素是输入框（input，textarea、select），将会以目标元素为基准点，插入一条消息；<br>2、如果目标元素是<b>消息占位</b>（class="msg-box"），这和直接使用消息占位没有区别；<br>3、其他情况下，直接显示在target指向的<b>消息容器</b>中。</p><p>消息容器与消息占位的区别：消息占位只能包含一条消息，消息容器可以容纳很多消息。</p><p><strong>示例</strong>：</p><pre><code class="lang-javascript">$('form').validator({
+    // 自己指定消息容器位置
+    target: function(elem){
+        var $formitem = $(elem).closest('.form-item'),
+            $msgbox = $formitem.find('span.msg-box');
+        if (!$msgbox.length) {
+            $msgbox = $('&lt;span class=&quot;msg-box&quot;&gt;&lt;/span&gt;').appendTo($formitem);
+        }
+        return $msgbox;
+    }
+});
+
+$('form').validator({
+    // 将所有消息全部提示在 id 为 myContainer 里面
+    target: &quot;#myContainer&quot;
+});</code></pre><h3>valid - 表单验证通过时调用此函数</h3><p><strong>类型</strong>：<code>Function(form)</code><br><strong>默认</strong>：<code>null</code>  <br><strong>描述</strong>：表单验证成功后的回调。也可以使用 <a href="events.html#section-1-2">valid.form</a> 事件<br><strong>示例</strong>：ajax 提交表单</p><pre><code class="lang-javascript">$('#form1').validator({
+    fields: {
+        username: &quot;required; email|mobile; remote(/check/username)&quot;,
+        password: &quot;required; length(6~16)&quot;,
+        passwordAgain: &quot;match(password)&quot;
+    },
+    valid: function(form){
+        // 表单验证通过，提交表单
+        $.post(&quot;path/to/server&quot;, $(form).serialize())
+            .done(function(d){
+                // some code
+            });
+    }
+});</code></pre><h3>invalid - 表单验证不通过时调用此函数</h3><p><strong>类型</strong>：<code>Function(form, errors)</code><br><strong>默认</strong>：<code>null</code>  <br><strong>描述</strong>：表单验证失败后的回调。也可以使用 <a href="events.html#section-1-3">invalid.form</a> 事件<br><strong>示例</strong>：摇晃提交按钮（需要 <a href="http://daneden.github.io/animate.css/">animate.css</a> 支持）</p><pre><code class="lang-javascript">$('#form1').validator({
+    invalid: function(form, errors){
+        var CLS_ANIMATE = 'shake animated';
+        $('#submitBtn').addClass(CLS_ANIMATE)
+            .one('animationend webkitAnimationEnd mozAnimationEnd', function(){
+                $(this).removeClass(CLS_ANIMATE);
+            });
+    }
+});</code></pre><h3>validation - 验证每个字段后调用此函数</h3><p><strong>类型</strong>：<code>Function(form)</code><br><strong>默认</strong>：<code>null</code>  <br><strong>描述</strong>：验证完每个字段时的回调。也可以使用 <a href="events.html#section-1-1">validation</a> 事件<br><strong>示例</strong>：只有在全部字段都验证通过时，提交按钮才可用</p><pre><code class="lang-javascript">$('#form1').validator({
+    validation: function(element, result){
+        $(&quot;#submitBtn&quot;).prop('disabled', !element.form.isValid)
+    }
+});</code></pre><h3>rules - 自定义规则</h3><p><strong>类型</strong>：<code>Object</code><br><strong>默认</strong>：<code>null</code><br><strong>示例</strong>：自定义用于当前实例的规则，支持两种定义方式</p><pre><code class="lang-javascript">$('form').validator({
+    rules: {
+        // 自定义验证函数，具有最大的灵活性
+        myRule: function(el, param, field){
+            //do something...
+        },
+        // 简单配置正则及错误消息
+        another: [/^\w*$/, 'Please enter the letters or underscore.']
+    },
+    fields: {
+        //调用前面定义的两个规则
+        foo: 'required; myRule[param]; another'
+    }
+});</code></pre><h3>messages - 自定义消息</h3><p><strong>类型</strong>：<code>Object</code><br><strong>默认</strong>：<code>null</code><br><strong>描述</strong>：自定义用于当前实例的规则消息。当有多个字段使用同一个规则，而这个规则没有消息或需要覆盖它的消息，则使用 messages 统一配置比较方便。消息中可以包含<code>{0}</code>模板变量，会自动替换成 display 的值<br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('form').validator({
+    messages: {
+        required: &quot;Please fill in this field&quot;,
+        email: &quot;Please enter a valid email address.&quot;,
+    },
+    fields: {
+        'email': 'required;email;'
+    }
+});</code></pre><h3>fields - 配置字段规则及参数</h3><p><strong>类型</strong>：<code>Object</code> - 待验证的字段集合，键为字段的 name 值或者 #id<br><strong>默认</strong>：<code>null</code><br><strong>参数</strong>：</p><ul><li>fields[key].<code>rule</code><br>字段规则，多个规则用分号 “;” 分隔，支持使用圆括号 “( )” 或者方括号 “[ ]” 传参</li><li>fields[key].<code>msg</code><br>自定义字段中每个规则的错误消息</li><li>fields[key].<code>tip</code><br>自定义获得焦点时的友好提示信息</li><li>fields[key].<code>ok</code><br>自定义字段验证成功后显示的消息</li><li>fields[key].<code>valid</code><br>字段验证通过的回调</li><li>fields[key].<code>invalid</code><br>字段验证失败的回调</li><li>fields[key].<code>timely</code><br>是否启用实时验证，默认继承</li><li>fields[key].<code>target</code><br>验证当前字段，但是实际上在 target 的元素上提示错误消息，<br>如果目标元素是输入框（input，textarea、select），将会以目标元素为基准点，插入一条消息；<br>如果目标元素是消息占位（className 为 msg-box），这和直接使用消息占位没有区别<br>其他情况下，直接显示在target指向的容器中</li><li>fields[key].<code>dataFilter</code><br>使用 dataFilter 回调可以转换 ajax 返回的结果为 nice-validator 支持的格式</li><li>fields[key].<code>must</code><br>是否强制验证该字段</li><li>fields[key].<code>msgWrapper</code><br>自定义该字段的消息容器的标签名</li><li>fields[key].<code>msgMaker</code><br>自定义该字段的消息生成器</li><li>fields[key].<code>msgClass</code><br>自定义该字段的消息Class</li><li>fields[key].<code>msgStyle</code><br>自定义该字段的消息 CSS 样式</li><li>fields[key].<code>getValue</code>  （<code>v1.0.0+</code>）<br>自定义 value 的 getter</li><li>fields[key].<code>setValue</code>  （<code>v1.0.0+</code>）<br>自定义 value 的 setter</li></ul><p><strong>示例</strong>：快捷传参和对象传参</p><pre><code class="lang-javascript">fields: {
+    //name 字段使用对象传参
+    name: {
+        rule: &quot;姓名: required; rule2; rule3&quot;,
+        msg: {
+            required: &quot;请填写姓名&quot;,
+            rule2: &quot;xxxx&quot;,
+            rule3: &quot;xxxx&quot;
+        },
+        tip: &quot;填写真实姓名有助于朋友找到你&quot;,
+        ok: &quot;&quot;,
+        timely: false,
+        target: &quot;#msg_holder&quot;
+    },
+    //email 和 mobile 字段使用快捷传参
+    email: &quot;required; email&quot;,
+    mobile: &quot;mobile&quot;
+}</code></pre><h3>beforeSubmit - 在提交表单之前调用此函数</h3><p><strong>类型</strong>：<code>Function(form)</code><br><strong>默认</strong>：<code>null</code></p><p>一次 submit 事件触发的流程：</p><ol><li>接收 form 的 submit 事件；</li><li>执行 beforeSubmit 回调，如果 beforeSubmit 返回值为 false，将取消本次验证与提交；</li><li>验证整个表单；</li><li>根据表单验证结果决定执行 valid 回调还是 invalid 回调</li></ol><h3>dataFilter - 转换ajax返回数据为插件支持的格式</h3><p><strong>类型</strong>：<code>Function(data)</code><br><strong>默认</strong>：<code>null</code><br><strong>示例</strong>：如果服务端返回格式无法更改，可以用 <a href="#section-1-18">dataFilter</a> 参数转换</p><pre><code class="lang-javascript">/* 假设服务端返回结果为： {&quot;status&quot;:600, &quot;msg&quot;:&quot;名字已被占用&quot;}
+ */
+$('#form1').validator({
+    dataFilter: function(data) {
+        if (data.status === 200) return &quot;&quot;;
+        else return data.msg;
+    },
+    fields: {
+        name: &quot;required; length(4~12); remote(/user/check/name)&quot;
+    }
+});</code></pre><hr><h2>主题相关参数</h2><h3>showOk - 是否显示成功提示</h3><p><strong>类型</strong>：<code>Boolean|String</code><br><strong>默认</strong>：<code>true</code></p><p>是否显示成功提示（注意：前提是有传ok的消息），如果设置成false在字段验证通过后将只是简单的隐藏消息。<br>还有另一种用法：如果传递一个字符串，在验证通过后将提示这个消息，如果设置成空字符串，将只显示一个成功的图标</p><pre><code class="lang-javascript">//字段验证通过后提示“正确”
+$('form').validator({
+    showOk: &quot;正确&quot;
+});
+//对于simple_right主题，验证通过后默认不会提示，只是单纯的隐藏错误消息
+//加上 showOk: &quot;&quot; 这个配置后，将显示一个通过的图标
+$('form').validator({
+    theme: &quot;simple_right&quot;,
+    showOk: &quot;&quot;
+});</code></pre><h3>validClass - 给验证通过的输入框添加的class名</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>n-valid</code></p><h3>invalidClass - 给验证不通过的输入框添加的class名</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>n-invalid</code></p><h3>bindClassTo - 设置 validClass 和 invalidClass 添加到的位置</h3><p><strong>支持</strong>：<code>v0.9.0+</code><br><strong>类型</strong>：<code>jqSelector</code><br><strong>默认</strong>：<code>:verifiable</code><br><strong>示例</strong>：适配 <a href="http://v3.bootcss.com/css/#forms-control-validation">Bootstrap</a> 样式</p><pre><code class="lang-html">&lt;form id=&quot;form1&quot;&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label for=&quot;email&quot;&gt;Email address&lt;/label&gt;
+        &lt;input type=&quot;email&quot; name=&quot;email&quot; id=&quot;email&quot; class=&quot;form-control&quot; placeholder=&quot;Email&quot;&gt;
+    &lt;/div&gt;
+&lt;/form&gt;</code></pre><pre><code class="lang-javascript">$('#form1').validator({
+    validClass: &quot;has-succes&quot;,
+    invalidClass: &quot;has-error&quot;,
+    bindClassTo: &quot;.form-group&quot;,
+    fields: {
+        email: &quot;required; email&quot;
+    }
+});</code></pre><h3>formClass - 主题的 class 名称，添加在 form 上</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>n-default</code></p><h3>msgClass - 字段消息的 class 名称，添加在消息容器上</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>n-right</code><br><strong>示例</strong>：</p><pre><code class="lang-javascript">msgClass: &quot;n-top&quot;     //消息将自动显示在输入框上边
+msgClass: &quot;n-right&quot;   //消息将自动显示在输入框右边
+msgClass: &quot;n-bottom&quot;  //消息将自动显示在输入框下边
+msgClass: &quot;n-left&quot;    //消息将自动显示在输入框左边
+msgClass: &quot;n-right myclass&quot;    //消息将自动显示在输入框右边，你还可以通过myclass来定义更多样式</code></pre><h3>msgStyle - 自定义 CSS 样式，添加在消息容器上</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>&quot;&quot;</code><br><strong>示例</strong>：</p><pre><code class="lang-javascript">// 有时候主题定义的消息样式的位置没有达到预期，就可以通过 msgStyle 参数传递 css 来精确控制消息位置
+$('form').validator({
+    theme: &quot;simple_right&quot;,
+    msgStyle: &quot;margin-left:-10px; margin-top:10px;&quot;,
+    fields: {
+        'email': 'required;email;'
+    }
+});</code></pre><h3>msgWrapper - 消息容器的 tagName</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>span</code></p><h3>msgMaker - 自定义消息 HTML 结构</h3><p><strong>类型</strong>：<code>Function(obj)</code> | <code>Boolean</code><br><strong>默认</strong>：<code>null</code><br><strong>说明</strong>：msgMaker 生成的消息 HTML 会插入到对应的 msgWrapper 中，如果不想生成消息，可以设置<code>msgMaker:false</code><br><strong>示例</strong>：</p><pre><code class="lang-javascript">$('#form').validator({
+    fields: {
+        'user[name]': 'required;username'
+        ,'user[pwd]': 'required;password'
+    },
+    msgWrapper: 'div',
+    msgMaker: function(opt){
+        return '&lt;span class=&quot;'+ opt.type +'&quot;&gt;' + opt.msg + '&lt;/span&gt;';
+    }
+});</code></pre><p>以上 msgMaker 配置，将生成如下消息结构</p><pre><code class="lang-html">&lt;div class=&quot;msg-box n-right&quot; for=&quot;user[name]&quot;&gt;
+    &lt;span class=&quot;n-error&quot;&gt;Please fill this field.&lt;/span&gt;
+&lt;/div&gt;</code></pre><h3>msgIcon - 自定义消息图标的 HTML 模板</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>&quot;&lt;span class=&quot;n-icon&quot;&gt;&lt;/span&gt;&quot;</code></p><h3>msgArrow- 自定义消息箭头的 HTML 模板</h3><p><strong>类型</strong>：<code>String</code><br><strong>默认</strong>：<code>&quot;&quot;</code></p><h3>msgShow - 消息提示之前调用此函数</h3><p><strong>类型</strong>：<code>Function($msgbox, type)</code><br><strong>默认</strong>：<code>null</code></p><h3>msgHide - 消息隐藏之前调用此函数</h3><p><strong>类型</strong>：<code>Function($msgbox, type)</code><br><strong>默认</strong>：<code>null</code></p>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>

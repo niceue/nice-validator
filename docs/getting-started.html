@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="page-getting-started">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>快速上手 （Getting Started） - nice validator</title>
+    <meta name="author" content="Jony Zhang">
+    <meta name="description" content="1. 加载插件nice-validator 依赖 [jQuery]1。除了直接引用插件，还支持 AMD 模块系统。(1)、直接引用一行代码引入插件，local 参数用来加载对应的配置文件。如果不...">
+    <link rel="stylesheet" href="../static/css/style.css">
+<!--[if lt IE 9]>
+    <script src="//cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/es5.shim/4.5.9/es5-shim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<header class="header">
+    <h1 class="site-name tac">
+        <a href="../index.html" class="clearfix"><img src="../static/picture/N.png"></a>
+        <a href="../index.html" class="hidden-tb">nice validator</a>
+    </h1>
+    <form class="site-search hidden-tb" id="search" method="post" action="./">
+        <input type="text" name="s" class="text" placeholder="Search">
+        <button type="submit" class="icon icon-search"></button>
+    </form>
+    <div class="site-description hidden-tb"></div>
+    <nav class="site-menu clearfix">
+<a href="index.html" class="active">文档</a><a href="../examples/index.html" class="">示例</a><a href="../download/index.html" class="">下载</a><a href="../discuss.html" class="">讨论</a>
+    </nav>
+    <div class="about-links hidden-tb">
+        <a title="Fork Me on Github" href="https://github.com/niceue/nice-validator" target="_blank"><i class="icon-github-circle"></i></a>
+        <!-- <a href="mailto:zj86@live.cn"><i class="icon-email-circle"></i></a> -->
+        <!-- <a href="https://validator.niceue.com/feed/atom/docs/getting-started.html" target="_blank"><i class="icon-feed-circle"></i></a> -->
+        <a title="进QQ群交流" href="//shang.qq.com/wpa/qunwpa?idkey=01dd82d0aad8630f07c6cd9bbf9c31a0a3f91ee98299b198c7293746b6cc1e1a" target="_blank"><i class="icon-qq-circle"></i></a>
+        <a title="打赏作者" class="sponsor" href="../sponsor.html"><i class="icon-shang"></i>
+            <img src="../static/picture/pay.png">
+        </a>
+    </div>
+</header><!-- end .sidebar -->
+
+<div class="main clearfix" id="main">
+
+<h1 class="archive-title fadeInUp animated">
+    <i class="icon-paper"></i> <span>快速上手 （Getting Started）</span>
+</h1>
+
+<article class="post article">
+    <time class="fr gray fs14" datetime="Jun 02, 2015">Jun 02, 2015</time>
+    <div class="post-content typo">
+        <h2>1. 加载插件</h2><blockquote><p>nice-validator 依赖 [jQuery]<a href="1.7+">1</a>。除了直接引用插件，还支持 AMD 模块系统。</p></blockquote><h3>(1)、直接引用</h3><p>一行代码引入插件，local 参数用来加载对应的配置文件。如果不传 local 参数，配置以及样式就需要自行引入</p><pre><code class="lang-html">&lt;script src=&quot;path/to/nice-validator/jquery.validator.js?local=zh-CN&quot;&gt;&lt;/script&gt;</code></pre><h3>(2)、通过 <a href="http://requirejs.org/">RequireJS</a> 模块系统</h3><pre><code class="lang-js">requirejs.config({
+    paths: {
+        jquery: 'http://cdn.jsdelivr.net/jquery/1.12.3/jquery.min',
+        validator: 'path/to/nice-validator/local/zh-CN'
+    },
+    shim: {
+        validator: ['path/to/nice-validator/jquery.validator.js?css']
+    }
+});
+require(['jquery', 'validator'], function($){
+    $('#form1').validator();
+});</code></pre><h2>2. 了解规则</h2><h3>(1)、定义规则语句</h3><p><code>&quot;display: rule1; rule2(p1, p2); ...rulen(n1~n2)&quot;</code></p><blockquote><ol><li>前面的 display: 是可选的，用于替换错误消息中的{0}，一般为显示的字段名。</li><li>多个规则由分号（;）分开，末尾分号可省略，不限制规则数量，按规则先后顺序执行验证</li><li>未定义的规则自动忽略，对验证不产生影响</li></ol></blockquote><h4>规则语句中的符号：</h4><ul><li>分号 <code>;</code>  - 分隔多个规则，也代表<b>逻辑与</b></li><li>冒号 <code>:</code>  - 分隔 display（字段显示名）与规则语句</li><li>括号 <code>()</code> - 规则传参使用，也可以使用方括号（[ ]）</li><li>逗号 <code>, </code> - 分隔规则的参数，<b class="red">注意：逗号后需加空格</b></li><li>波浪 <code>~</code>  - 定义范围值使用</li><li>俺的 <code>&amp;</code>  - <b>逻辑与</b>，用在某个规则前面，与;（分号）效果差不多</li><li>叹号 <code>!</code>  - <b>逻辑非</b>，用在某个规则前面，对规则取反</li><li>竖线 <code>|</code>  - <b>逻辑或</b>，用在多个规则之间，多个规则满足之一则通过</li></ul><p><strong>示例</strong>：</p><pre><code class="lang-javascript">// 单个规则
+&quot;required&quot;
+
+// 多个规则
+&quot;required; email; remote(/server/check/email)&quot;
+
+// 范围参数
+&quot;range(1~100)&quot;
+
+// 规则有多个参数
+&quot;match(neq, oldPassword)&quot;
+
+// 定义显示替换名称
+&quot;邮箱: required; email&quot;
+
+// 逻辑或
+&quot;required; mobile|email; remote(/server/check/user)&quot;
+
+// 逻辑非
+&quot;required; !digits&quot;</code></pre><h3>(2)、配置规则</h3><p><strong>示例</strong>：DOM 配置规则，使用 data-rule</p><pre><code class="lang-html">&lt;input name=&quot;email&quot; data-rule=&quot;required;email;remote(/path/to/server)&quot;&gt;</code></pre><p><strong>示例</strong>：JS 配置规则，使用 <a href="options.html#section-1-16">fields</a> 参数</p><pre><code class="lang-javascript">$(&quot;#form&quot;).validator({
+    fields: {
+        email: &quot;required;email;remote(/path/to/server)&quot;
+    }
+});</code></pre><h3>(3)、内置规则</h3><p>插件内置 8 个规则：</p><ul><li><a href="core-rules.html#section-1">required  - 使字段必填</a></li><li><a href="core-rules.html#section-2">checked   - 必选，还可以控制选择项目的数量</a></li><li><a href="core-rules.html#section-3">match   - 当前字段与另一个字段比较</a></li><li><a href="core-rules.html#section-4">remote   - 获取服务器端验证的结果</a></li><li><a href="core-rules.html#section-5">integer   - 只能填写整数</a></li><li><a href="core-rules.html#section-6">range   - 只能填写指定范围的数</a></li><li><a href="core-rules.html#section-7">length   - 字段值必须符合指定长度</a></li><li><a href="core-rules.html#section-8">filter   - 过滤当前字段的值，不做验证</a></li></ul><p>自定义规则如果与内置规则同名，则自定义规则优先<br>详情参考<a href="core-rules.html">内置规则</a></p><h3>(4)、自定义规则</h3><p>详情参考<a href="custom-themes.html">自定义规则</a></p><p><strong>示例</strong>：在 <code>local/zh-CN.js</code> 中配置全局规则（<strong>全局生效</strong>）</p><pre><code class="lang-js">$.validator.config({
+    rules: {
+        mobile: [/^1[3-9]\d{9}$/, &quot;请填写有效的手机号&quot;],
+        chinese: [/^[\u0391-\uFFE5]+$/, &quot;请填写中文字符&quot;]
+    }
+});</code></pre><p><strong>示例</strong>：通过 DOM 方式自定义规则（<strong>只对当前字段有效</strong>）</p><pre><code class="lang-html">&lt;input name=&quot;demo&quot; data-rule=&quot;required; xxx&quot; data-rule-xxx=&quot;[/^\d{6}$/, '请输入6位数字']&quot;&gt;</code></pre><p><strong>示例</strong>：通过 <a href="options.html#section-1-14">rules</a> 配置规则（<strong>当前表单实例有效</strong>）</p><pre><code class="lang-js">$('#form1').validator({
+    rules: {
+        // 使用正则表达式定义规则
+        mobile: [/^1[3-9]\d{9}$/, &quot;请填写有效的手机号&quot;],
+        // 使用函数定义规则
+        xxx: function(elem, param) {
+            return /^1[3458]\d{9}$/.test($(elem).val()) || '请检查手机号格式'; 
+        }
+    },
+    fields: {
+        // 对字段 username 应用规则 mobile
+        'username': 'required;mobile'
+    }
+});</code></pre><h2>3. 初始化验证</h2><h4>(1)、DOM 绑定规则，无需 JS 代码</h4><pre><code class="lang-html">&lt;form id=&quot;form1&quot; action=&quot;register.php&quot;&gt;
+    &lt;label&gt;Email&lt;/label&gt;
+    &lt;input type=&quot;email&quot; name=&quot;email&quot; data-rule=&quot;required;email&quot;&gt;
+    &lt;label&gt;Password&lt;/label&gt;
+    &lt;input type=&quot;password&quot; name=&quot;pwd&quot; data-rule=&quot;required;length(6~16)&quot;&gt;
+&lt;/form&gt;</code></pre><p>参考<a href="dom-bindings.html">DOM 绑定</a></p><h4>(2)、JS 配置规则，无侵入 DOM</h4><pre><code class="lang-html">&lt;form id=&quot;form1&quot; action=&quot;register.php&quot;&gt;
+    &lt;label&gt;Email&lt;/label&gt;
+    &lt;input type=&quot;email&quot; name=&quot;email&quot;&gt;
+    &lt;label&gt;Password&lt;/label&gt;
+    &lt;input type=&quot;password&quot; name=&quot;pwd&quot;&gt;
+&lt;/form&gt;</code></pre><pre><code class="lang-js">// 初始化验证
+$('#form1').validator({
+    fields: {
+        'email': 'required;email',
+        'pwd': 'required;length(6~16)'
+    }
+});</code></pre><p>调用插件方法 <a href="methods.html#section-1-1">.validator()</a>，并使用 <a href="options.html#section-1-16">fileds</a> 参数</p><p>当然，DOM 和 JS 两种方式也支持同时使用，你也可以通过 DOM 绑定规则，然后使用 js 初始化。</p><h2>4. 提交表单</h2><blockquote><ol><li>nice-validator 一旦初始化就会阻止表单被提交，直到表单规则全部验证通过。</li><li>如果传递了<code>valid</code>参数回调或者<code>valid.form</code>事件，表单即使验证通过也不会被提交，而是由<code>valid</code>参数和<code>valid.form</code>事件接管。然后你需要自己决定如何提交表单。</li></ol></blockquote><h4>方式一：点击提交按钮，表单验证通过后自动原生方式提交</h4><pre><code class="lang-html">&lt;form id=&quot;form1&quot; action=&quot;register.php&quot;&gt;
+    &lt;label&gt;Email&lt;/label&gt;
+    &lt;input type=&quot;email&quot; name=&quot;email&quot; data-rule=&quot;required;email&quot;&gt;
+    &lt;label&gt;Password&lt;/label&gt;
+    &lt;input type=&quot;password&quot; name=&quot;pwd&quot; data-rule=&quot;required;length(6~16)&quot;&gt;
+    &lt;button type=&quot;submit&quot;&gt;提交&lt;/button&gt;
+&lt;/form&gt;</code></pre><h4>方式二：使用验证通过回调（参考：<a href="options.html#section-1-11">valid</a>）</h4><pre><code class="lang-js">$('#form1').validator({
+    valid: function(form) {
+        // do something
+        // use native submit.
+        form.submit();
+    }
+});</code></pre><h4>示例三：绑定表单验证通过的事件（参考：<a href="events.html#section-1-2">valid.form事件</a>）</h4><pre><code class="lang-js">$('#form1').on('valid.form', function(e){
+    // You can do something, then submit form by native
+    // this.submit();
+    // or use ajax submit
+    $.post(&quot;path/to/server&quot;, $(this).serialize())
+        .done(function(d){
+            // some code
+        });
+});</code></pre>    </div>
+    <div class="post-tags"></div>
+</article>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+<script src="../static/js/prism.js"></script>
+<script src="../static/js/script.js"></script>
+</body>
+</html>
